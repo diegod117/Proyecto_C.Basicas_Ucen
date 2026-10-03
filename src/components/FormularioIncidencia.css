@@ -1,0 +1,116 @@
+/* FormularioIncidencia.css
+   Estilos del formulario para registrar una incidencia (HU-04).
+   Los colores y variables vienen de styles/global.css. */
+
+/* Contenedor principal del formulario */
+.formulario-incidencia {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 640px;
+}
+
+/* Título del formulario */
+.formulario-incidencia-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  margin: 0 0 4px 0;
+}
+
+/* Subtítulo / descripción breve */
+.formulario-incidencia-subtitulo {
+  font-size: 0.875rem;
+  color: var(--color-texto-secundario);
+  margin: 0 0 20px 0;
+}
+
+/* Cada grupo de campo: label + input/select/textarea */
+.campo-formulario {
+  margin-bottom: 16px;
+}
+
+/* Etiqueta (label) de cada campo */
+.campo-formulario label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-texto);
+  margin-bottom: 4px;
+}
+
+/* Estilos comunes para input, select y textarea */
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+/* Borde azul al enfocar un campo */
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+  border-color: var(--color-principal);
+}
+
+/* El textarea no debe poder cambiar de ancho, solo de alto */
+.campo-formulario textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Campo con checkbox: el label contiene el input y el texto en línea */
+.campo-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+/* El checkbox en sí */
+.campo-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Mensaje de error cuando falta un campo obligatorio */
+.mensaje-error {
+  color: var(--color-danado);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+  padding: 8px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+}
+
+/* Botón para registrar la incidencia */
+.boton-registrar {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-principal);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Efecto al pasar el mouse por encima del botón */
+.boton-registrar:hover {
+  background-color: var(--color-principal-oscuro);
+}
