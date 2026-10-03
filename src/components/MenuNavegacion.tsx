@@ -58,6 +58,12 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
         >
           Incidencias
         </button>
+        <button
+          className={obtenerClaseBoton('alertas')}
+          onClick={() => props.onCambiarPagina('alertas')}
+        >
+          Alertas
+        </button>
       </nav>
     </header>
   );

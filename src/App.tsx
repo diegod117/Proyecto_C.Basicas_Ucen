@@ -9,6 +9,7 @@ import MenuNavegacion from './components/MenuNavegacion';
 import PaginaInventario from './pages/PaginaInventario';
 import PaginaReservas from './pages/PaginaReservas';
 import PaginaIncidencias from './pages/PaginaIncidencias';
+import PaginaAlertas from './pages/PaginaAlertas';
 
 // Componente App
 // No recibe props. Devuelve la aplicación completa (menú + página actual).
@@ -18,7 +19,7 @@ function App() {
   //   - paginaActual: el valor actual (parte en 'inventario')
   //   - setPaginaActual: la función para cambiarlo
   // "<Pagina>" le dice a TypeScript que este dato solo puede ser
-  // 'inventario', 'reservas' o 'incidencias' (ver types/Pagina.ts).
+  // 'inventario', 'reservas', 'incidencias' o 'alertas' (ver types/Pagina.ts).
   const [paginaActual, setPaginaActual] = useState<Pagina>('inventario');
 
   // Decide qué página mostrar según el valor de paginaActual.
@@ -28,8 +29,10 @@ function App() {
       return <PaginaInventario />;
     } else if (paginaActual === 'reservas') {
       return <PaginaReservas />;
-    } else {
+    } else if (paginaActual === 'incidencias') {
       return <PaginaIncidencias />;
+    } else {
+      return <PaginaAlertas />;
     }
   }
 
