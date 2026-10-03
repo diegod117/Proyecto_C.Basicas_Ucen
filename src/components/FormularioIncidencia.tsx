@@ -1,7 +1,7 @@
 // FormularioIncidencia.tsx
 // Formulario para registrar una incidencia en el laboratorio (HU-04).
-// Por ahora tiene 3 campos: recurso afectado, docente presente y descripción.
-// En el siguiente commit (D3) se agrega la pregunta de personas afectadas.
+// Campos: recurso afectado, docente presente, descripción y personas afectadas.
+// El campo de detalle de afectación solo aparece si se marca el checkbox.
 // Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia)
 
 import { useState } from 'react';
@@ -29,6 +29,14 @@ function FormularioIncidencia(_props: PropsFormularioIncidencia) {
   const [recursoId, setRecursoId] = useState<string>('');
   const [docentePresente, setDocentePresente] = useState('');
   const [descripcion, setDescripcion] = useState('');
+
+  // Estado del checkbox: ¿hubo personas afectadas? (true o false)
+  // Parte en false porque la mayoría de incidencias no afectan personas.
+  const [hayPersonasAfectadas, setHayPersonasAfectadas] = useState(false);
+
+  // Detalle de la afectación: solo se usa si hayPersonasAfectadas es true.
+  // Es el campo opcional ("?") del tipo Incidencia.
+  const [detalleAfectacion, setDetalleAfectacion] = useState('');
 
   return (
     <form className="formulario-incidencia">
@@ -77,6 +85,36 @@ function FormularioIncidencia(_props: PropsFormularioIncidencia) {
           onChange={(evento) => setDescripcion(evento.target.value)}
         />
       </div>
+
+      {/* Campo 4: ¿Hubo personas afectadas? (checkbox) */}
+      {/* Un checkbox usa "checked" en vez de "value", y el evento
+          entrega true o false en "evento.target.checked". */}
+      <div className="campo-formulario campo-checkbox">
+        <label>
+          <input
+            type="checkbox"
+            checked={hayPersonasAfectadas}
+            onChange={(evento) => setHayPersonasAfectadas(evento.target.checked)}
+          />
+          ¿Hubo personas afectadas?
+        </label>
+      </div>
+
+      {/* Campo 5: Detalle de la afectación (solo si se marcó el checkbox) */}
+      {/* "hayPersonasAfectadas && ..." es renderizado condicional:
+          React solo muestra lo que viene después del && si la condición es true. */}
+      {hayPersonasAfectadas && (
+        <div className="campo-formulario">
+          <label htmlFor="campo-detalle-afectacion">Detalle de la afectación</label>
+          <textarea
+            id="campo-detalle-afectacion"
+            placeholder="Describa cómo fueron afectadas las personas..."
+            rows={3}
+            value={detalleAfectacion}
+            onChange={(evento) => setDetalleAfectacion(evento.target.value)}
+          />
+        </div>
+      )}
     </form>
   );
 }

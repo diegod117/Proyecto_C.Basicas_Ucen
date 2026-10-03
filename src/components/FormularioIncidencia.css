@@ -66,3 +66,22 @@
   resize: vertical;
   min-height: 80px;
 }
+
+/* Campo con checkbox: el label contiene el input y el texto en línea */
+.campo-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+/* El checkbox en sí */
+.campo-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
