@@ -51,3 +51,37 @@ export function validarCamposReserva(
   // Si pasa todas las comprobaciones, no hay error
   return '';
 }
+
+// ------------------------------------------------------------------
+// seCruzanHorarios
+// ------------------------------------------------------------------
+// Recibe: fecha y horas de dos intervalos de tiempo (A y B).
+// Devuelve: true si ambos horarios chocan o se solapan en el mismo día,
+//           false si son en días distintos o están separados en el tiempo.
+//
+// ¿Cómo se deduce si chocan?
+// Dos intervalos NO se cruzan únicamente si:
+//   - El intervalo A termina antes o justo cuando empieza el B (finA <= inicioB)
+//   - O bien el intervalo B termina antes o justo cuando empieza el A (finB <= inicioA)
+// En cualquier otro caso, hay solapamiento de horario.
+export function seCruzanHorarios(
+  fechaA: string,
+  inicioA: string,
+  finA: string,
+  fechaB: string,
+  inicioB: string,
+  finB: string
+): boolean {
+  // 1. Si son días diferentes, no hay cruce
+  if (fechaA !== fechaB) {
+    return false;
+  }
+
+  // 2. Si uno termina antes de que empiece el otro, no hay cruce
+  if (finA <= inicioB || finB <= inicioA) {
+    return false;
+  }
+
+  // 3. En caso contrario, se solapan
+  return true;
+}
