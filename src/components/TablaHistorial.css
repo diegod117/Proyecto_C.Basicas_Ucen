@@ -1,0 +1,65 @@
+/* TablaHistorial.css
+   Estilos de la tabla "Historial de estados" (basada en el mockup). */
+
+.tabla-historial {
+  background-color: white;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  overflow: hidden; /* para que el fondo gris del título respete las esquinas */
+}
+
+.tabla-historial-titulo {
+  margin: 0;
+  padding: 12px 20px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla-historial-vacia {
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--color-texto-secundario);
+}
+
+/* overflow-x: auto agrega una barra para deslizar hacia el lado
+   SOLO si la tabla es más ancha que la pantalla (celular) */
+.tabla-historial-contenedor {
+  overflow-x: auto;
+}
+
+.tabla-historial table {
+  width: 100%;
+  border-collapse: collapse; /* une los bordes de las celdas */
+  font-size: 14px;
+}
+
+.tabla-historial th {
+  text-align: left;
+  padding: 10px 20px;
+  font-weight: bold;
+  color: #4b5563;
+  background-color: #f3f4f6;
+}
+
+.tabla-historial td {
+  padding: 10px 20px;
+  border-top: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+
+/* white-space: nowrap evita que la fecha y el cambio se partan en dos
+   líneas. Si en celular la tabla no cabe, se desliza hacia el lado. */
+.tabla-historial-fecha {
+  white-space: nowrap;
+  color: var(--color-texto-secundario);
+}
+
+.tabla-historial-cambio {
+  white-space: nowrap;
+}
+
+.tabla-historial-cantidad {
+  font-weight: bold;
+}
