@@ -1,12 +1,12 @@
 // PaginaInventario.tsx
-// Página del inventario. Por ahora muestra una VISTA PREVIA de la
-// tarjeta de un recurso, para probar el componente TarjetaRecurso.
-// En J4 se reemplaza por el listado completo, y luego se agregan los filtros.
+// Página del inventario: muestra TODOS los recursos en una grilla de tarjetas,
+// para que el docente sepa qué hay y en qué cantidad operativa.
+// Más adelante se agregan los filtros (J5 y J6).
 // Cubre: HU-01 (en progreso), RF-02
 
 // La página pide los recursos al SERVICIO, no directamente a src/data/.
 // Así no le importa de dónde vienen los datos (ver recursosService.ts).
-import { obtenerRecursos, obtenerRecursoPorId } from '../services/recursosService';
+import { obtenerRecursos } from '../services/recursosService';
 import TarjetaRecurso from '../components/TarjetaRecurso';
 import './PaginaInventario.css';
 
@@ -15,24 +15,23 @@ import './PaginaInventario.css';
 function PaginaInventario() {
   const listaRecursos = obtenerRecursos();
 
-  // Recurso de ejemplo para la vista previa: el Arduino (id 4),
-  // porque tiene dos estados con unidades (disponible y en uso).
-  const recursoEjemplo = obtenerRecursoPorId(4);
-
   return (
     <section className="contenido-pagina">
-      <h2>Inventario</h2>
-      <p>Pendiente: HU-01 (listado del inventario con filtros).</p>
-      {/* ".length" es la cantidad de elementos que tiene la lista */}
-      <p className="texto-secundario">
-        Recursos de prueba cargados: {listaRecursos.length}
-      </p>
+      <div className="inventario-encabezado">
+        <h2>Inventario de laboratorios</h2>
+        {/* ".length" es la cantidad de elementos que tiene la lista */}
+        <p className="texto-secundario">Mostrando {listaRecursos.length} recursos</p>
+      </div>
 
-      {/* obtenerRecursoPorId puede devolver undefined (si no existe el id).
-          Con "recursoEjemplo &&" la tarjeta solo se dibuja si el recurso
-          existe. Si es undefined, React no muestra nada. */}
-      <div className="vista-previa-tarjeta">
-        {recursoEjemplo && <TarjetaRecurso recurso={recursoEjemplo} />}
+      <div className="grilla-recursos">
+        {/* .map() recorre la lista de recursos y por CADA recurso devuelve
+            una TarjetaRecurso. Es como un for que va "fabricando" tarjetas.
+            La "key" debe ser única en la lista: usamos el id del recurso,
+            que nunca se repite. React la usa para saber qué tarjeta es cuál
+            cuando la lista cambie (por ejemplo, al filtrar en J5). */}
+        {listaRecursos.map((recurso) => (
+          <TarjetaRecurso key={recurso.id} recurso={recurso} />
+        ))}
       </div>
     </section>
   );
