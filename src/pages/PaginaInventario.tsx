@@ -3,12 +3,13 @@
 // para que el docente sepa qué hay y en qué cantidad operativa.
 // Se puede filtrar por nombre, categoría, laboratorio y estado.
 // Si ningún recurso cumple los filtros, muestra un mensaje para limpiarlos.
-// Cubre: HU-01, RF-02, RF-08
+// Al hacer clic en una tarjeta, muestra la ficha completa del recurso.
+// Cubre: HU-01, HU-02, RF-02, RF-08
 
 import { useState } from 'react';
 // La página pide los recursos al SERVICIO, no directamente a src/data/.
 // Así no le importa de dónde vienen los datos (ver recursosService.ts).
-import { obtenerRecursos } from '../services/recursosService';
+import { obtenerRecursos, obtenerRecursoPorId } from '../services/recursosService';
 import {
   filtrarRecursos,
   hayFiltrosActivos,
@@ -17,6 +18,8 @@ import {
 } from '../utils/filtrosInventario';
 import FiltrosInventario from '../components/FiltrosInventario';
 import TarjetaRecurso from '../components/TarjetaRecurso';
+import FichaRecurso from '../components/FichaRecurso';
+import MensajeSinResultados from '../components/MensajeSinResultados';
 import './PaginaInventario.css';
 
 // Componente PaginaInventario
@@ -29,6 +32,14 @@ function PaginaInventario() {
   const [categoria, setCategoria] = useState(SIN_FILTRO);
   const [laboratorio, setLaboratorio] = useState(SIN_FILTRO);
   const [estado, setEstado] = useState(SIN_FILTRO);
+
+  // Id del recurso cuya ficha está abierta.
+  // "number | null" significa que puede ser un número o null.
+  // null = no hay ninguna ficha abierta (se muestra el listado).
+  // Guardamos el ID y no el recurso completo: así, cuando el recurso cambie
+  // (por ejemplo, al cambiar su estado en J10), lo volvemos a buscar con
+  // su id y la ficha siempre muestra los datos actualizados.
+  const [idRecursoSeleccionado, setIdRecursoSeleccionado] = useState<number | null>(null);
 
   const listaRecursos = obtenerRecursos();
   const laboratoriosDisponibles = obtenerLaboratorios(listaRecursos);
@@ -55,6 +66,21 @@ function PaginaInventario() {
     setEstado(SIN_FILTRO);
   }
 
+  // abrirFicha
+  // Recibe: el id del recurso en que el usuario hizo clic. No devuelve nada.
+  function abrirFicha(idRecurso: number) {
+    setIdRecursoSeleccionado(idRecurso);
+    // Subimos al inicio de la página, por si el usuario estaba más abajo
+    window.scrollTo(0, 0);
+  }
+
+  // volverAlListado
+  // No recibe ni devuelve nada: cierra la ficha y vuelve a mostrar el listado.
+  // Los filtros NO se pierden, porque sus useState siguen guardados aquí.
+  function volverAlListado() {
+    setIdRecursoSeleccionado(null);
+  }
+
   // mostrarResultados
   // No recibe nada. Devuelve lo que va debajo de los filtros:
   //   - si no hay recursos que cumplan los filtros: un mensaje con un botón
@@ -63,15 +89,7 @@ function PaginaInventario() {
   // el return de abajo se lea fácil.
   function mostrarResultados() {
     if (recursosFiltrados.length === 0) {
-      return (
-        <div className="inventario-sin-resultados">
-          <p className="sin-resultados-titulo">No hay recursos que coincidan con los filtros</p>
-          <p className="texto-secundario">Prueba con otro nombre o cambia la categoría, el laboratorio o el estado.</p>
-          <button className="boton-limpiar-filtros" onClick={limpiarFiltros}>
-            Limpiar filtros
-          </button>
-        </div>
-      );
+      return <MensajeSinResultados onLimpiarFiltros={limpiarFiltros} />;
     } else {
       return (
         <div className="grilla-recursos">
@@ -79,9 +97,23 @@ function PaginaInventario() {
               TarjetaRecurso. La "key" (el id del recurso) le permite a React
               saber qué tarjetas quitar o mantener cuando cambia un filtro. */}
           {recursosFiltrados.map((recurso) => (
-            <TarjetaRecurso key={recurso.id} recurso={recurso} />
+            <TarjetaRecurso key={recurso.id} recurso={recurso} onSeleccionar={abrirFicha} />
           ))}
         </div>
+      );
+    }
+  }
+
+  // Si hay una ficha abierta, mostramos SOLO la ficha (en vez del listado).
+  // Buscamos el recurso por su id; si por algún motivo no existe
+  // (undefined), no entramos al if y se muestra el listado normal.
+  if (idRecursoSeleccionado !== null) {
+    const recursoSeleccionado = obtenerRecursoPorId(idRecursoSeleccionado);
+    if (recursoSeleccionado) {
+      return (
+        <section className="contenido-pagina">
+          <FichaRecurso recurso={recursoSeleccionado} onVolver={volverAlListado} />
+        </section>
       );
     }
   }
@@ -90,8 +122,8 @@ function PaginaInventario() {
     <section className="contenido-pagina">
       <div className="inventario-encabezado">
         <h2>Inventario de laboratorios</h2>
-        {/* ".length" es la cantidad de elementos que tiene la lista */}
         <div className="inventario-contador">
+          {/* ".length" es la cantidad de elementos que tiene la lista */}
           <p className="texto-secundario">
             Mostrando {recursosFiltrados.length} de {listaRecursos.length} recursos
           </p>
@@ -100,7 +132,7 @@ function PaginaInventario() {
               onClick recibe la función limpiarFiltros SIN paréntesis: así
               React la ejecuta recién cuando el usuario hace clic. */}
           {filtrosActivos && (
-            <button className="boton-limpiar-filtros boton-limpiar-pequeno" onClick={limpiarFiltros}>
+            <button className="boton-limpiar-pequeno" onClick={limpiarFiltros}>
               Limpiar filtros
             </button>
           )}

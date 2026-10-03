@@ -1,0 +1,110 @@
+/* FichaRecurso.css
+   Estilos de la ficha completa de un recurso. */
+
+/* Ruta "← Inventario / Nombre del recurso" */
+.ficha-ruta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.ficha-boton-volver {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-size: 16px;
+  color: var(--color-texto-secundario);
+  cursor: pointer;
+}
+
+.ficha-boton-volver:hover {
+  color: var(--color-principal);
+}
+
+.ficha-ruta-separador {
+  color: #9ca3af;
+}
+
+.ficha-ruta-actual {
+  font-weight: bold;
+}
+
+/* Recuadro blanco con todos los datos */
+.ficha-tarjeta {
+  background-color: white;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 640px;
+}
+
+.ficha-encabezado {
+  margin-bottom: 8px;
+}
+
+.ficha-categoria {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-principal);
+  text-transform: uppercase;
+}
+
+.ficha-nombre {
+  margin: 4px 0 0 0;
+}
+
+.ficha-subtitulo {
+  font-size: 15px;
+  margin: 20px 0 8px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Lista "Dato: valor" en dos columnas: nombre del dato | valor.
+   "max-content" hace que la primera columna mida lo justo para el texto
+   más largo ("N° de serie"), y la segunda ocupa el resto (1fr). */
+.ficha-datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.ficha-datos dt {
+  color: var(--color-texto-secundario);
+}
+
+.ficha-datos dd {
+  margin: 0; /* el navegador le pone margen a <dd> por defecto */
+}
+
+.ficha-codigo {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+/* Tabla de unidades por estado */
+.ficha-tabla-estados {
+  border-collapse: collapse; /* une los bordes de las celdas */
+  font-size: 14px;
+  min-width: 260px;
+}
+
+.ficha-tabla-estados td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.ficha-tabla-numero {
+  text-align: right;
+  font-weight: bold;
+}
+
+.ficha-tabla-total td {
+  font-weight: bold;
+  border-bottom: none;
+}

@@ -94,6 +94,18 @@ export function calcularCantidadTotal(recurso: Recurso): number {
   return total;
 }
 
+// textoCampoOpcional
+// Recibe: el valor de un campo opcional del recurso (marca, proveedor...).
+// Devuelve: ese mismo texto, o "No registrado" si el campo no viene.
+// El "?" en "valor?: string" indica que el parámetro puede no venir
+// (undefined), igual que los campos opcionales de la interface Recurso.
+export function textoCampoOpcional(valor?: string): string {
+  if (valor === undefined || valor === '') {
+    return 'No registrado';
+  }
+  return valor;
+}
+
 // obtenerEstadosConUnidades
 // Recibe: un recurso.
 // Devuelve: solo los estados que tienen al menos 1 unidad.

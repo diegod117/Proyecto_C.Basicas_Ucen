@@ -8,6 +8,16 @@
   /* overflow: hidden hace que la cabecera respete las esquinas redondeadas */
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* La manito del mouse indica que la tarjeta se puede cliquear */
+  cursor: pointer;
+  /* transition hace que el cambio de sombra y borde sea suave */
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+/* Al pasar el mouse por encima, la tarjeta se resalta */
+.tarjeta-recurso:hover {
+  border-color: var(--color-principal);
+  box-shadow: 0 4px 14px rgba(26, 99, 187, 0.15);
 }
 
 /* Franja superior gris con la categoría y el código de ubicación */
@@ -55,41 +65,5 @@
   margin-top: 10px;
 }
 
-/* Estilo común de todas las etiquetas de estado */
-.etiqueta {
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid;
-  /* "currentColor" usa el mismo color del texto para el borde */
-  border-color: currentColor;
-}
-
-/* Un color por estado. Los nombres de clase terminan igual que los
-   estados (etiqueta-disponible, etiqueta-en_uso...), así en el .tsx
-   basta con escribir 'etiqueta-' + estado. */
-.etiqueta-disponible {
-  color: var(--color-disponible);
-  background-color: #dcfce7;
-}
-
-.etiqueta-en_uso {
-  color: var(--color-en-uso);
-  background-color: #dbeafe;
-}
-
-.etiqueta-danado {
-  color: var(--color-danado);
-  background-color: #fee2e2;
-}
-
-.etiqueta-en_mantencion {
-  color: var(--color-mantencion);
-  background-color: #fef9c3;
-}
-
-.etiqueta-dado_de_baja {
-  color: var(--color-baja);
-  background-color: #f3f4f6;
-}
+/* Los colores de las etiquetas de estado (.etiqueta, .etiqueta-disponible...)
+   están en styles/global.css, porque también los usa FichaRecurso. */
