@@ -1,0 +1,17 @@
+/* AvisoUbicacion.css
+   Recuadro amarillo de advertencia para ubicaciones con problemas. */
+
+.aviso-ubicacion {
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-mantencion);
+  background-color: #fef9c3;
+  border: 1px solid #fde047;
+  border-radius: 6px;
+}
+
+.aviso-ubicacion ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px; /* sangría de los puntos de la lista */
+}

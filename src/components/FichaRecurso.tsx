@@ -6,7 +6,7 @@
 // A la derecha muestra el formulario para cambiar el estado, y debajo
 // de los datos, el historial de cambios de estado.
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
-//        RF-01 (estados), RF-10 (ubicación)
+//        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10
 
 import type { Recurso } from '../types/Recurso';
 import {
@@ -19,6 +19,7 @@ import {
 import { obtenerHistorialDeRecurso } from '../services/historialService';
 import FormularioCambioEstado from './FormularioCambioEstado';
 import TablaHistorial from './TablaHistorial';
+import AvisoUbicacion from './AvisoUbicacion';
 import './FichaRecurso.css';
 
 interface PropsFichaRecurso {
@@ -81,6 +82,8 @@ function FichaRecurso(props: PropsFichaRecurso) {
               <dt>Código</dt>
               <dd className="ficha-codigo">{ubicacion.codigo}</dd>
             </dl>
+            {/* Solo aparece si la ubicación tiene algún problema (HU-11) */}
+            <AvisoUbicacion ubicacion={ubicacion} />
 
             {/* Datos que hoy vienen de la planilla Excel. Son opcionales, por eso
                 usamos textoCampoOpcional: si no vienen, muestra "No registrado". */}
