@@ -1,0 +1,52 @@
+/* MenuNavegacion.css
+   Estilos de la barra superior de navegación. */
+
+.menu-navegacion {
+  background-color: var(--color-principal);
+  color: white;
+  padding: 12px 16px;
+  /* flex pone el título y los botones uno al lado del otro */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* flex-wrap: si no caben (celular), los botones bajan a otra línea (RNF-01) */
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.menu-titulo {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+}
+
+.menu-botones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.boton-menu {
+  background-color: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.boton-menu:hover {
+  background-color: var(--color-principal-oscuro);
+}
+
+/* Botón de la página que se está mostrando */
+.boton-menu-activo {
+  background-color: white;
+  color: var(--color-principal);
+  font-weight: bold;
+}
+
+.boton-menu-activo:hover {
+  background-color: white;
+}
