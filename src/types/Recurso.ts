@@ -38,16 +38,28 @@ export type EstadoRecurso =
   | 'dado_de_baja';
 
 // ------------------------------------------------------------------
+// Torre donde está el laboratorio
+// ------------------------------------------------------------------
+// Los laboratorios del departamento están en los edificios (torres) B y C
+// (ver sección 1.1 de los requerimientos).
+export type Torre = 'B' | 'C';
+
+// ------------------------------------------------------------------
 // Ubicación física (RF-10, HU-11)
 // ------------------------------------------------------------------
 // Una "interface" describe la forma de un objeto: qué propiedades tiene
 // y de qué tipo es cada una. Todas son obligatorias porque HU-11 dice
 // que la ubicación es obligatoria.
+//
+// El laboratorio se identifica con torre + sala. Ejemplo: "B307" es la
+// sala 307 de la torre B. Los guardamos separados para poder filtrar
+// por torre o por sala más adelante (HU-01).
 export interface Ubicacion {
-  laboratorio: string; // ej: "B206"
+  torre: Torre; // "B" o "C"
+  sala: string; // ej: "307"
   bodega: string; // ej: "Bodega 1"
   mueble: string; // ej: "Mueble 2"
-  codigo: string; // código corto para encontrarlo rápido, ej: "B206-B1-M02"
+  codigo: string; // código corto para encontrarlo rápido, ej: "B307-B1-M2"
 }
 
 // ------------------------------------------------------------------

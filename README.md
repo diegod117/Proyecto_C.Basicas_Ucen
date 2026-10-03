@@ -33,6 +33,7 @@ npm run lint     # revisa errores comunes en el código
 
 - `docs/requerimientos.md`: requerimientos funcionales, no funcionales e historias de usuario.
 - `docs/avance.md`: bitácora de lo que se hizo en cada sesión.
+- `docs/plan-implementacion.md`: qué hace cada integrante, en qué orden y con qué commits.
 - `docs/mockup-sgil.html`: diseño de referencia (ábrelo directo en el navegador).
 - `CLAUDE.md`: reglas del proyecto.
 
