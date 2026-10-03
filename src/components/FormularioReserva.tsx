@@ -1,13 +1,17 @@
 // FormularioReserva.tsx
 // Componente de formulario para reservar recursos del laboratorio.
 // Implementa el patrón de "formulario controlado" con React useState.
-// Cubre: HU-03 (guardar reserva y confirmar), RF-03
+// Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (desactivar botón por falta de stock)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { obtenerRecursos } from '../services/recursosService';
 import { agregarReserva } from '../services/reservasService';
-import { validarCamposReserva } from '../utils/disponibilidad';
+import {
+  validarCamposReserva,
+  calcularUnidadesDisponibles,
+  validarDisponibilidadReserva,
+} from '../utils/disponibilidad';
 import './FormularioReserva.css';
 
 // Props que recibe el formulario
@@ -16,8 +20,8 @@ interface FormularioReservaProps {
 }
 
 // Componente FormularioReserva
-// Permite al docente ingresar los datos de reserva, validarlos al enviar
-// y guardarlos en el servicio de reservas con mensaje de confirmación.
+// Permite al docente seleccionar el recurso, fecha y horario.
+// Desactiva el botón de confirmación si no hay disponibilidad suficiente en ese tramo.
 function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
   // --- Estados controlados del formulario ---
   const [recursoId, setRecursoId] = useState('');
@@ -36,6 +40,30 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
   // Obtenemos los recursos desde el servicio
   const recursos = obtenerRecursos();
 
+  // --- Cálculo dinámico de disponibilidad en tiempo real (HU-07) ---
+  let unidadesDisponibles: number | null = null;
+  const datosCompletosParaCalculo =
+    recursoId !== '' &&
+    fecha !== '' &&
+    horaInicio !== '' &&
+    horaFin !== '' &&
+    horaFin > horaInicio;
+
+  if (datosCompletosParaCalculo) {
+    unidadesDisponibles = calcularUnidadesDisponibles(
+      Number(recursoId),
+      fecha,
+      horaInicio,
+      horaFin
+    );
+  }
+
+  // --- Validación reactiva para el botón (HU-08) ---
+  // El botón se bloquea si se comprobó que no quedan unidades o la cantidad pedida supera las disponibles
+  const bloqueoPorDisponibilidad =
+    unidadesDisponibles !== null &&
+    (unidadesDisponibles === 0 || cantidad > unidadesDisponibles);
+
   // Limpiar campos luego de un registro exitoso
   function limpiarFormulario() {
     setRecursoId('');
@@ -49,13 +77,12 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
 
   // Manejador del evento de envío del formulario
   function manejarEnvio(evento: FormEvent) {
-    // 1. preventDefault() evita la recarga de página estándar en formularios HTML
     evento.preventDefault();
     setMensajeError('');
     setMensajeExito('');
 
-    // 2. Validación de campos usando la función de utilidad (M4)
-    const error = validarCamposReserva(
+    // 1. Validación de campos obligatorios (HU-03)
+    const errorCampos = validarCamposReserva(
       recursoId,
       fecha,
       horaInicio,
@@ -65,12 +92,26 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
       sala
     );
 
-    if (error !== '') {
-      setMensajeError(error);
+    if (errorCampos !== '') {
+      setMensajeError(errorCampos);
       return;
     }
 
-    // 3. Guardar la nueva reserva en el servicio en memoria (M1)
+    // 2. Validación de disponibilidad física en ese horario (HU-08)
+    const errorDisponibilidad = validarDisponibilidadReserva(
+      Number(recursoId),
+      fecha,
+      horaInicio,
+      horaFin,
+      cantidad
+    );
+
+    if (errorDisponibilidad !== '') {
+      setMensajeError(errorDisponibilidad);
+      return;
+    }
+
+    // 3. Guardar en el servicio
     agregarReserva({
       recursoId: Number(recursoId),
       docente: docente.trim() === '' ? 'Prof. Martín Zepeda' : docente,
@@ -82,11 +123,9 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
       sala,
     });
 
-    // 4. Mostrar confirmación en pantalla y reiniciar formulario
     setMensajeExito('¡Reserva registrada con éxito!');
     limpiarFormulario();
 
-    // 5. Notificar al componente padre si definió el callback
     if (onReservaCreada) {
       onReservaCreada();
     }
@@ -191,6 +230,21 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
         </div>
       </div>
 
+      {/* Aviso reactivo de disponibilidad en tiempo real (HU-07) */}
+      {unidadesDisponibles !== null && (
+        <div
+          className={
+            unidadesDisponibles > 0
+              ? 'aviso-disponibilidad hay-unidades'
+              : 'aviso-disponibilidad sin-unidades'
+          }
+        >
+          {unidadesDisponibles > 0
+            ? `✔ Disponibles en este horario: ${unidadesDisponibles} unidad(es)`
+            : '✖ Sin unidades disponibles en este horario (todas reservadas)'}
+        </div>
+      )}
+
       {/* Fila 4: Cantidad requerida, Asignatura y Sala */}
       <div className="grupo-campos">
         <div className="campo">
@@ -239,8 +293,15 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
         </div>
       </div>
 
-      <button type="submit" className="boton-confirmar">
-        Confirmar reserva
+      {/* Botón de envío con bloqueo disabled condicional (HU-08) */}
+      <button
+        type="submit"
+        className="boton-confirmar"
+        disabled={bloqueoPorDisponibilidad}
+      >
+        {bloqueoPorDisponibilidad
+          ? 'Sin disponibilidad suficiente'
+          : 'Confirmar reserva'}
       </button>
     </form>
   );
