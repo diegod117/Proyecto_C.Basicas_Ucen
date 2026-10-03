@@ -62,3 +62,43 @@
   color: var(--color-texto-secundario);
   font-size: 0.875rem;
 }
+
+/* Botones de acción para cambiar de estado (HU-10) */
+.boton-accion-incidencia {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Botón para pasar a 'en_revision' */
+.boton-accion-revision {
+  color: #1e40af;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.boton-accion-revision:hover {
+  background-color: #dbeafe;
+}
+
+/* Botón para marcar como 'resuelta' */
+.boton-accion-resuelta {
+  color: #166534;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.boton-accion-resuelta:hover {
+  background-color: #dcfce7;
+}
+
+/* Guion centrado para incidencias que ya están resueltas */
+.texto-accion-finalizada {
+  color: var(--color-texto-secundario);
+  font-weight: 600;
+  padding-left: 8px;
+}

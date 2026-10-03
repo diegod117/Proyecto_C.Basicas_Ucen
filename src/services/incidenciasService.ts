@@ -5,7 +5,7 @@
 // Así, cuando exista un backend, solo se cambia este archivo.
 // Cubre: HU-04 (registrar incidencia), HU-10 (historial con estado)
 
-import type { Incidencia } from '../types/Incidencia';
+import type { Incidencia, EstadoIncidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
 import { obtenerFechaActual } from '../utils/fechas';
 
@@ -76,6 +76,32 @@ function agregarIncidencia(
 }
 
 // ------------------------------------------------------------------
+// cambiarEstadoIncidencia
+// ------------------------------------------------------------------
+// Recibe el id de una incidencia y el nuevo estado al que debe pasar
+// ('pendiente', 'en_revision' o 'resuelta').
+// Busca la incidencia en la lista y le actualiza el estado.
+// Devuelve true si la encontró y la actualizó, o false si no existía.
+// Cubre: HU-10 (avanzar incidencia de pendiente -> en_revision -> resuelta)
+function cambiarEstadoIncidencia(
+  id: number,
+  nuevoEstado: EstadoIncidencia
+): boolean {
+  for (const incidencia of incidencias) {
+    if (incidencia.id === id) {
+      incidencia.estado = nuevoEstado;
+      return true;
+    }
+  }
+  return false;
+}
+
+// ------------------------------------------------------------------
 // Exportamos las funciones para que las usen las páginas
 // ------------------------------------------------------------------
-export { obtenerIncidencias, obtenerIncidenciaPorId, agregarIncidencia };
+export {
+  obtenerIncidencias,
+  obtenerIncidenciaPorId,
+  agregarIncidencia,
+  cambiarEstadoIncidencia,
+};

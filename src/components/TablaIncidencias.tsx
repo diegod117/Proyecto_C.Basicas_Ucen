@@ -1,12 +1,18 @@
 // TablaIncidencias.tsx
 // Tabla que muestra el historial de todas las incidencias registradas (HU-10).
-// Cada fila muestra: fecha, recurso afectado, descripción y estado.
+// Cada fila muestra: fecha, recurso afectado, descripción, estado y una acción
+// para avanzar el estado: de 'pendiente' -> 'en_revision' -> 'resuelta'.
 // El nombre del recurso se obtiene a partir de su recursoId usando
 // obtenerRecursoPorId() del servicio de Johann.
-// Cubre: HU-10 (historial de incidencias), RF-05
+// Cubre: HU-10 (historial de incidencias y avance de estado), RF-05
 
-import { obtenerIncidencias } from '../services/incidenciasService';
+import { useState } from 'react';
+import {
+  obtenerIncidencias,
+  cambiarEstadoIncidencia,
+} from '../services/incidenciasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
+import type { EstadoIncidencia } from '../types/Incidencia';
 import EtiquetaEstadoIncidencia from './EtiquetaEstadoIncidencia';
 import './TablaIncidencias.css';
 
@@ -25,9 +31,22 @@ function nombreDelRecurso(recursoId: number): string {
 }
 
 // Componente TablaIncidencias
-// No recibe props. Devuelve la tabla con todas las incidencias.
+// No recibe props. Devuelve la tabla con todas las incidencias y sus botones de acción.
 function TablaIncidencias() {
-  const incidencias = obtenerIncidencias();
+  // Guardamos las incidencias en el estado local de React.
+  // Así, cuando cambiemos el estado de una incidencia, React volverá a dibujar
+  // la tabla mostrando el cambio inmediatamente sin recargar la página.
+  const [incidencias, setIncidencias] = useState(obtenerIncidencias());
+
+  // Función que se llama al hacer clic en un botón para avanzar el estado.
+  // Recibe el id de la incidencia y el nuevo estado al que pasa.
+  function manejarCambiarEstado(id: number, nuevoEstado: EstadoIncidencia) {
+    const exito = cambiarEstadoIncidencia(id, nuevoEstado);
+    if (exito) {
+      // Le pedimos de nuevo la lista al servicio y actualizamos el estado de React
+      setIncidencias(obtenerIncidencias());
+    }
+  }
 
   // Si no hay incidencias, mostramos un mensaje en vez de la tabla vacía.
   if (incidencias.length === 0) {
@@ -49,6 +68,7 @@ function TablaIncidencias() {
             <th>Recurso afectado</th>
             <th>Descripción</th>
             <th>Estado</th>
+            <th>Acción</th>
           </tr>
         </thead>
         <tbody>
@@ -58,6 +78,34 @@ function TablaIncidencias() {
               <td>{nombreDelRecurso(incidencia.recursoId)}</td>
               <td>{incidencia.descripcion}</td>
               <td><EtiquetaEstadoIncidencia estado={incidencia.estado} /></td>
+              <td>
+                {/* Si está pendiente, permite pasarla a 'en_revision' */}
+                {incidencia.estado === 'pendiente' && (
+                  <button
+                    type="button"
+                    className="boton-accion-incidencia boton-accion-revision"
+                    onClick={() => manejarCambiarEstado(incidencia.id, 'en_revision')}
+                  >
+                    Pasar a en revisión
+                  </button>
+                )}
+
+                {/* Si está en revisión, permite pasarla a 'resuelta' */}
+                {incidencia.estado === 'en_revision' && (
+                  <button
+                    type="button"
+                    className="boton-accion-incidencia boton-accion-resuelta"
+                    onClick={() => manejarCambiarEstado(incidencia.id, 'resuelta')}
+                  >
+                    Marcar como resuelta
+                  </button>
+                )}
+
+                {/* Si ya está resuelta, no hay más acciones por realizar */}
+                {incidencia.estado === 'resuelta' && (
+                  <span className="texto-accion-finalizada">—</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
