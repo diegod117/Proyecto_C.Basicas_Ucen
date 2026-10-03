@@ -1,7 +1,7 @@
 // recursosService.ts
 // Servicio de recursos: es el ÚNICO lugar desde donde las páginas
 // obtienen los recursos del inventario.
-// Cubre: HU-01, RF-02 (base para consultar el inventario)
+// Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -11,7 +11,7 @@
 // Además, como todas las páginas leen de aquí, todas ven los mismos datos:
 // si alguien cambia el estado de un recurso, todos ven el cambio.
 
-import type { Recurso } from '../types/Recurso';
+import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { listaRecursosPrueba } from '../data/recursos';
 
 // La lista de recursos que usa toda la aplicación.
@@ -43,4 +43,40 @@ export function obtenerRecursoPorId(id: number): Recurso | undefined {
 
   // Si el for terminó sin encontrarlo, el recurso no existe
   return undefined;
+}
+
+// cambiarEstadoRecurso
+// Recibe: el id del recurso, el estado de origen, el estado nuevo y
+//         cuántas unidades se mueven de uno a otro.
+// Devuelve: true si se pudo hacer el cambio, false si no.
+// Ejemplo: mover 1 multímetro de 'disponible' a 'danado' deja
+//          disponible: 12 -> 11 y danado: 1 -> 2. El total no cambia.
+//
+// El formulario ya valida los datos antes de llamar a esta función, pero
+// el servicio vuelve a revisar lo más importante (que el recurso exista y
+// que haya unidades suficientes). Así los datos nunca quedan con números
+// negativos, aunque alguien llame a esta función desde otra parte.
+export function cambiarEstadoRecurso(
+  idRecurso: number,
+  estadoOrigen: EstadoRecurso,
+  estadoNuevo: EstadoRecurso,
+  cantidad: number,
+): boolean {
+  const recurso = obtenerRecursoPorId(idRecurso);
+
+  if (recurso === undefined) {
+    return false; // no existe un recurso con ese id
+  }
+  if (cantidad < 1 || cantidad > recurso.cantidades[estadoOrigen]) {
+    return false; // cantidad inválida o no hay suficientes unidades
+  }
+
+  // Restamos en el estado de origen y sumamos en el estado nuevo.
+  // Como "recurso" apunta al MISMO objeto que está en listaRecursos,
+  // al modificarlo aquí se modifica en la lista, y todas las páginas
+  // que lean del servicio verán el cambio.
+  recurso.cantidades[estadoOrigen] = recurso.cantidades[estadoOrigen] - cantidad;
+  recurso.cantidades[estadoNuevo] = recurso.cantidades[estadoNuevo] + cantidad;
+
+  return true;
 }
