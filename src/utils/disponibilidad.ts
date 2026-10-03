@@ -44,9 +44,6 @@ export function validarCamposReserva(
   }
 
   // --- 2. Validación de coherencia horaria ---
-  // Las horas están en formato "HH:MM" de dos dígitos (ej: "08:30", "10:00").
-  // Por el estándar ISO 8601 / formato 24 horas, comparar cadenas de texto
-  // con <= respeta el mismo orden cronológico que comparar números o marcas de tiempo.
   if (horaFin <= horaInicio) {
     return 'La hora de fin debe ser posterior a la hora de inicio.';
   }
@@ -88,32 +85,20 @@ export function seCruzanHorarios(
 // ------------------------------------------------------------------
 // Recibe: ID del recurso, fecha y rango de horas solicitado.
 // Devuelve: la cantidad neta de unidades que quedan libres para ese horario.
-//
-// Lógica de cálculo:
-// 1. Busca el recurso en el inventario para conocer sus unidades operativas disponibles.
-// 2. Obtiene todas las reservas registradas.
-// 3. Resta la cantidad de cada reserva que coincida con el mismo recurso y cuyo
-//    horario se cruce con el horario solicitado.
-// 4. Retorna el remanente (mínimo 0).
 export function calcularUnidadesDisponibles(
   recursoId: number,
   fecha: string,
   horaInicio: string,
   horaFin: string
 ): number {
-  // 1. Obtener el recurso desde el servicio
   const recurso = obtenerRecursoPorId(recursoId);
   if (!recurso) {
     return 0;
   }
 
-  // Stock base que el laboratorio tiene en estado 'disponible'
   let unidadesLibres = recurso.cantidades.disponible;
-
-  // 2. Consultar todas las reservas existentes
   const reservas = obtenerReservas();
 
-  // 3. Recorrer las reservas y descontar las que ocupen este recurso en este horario
   for (const reserva of reservas) {
     if (reserva.recursoId === recursoId) {
       const hayChoque = seCruzanHorarios(
@@ -131,6 +116,36 @@ export function calcularUnidadesDisponibles(
     }
   }
 
-  // 4. No permitir valores negativos por seguridad
   return Math.max(0, unidadesLibres);
+}
+
+// ------------------------------------------------------------------
+// validarDisponibilidadReserva (HU-08)
+// ------------------------------------------------------------------
+// Recibe: ID del recurso, fecha, horario y la cantidad solicitada.
+// Devuelve: mensaje de error si la cantidad solicitada excede el stock libre,
+//           o '' si hay suficiente disponibilidad.
+export function validarDisponibilidadReserva(
+  recursoId: number,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  cantidadSolicitada: number
+): string {
+  const disponibles = calcularUnidadesDisponibles(
+    recursoId,
+    fecha,
+    horaInicio,
+    horaFin
+  );
+
+  if (disponibles === 0) {
+    return 'No hay unidades disponibles de este recurso para el horario seleccionado.';
+  }
+
+  if (cantidadSolicitada > disponibles) {
+    return `No se puede reservar: solicitó ${cantidadSolicitada} unidad(es), pero solo quedan ${disponibles} disponible(s) en ese horario.`;
+  }
+
+  return '';
 }

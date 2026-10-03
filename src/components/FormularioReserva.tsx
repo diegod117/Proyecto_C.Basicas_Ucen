@@ -1,7 +1,7 @@
 // FormularioReserva.tsx
 // Componente de formulario para reservar recursos del laboratorio.
 // Implementa el patrón de "formulario controlado" con React useState.
-// Cubre: HU-03 (reserva básica), HU-07 (cálculo y visualización de disponibilidad en tiempo real)
+// Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (validar stock e impedir sobre-reserva)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -10,6 +10,7 @@ import { agregarReserva } from '../services/reservasService';
 import {
   validarCamposReserva,
   calcularUnidadesDisponibles,
+  validarDisponibilidadReserva,
 } from '../utils/disponibilidad';
 import './FormularioReserva.css';
 
@@ -20,7 +21,7 @@ interface FormularioReservaProps {
 
 // Componente FormularioReserva
 // Permite al docente seleccionar el recurso, fecha y rango horario,
-// mostrando en tiempo real cuántas unidades quedan libres para ese tramo.
+// valida en tiempo real y al enviar que no se superen las unidades disponibles.
 function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
   // --- Estados controlados del formulario ---
   const [recursoId, setRecursoId] = useState('');
@@ -40,7 +41,6 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
   const recursos = obtenerRecursos();
 
   // --- Cálculo dinámico de disponibilidad en tiempo real (HU-07) ---
-  // Se recalcula automáticamente cada vez que el usuario cambia el recurso, la fecha o el horario.
   let unidadesDisponibles: number | null = null;
   const datosCompletosParaCalculo =
     recursoId !== '' &&
@@ -75,8 +75,8 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     setMensajeError('');
     setMensajeExito('');
 
-    // Validación de campos obligatorios y coherencia horaria
-    const error = validarCamposReserva(
+    // 1. Validación de campos obligatorios y coherencia horaria (HU-03)
+    const errorCampos = validarCamposReserva(
       recursoId,
       fecha,
       horaInicio,
@@ -86,12 +86,27 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
       sala
     );
 
-    if (error !== '') {
-      setMensajeError(error);
+    if (errorCampos !== '') {
+      setMensajeError(errorCampos);
       return;
     }
 
-    // Guardar en el servicio
+    // 2. Validación de disponibilidad física en ese horario (HU-08)
+    // Impide reservar más unidades de las que realmente quedan libres
+    const errorDisponibilidad = validarDisponibilidadReserva(
+      Number(recursoId),
+      fecha,
+      horaInicio,
+      horaFin,
+      cantidad
+    );
+
+    if (errorDisponibilidad !== '') {
+      setMensajeError(errorDisponibilidad);
+      return;
+    }
+
+    // 3. Guardar en el servicio si todas las validaciones pasaron
     agregarReserva({
       recursoId: Number(recursoId),
       docente: docente.trim() === '' ? 'Prof. Martín Zepeda' : docente,
