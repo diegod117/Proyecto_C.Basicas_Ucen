@@ -1,7 +1,7 @@
 // FormularioReserva.tsx
 // Componente de formulario para reservar recursos del laboratorio.
 // Implementa el patrón de "formulario controlado" con React useState.
-// Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (validar stock e impedir sobre-reserva)
+// Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (desactivar botón por falta de stock)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -20,8 +20,8 @@ interface FormularioReservaProps {
 }
 
 // Componente FormularioReserva
-// Permite al docente seleccionar el recurso, fecha y rango horario,
-// valida en tiempo real y al enviar que no se superen las unidades disponibles.
+// Permite al docente seleccionar el recurso, fecha y horario.
+// Desactiva el botón de confirmación si no hay disponibilidad suficiente en ese tramo.
 function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
   // --- Estados controlados del formulario ---
   const [recursoId, setRecursoId] = useState('');
@@ -58,6 +58,12 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     );
   }
 
+  // --- Validación reactiva para el botón (HU-08) ---
+  // El botón se bloquea si se comprobó que no quedan unidades o la cantidad pedida supera las disponibles
+  const bloqueoPorDisponibilidad =
+    unidadesDisponibles !== null &&
+    (unidadesDisponibles === 0 || cantidad > unidadesDisponibles);
+
   // Limpiar campos luego de un registro exitoso
   function limpiarFormulario() {
     setRecursoId('');
@@ -75,7 +81,7 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     setMensajeError('');
     setMensajeExito('');
 
-    // 1. Validación de campos obligatorios y coherencia horaria (HU-03)
+    // 1. Validación de campos obligatorios (HU-03)
     const errorCampos = validarCamposReserva(
       recursoId,
       fecha,
@@ -92,7 +98,6 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     }
 
     // 2. Validación de disponibilidad física en ese horario (HU-08)
-    // Impide reservar más unidades de las que realmente quedan libres
     const errorDisponibilidad = validarDisponibilidadReserva(
       Number(recursoId),
       fecha,
@@ -106,7 +111,7 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
       return;
     }
 
-    // 3. Guardar en el servicio si todas las validaciones pasaron
+    // 3. Guardar en el servicio
     agregarReserva({
       recursoId: Number(recursoId),
       docente: docente.trim() === '' ? 'Prof. Martín Zepeda' : docente,
@@ -288,8 +293,15 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
         </div>
       </div>
 
-      <button type="submit" className="boton-confirmar">
-        Confirmar reserva
+      {/* Botón de envío con bloqueo disabled condicional (HU-08) */}
+      <button
+        type="submit"
+        className="boton-confirmar"
+        disabled={bloqueoPorDisponibilidad}
+      >
+        {bloqueoPorDisponibilidad
+          ? 'Sin disponibilidad suficiente'
+          : 'Confirmar reserva'}
       </button>
     </form>
   );
