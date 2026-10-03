@@ -28,7 +28,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 14px;
-  min-width: 620px; /* Garantiza legibilidad forzando scroll suave en móviles */
+  min-width: 620px;
 }
 
 .tabla-reservas th {
@@ -57,7 +57,6 @@
   padding: 16px 0;
 }
 
-/* Botón de acción para cancelar reserva (RF-03) */
 .boton-cancelar-reserva {
   background-color: #fef2f2;
   color: var(--color-danado);
@@ -75,9 +74,6 @@
   color: #ffffff;
 }
 
-/* ==================================================================
-   RNF-01: Adaptación responsiva para móviles
-   ================================================================== */
 @media (max-width: 768px) {
   .tabla-reservas-contenedor {
     padding: 16px;
@@ -90,7 +86,7 @@
   }
 
   .boton-cancelar-reserva {
-    padding: 8px 12px; /* Mayor área táctil para el dedo */
+    padding: 8px 12px;
     font-size: 12px;
   }
 }
