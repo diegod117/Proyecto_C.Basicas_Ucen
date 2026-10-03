@@ -7,6 +7,7 @@
 
 import { obtenerIncidencias } from '../services/incidenciasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
+import EtiquetaEstadoIncidencia from './EtiquetaEstadoIncidencia';
 import './TablaIncidencias.css';
 
 // nombreDelRecurso
@@ -56,7 +57,7 @@ function TablaIncidencias() {
               <td>{incidencia.fecha}</td>
               <td>{nombreDelRecurso(incidencia.recursoId)}</td>
               <td>{incidencia.descripcion}</td>
-              <td>{incidencia.estado}</td>
+              <td><EtiquetaEstadoIncidencia estado={incidencia.estado} /></td>
             </tr>
           ))}
         </tbody>
