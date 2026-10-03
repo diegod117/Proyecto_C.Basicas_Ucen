@@ -72,7 +72,8 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       }
     }
 
-    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad);
+    // El servicio cambia las cantidades Y registra el cambio en el historial
+    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad, motivo);
     if (seGuardo) {
       setMensajeError('');
       setMensajeExito(textoResumenCambio(cantidad, estadoOrigen, estadoNuevo));
