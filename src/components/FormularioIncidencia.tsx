@@ -71,26 +71,15 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
     setMensajeError('');
 
     // Guardamos la incidencia usando el servicio (D1).
-    // La fecha y el estado se asignan aquí (HU-10 pide fecha automática
-    // y estado "pendiente"). Por ahora usamos una fecha simple;
-    // en D5 se creará una función dedicada en utils/fechas.ts.
-    const ahora = new Date();
-    const fechaTexto =
-      ahora.getFullYear() + '-' +
-      String(ahora.getMonth() + 1).padStart(2, '0') + '-' +
-      String(ahora.getDate()).padStart(2, '0') + ' ' +
-      String(ahora.getHours()).padStart(2, '0') + ':' +
-      String(ahora.getMinutes()).padStart(2, '0');
-
+    // El servicio se encarga de asignar la fecha automática y el estado
+    // "pendiente" (D5), así que solo enviamos los datos del formulario.
     agregarIncidencia({
       recursoId: Number(recursoId),
-      fecha: fechaTexto,
       docentePresente: docentePresente.trim(),
       descripcion: descripcion.trim(),
       hayPersonasAfectadas,
       detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
       registradaPor: 'Encargado (usuario actual)',
-      estado: 'pendiente',
     });
 
     // Limpiamos todos los campos para que el formulario quede listo

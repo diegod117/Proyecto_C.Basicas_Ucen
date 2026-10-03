@@ -1,0 +1,104 @@
+/* TablaIncidencias.css
+   Estilos de la tabla que muestra el historial de incidencias (HU-10).
+   Los colores vienen de styles/global.css. */
+
+/* Contenedor de la tabla con borde y esquinas redondeadas */
+.tabla-incidencias-contenedor {
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 24px;
+}
+
+/* Encabezado de la sección */
+.tabla-incidencias-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  padding: 14px 16px;
+  margin: 0;
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* La tabla ocupa todo el ancho */
+.tabla-incidencias {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+/* Encabezados de columna */
+.tabla-incidencias th {
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+  background-color: #f3f4f6;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Celdas de datos */
+.tabla-incidencias td {
+  padding: 10px 14px;
+  color: var(--color-texto);
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Última fila sin borde inferior */
+.tabla-incidencias tr:last-child td {
+  border-bottom: none;
+}
+
+/* Efecto hover en las filas */
+.tabla-incidencias tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Mensaje cuando no hay incidencias */
+.tabla-incidencias-vacia {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--color-texto-secundario);
+  font-size: 0.875rem;
+}
+
+/* Botones de acción para cambiar de estado (HU-10) */
+.boton-accion-incidencia {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Botón para pasar a 'en_revision' */
+.boton-accion-revision {
+  color: #1e40af;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.boton-accion-revision:hover {
+  background-color: #dbeafe;
+}
+
+/* Botón para marcar como 'resuelta' */
+.boton-accion-resuelta {
+  color: #166534;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.boton-accion-resuelta:hover {
+  background-color: #dcfce7;
+}
+
+/* Guion centrado para incidencias que ya están resueltas */
+.texto-accion-finalizada {
+  color: var(--color-texto-secundario);
+  font-weight: 600;
+  padding-left: 8px;
+}
