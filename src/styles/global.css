@@ -1,0 +1,52 @@
+/* global.css
+   Estilos que se aplican a TODA la aplicación.
+   Los estilos de cada componente o página irán en su propio archivo .css.
+   Los colores vienen del mockup (docs/mockup-sgil.html). */
+
+/* Variables de CSS: guardamos los colores en un solo lugar.
+   Si queremos cambiar el azul de toda la app, se cambia solo aquí. */
+:root {
+  --color-principal: #1a63bb; /* azul de la universidad (del mockup) */
+  --color-principal-oscuro: #144f96;
+  --color-fondo: #f8fafc;
+  --color-texto: #1f2937;
+  --color-texto-secundario: #6b7280;
+  --color-borde: #e5e7eb;
+
+  /* Colores de los estados del recurso */
+  --color-disponible: #15803d; /* verde */
+  --color-en-uso: #1d4ed8; /* azul */
+  --color-danado: #b91c1c; /* rojo */
+  --color-mantencion: #a16207; /* amarillo oscuro */
+  --color-baja: #4b5563; /* gris */
+}
+
+/* box-sizing: border-box hace que el ancho de un elemento incluya
+   su padding y borde. Así es más fácil calcular tamaños. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+h1 {
+  color: var(--color-principal);
+}
+
+/* Estilos de la pantalla de inicio temporal (App.tsx).
+   Se borrarán cuando App muestre las páginas reales. */
+.contenedor-inicio {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 0 16px; /* margen lateral para que se vea bien en celular (RNF-01) */
+  text-align: center;
+}
+
+.texto-secundario {
+  color: var(--color-texto-secundario);
+}

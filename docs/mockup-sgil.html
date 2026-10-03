@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGIL - Gestión de Laboratorio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#1A63BB', // Primary blue
+                            dark: '#144f96',
+                            light: '#e8f0fe'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            overflow: hidden; /* Prevent body scroll, manage scroll in containers */
+            background-color: #f8fafc;
+        }
+        
+        /* Screen Transitions (Login vs Main App) */
+        .screen-transition {
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        }
+        .hide-screen {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.98);
+            position: absolute;
+            z-index: -1;
+        }
+        .show-screen {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* View Transitions (Inner Dashboard Views) */
+        .hide-view {
+            display: none !important;
+        }
+        .show-view {
+            display: block !important;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative font-sans text-gray-800 flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- SCREEN: LOGIN -->
+    <!-- ========================================== -->
+    <div id="screen-login" class="screen-transition show-screen absolute inset-0 w-full h-full bg-brand flex flex-col items-center justify-center px-4 z-50">
+        
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-10 flex flex-col justify-center relative overflow-hidden">
+            <!-- Decorative top border -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-blue-400"></div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900 leading-tight">
+                    Gestión de Laboratorio <br>
+                    <span class="text-brand">Ciencias Básicas</span>
+                </h1>
+                <p class="text-gray-500 mt-2 text-sm">Ingrese sus credenciales</p>
+            </div>
+            
+            <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Usuario o Correo</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="username" placeholder="usuario@ucen.cl" class="w-full border border-gray-300 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none pl-10 pr-4 py-3 rounded-lg text-sm transition-all bg-gray-50 focus:bg-white" required value="admin">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" placeholder="••••••••" class="w-full border border-gray-300 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none pl-10 pr-4 py-3 rounded-lg text-sm transition-all bg-gray-50 focus:bg-white" required value="password">
+                    </div>
+                </div>
+                
+                <button type="submit" id="btn-login" class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3 rounded-lg transition-colors duration-200 mt-4 flex justify-center items-center">
+                    <span id="btn-text">Iniciar Sesión</span>
+                    <i id="btn-spinner" class="fa-solid fa-circle-notch fa-spin hidden ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN: MAIN APP LAYOUT -->
+    <!-- ========================================== -->
+    <div id="screen-dashboard" class="screen-transition hide-screen flex-1 flex flex-col h-full w-full">
+        
+        <!-- Top Header (Blue) -->
+        <header class="h-16 bg-brand text-white flex items-center justify-between px-6 shadow-md z-30 flex-shrink-0">
+            <!-- Left: User Info -->
+            <div class="flex items-center gap-3 w-1/3">
+                <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-user-tie text-white"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold leading-tight">Prof. Luis Sergio Torres</span>
+                    <span class="text-[11px] text-blue-200 font-medium tracking-wide uppercase">Administrador</span>
+                </div>
+            </div>
+            
+            <!-- Center: App Title -->
+            <div class="w-1/3 text-center hidden md:block">
+                <h2 class="text-lg font-bold tracking-wide">SGIL - GESTIÓN DE INVENTARIO</h2>
+            </div>
+            
+            <!-- Right: Search & Actions -->
+            <div class="flex items-center justify-end gap-5 w-1/3">
+                <div class="relative hidden lg:block">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" placeholder="Buscar..." class="bg-white text-gray-800 py-1.5 pl-9 pr-4 rounded text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                </div>
+                <button class="relative hover:text-blue-200 transition">
+                    <i class="fa-solid fa-bell text-lg"></i>
+                    <span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-brand">3</span>
+                </button>
+                <button onclick="handleLogout()" class="hover:text-blue-200 transition flex items-center gap-2 text-sm font-medium border-l border-blue-400/50 pl-5 ml-2">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- App Body (Sidebar + Main Content) -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Sidebar (Light Gray) -->
+            <aside class="w-64 bg-[#f1f5f9] border-r border-gray-200 flex-shrink-0 flex flex-col z-20">
+                <div class="flex-1 overflow-y-auto py-4">
+                    <ul class="space-y-1 font-medium text-sm text-gray-700">
+                        
+                        <li>
+                            <a href="#" class="flex items-center px-6 py-2.5 hover:bg-gray-200 transition-colors">
+                                <i class="fa-solid fa-border-all w-6 text-gray-500 text-center"></i> Dashboard
+                            </a>
+                        </li>
+                        
+                        <!-- NUEVO: Mis reservas -->
+                        <li>
+                            <a href="#" class="flex items-center px-6 py-2.5 bg-gray-200 text-gray-900 border-l-4 border-gray-400 font-semibold transition-colors">
+                                <i class="fa-regular fa-calendar-check w-6 text-gray-600 text-center"></i> Mis reservas
+                            </a>
+                        </li>
+                        
+                        <!-- Laboratorios (Accordion Style) -->
+                        <li class="mt-2">
+                            <div class="flex items-center justify-between px-6 py-2.5 bg-brand text-white shadow-sm">
+                                <div class="flex items-center">
+                                    <i class="fa-solid fa-flask w-6 text-center"></i> Laboratorios
+                                </div>
+                            </div>
+                            
+                            <div class="mt-1 relative bg-[#f1f5f9]">
+                                <div class="absolute left-[34px] top-0 bottom-0 w-px bg-gray-300"></div>
+                                
+                                <ul class="pl-[46px] pr-4 space-y-1 py-1">
+                                    <!-- LAB. ELECTRÓNICA -->
+                                    <li>
+                                        <div class="flex items-center justify-between py-1.5 cursor-pointer text-gray-800 font-bold text-xs tracking-wide">
+                                            <span>LAB. ELECTRÓNICA</span>
+                                            <i class="fa-solid fa-chevron-up text-[10px] text-gray-500"></i>
+                                        </div>
+                                        
+                                        <ul class="space-y-0.5 mt-1 text-gray-600 font-normal">
+                                            <li><a href="#" class="flex items-center py-1.5 px-2 hover:bg-gray-200 rounded"><i class="fa-solid fa-angle-down text-[10px] w-5 text-gray-400"></i> 334</a></li>
+                                            <li><a href="#" class="flex items-center py-1.5 px-2 hover:bg-gray-200 rounded"><i class="fa-solid fa-angle-down text-[10px] w-5 text-gray-400"></i> 335</a></li>
+                                            <!-- Active Item -->
+                                            <li class="relative">
+                                                <div class="absolute -left-[13px] top-0 bottom-0 w-[2px] bg-gray-600 z-10"></div>
+                                                <a href="#" class="flex items-center py-1.5 px-2 bg-gray-200 text-gray-900 font-semibold rounded shadow-sm"><i class="fa-solid fa-angle-down text-[10px] w-5 text-gray-600"></i> 336</a>
+                                            </li>
+                                            <li><a href="#" class="flex items-center py-1.5 px-2 hover:bg-gray-200 rounded"><i class="fa-solid fa-angle-down text-[10px] w-5 text-gray-400"></i> 337</a></li>
+                                            <li><a href="#" class="flex items-center py-1.5 px-2 hover:bg-gray-200 rounded"><i class="fa-solid fa-angle-down text-[10px] w-5 text-gray-400"></i> 338</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <!-- LAB. FÍSICA -->
+                                    <li class="mt-2">
+                                        <div class="flex items-center justify-between py-1.5 cursor-pointer text-gray-800 font-bold text-xs tracking-wide">
+                                            <span>LAB. FÍSICA</span>
+                                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-500"></i>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        
+                        <li class="mt-2">
+                            <a href="#" class="flex items-center justify-between px-6 py-2.5 hover:bg-gray-200 transition-colors">
+                                <div class="flex items-center"><i class="fa-solid fa-file-lines w-6 text-gray-500 text-center"></i> Reportes</div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center justify-between px-6 py-2.5 hover:bg-gray-200 transition-colors">
+                                <div class="flex items-center"><i class="fa-solid fa-users w-6 text-gray-500 text-center"></i> Usuarios</div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center justify-between px-6 py-2.5 hover:bg-gray-200 transition-colors">
+                                <div class="flex items-center"><i class="fa-solid fa-gear w-6 text-gray-500 text-center"></i> Configuración</div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-white p-6 lg:p-8 relative">
+                
+                <!-- ========================================== -->
+                <!-- VIEW 1: INVENTORY GRID -->
+                <!-- ========================================== -->
+                <div id="view-inventory" class="show-view">
+                    
+                    <div class="mb-6 border-b border-gray-100 pb-4">
+                        <div class="flex items-center text-sm text-gray-500 mb-1">
+                            <i class="fa-solid fa-house mr-2"></i> Dashboard <span class="mx-2">/</span> Laboratorios <span class="mx-2">/</span> <span class="text-gray-800 font-medium">336</span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-800">Inventario Disponible: Laboratorio 336</h1>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        
+                        <!-- Item Card 1 -->
+                        <div onclick="navigate('view-detail', {name: 'Multímetro Fluke 87V', code: 'B206-B1-M02', total: 14, disp: 12})" class="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+                            <div class="h-36 bg-gray-50 flex items-center justify-center p-4 border-b border-gray-100 relative group-hover:bg-blue-50/50 transition-colors">
+                                <i class="fa-solid fa-bolt text-5xl text-yellow-500"></i>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-800 text-base mb-1 truncate">Multímetro Fluke 87V</h3>
+                                <p class="text-xs text-gray-500 mb-3">Cantidad: 14 (12 Disponible)</p>
+                                <div class="flex gap-1.5 text-[10px] font-bold">
+                                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded border border-green-200">DISPONIBLE - Verde</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Card 2 -->
+                        <div class="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+                            <div class="h-36 bg-gray-50 flex items-center justify-center p-4 border-b border-gray-100 relative group-hover:bg-blue-50/50 transition-colors">
+                                <i class="fa-solid fa-wave-square text-5xl text-blue-500"></i>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-800 text-base mb-1 truncate">Osciloscopio Rigal</h3>
+                                <p class="text-xs text-gray-500 mb-3">Cantidad: 6 (3 Disponible)</p>
+                                <div class="flex flex-wrap gap-1.5 text-[10px] font-bold">
+                                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded border border-red-200">RESERVADO (2)</span>
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded border border-yellow-200">MANTENIMIENTO (1)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Card 3 -->
+                        <div class="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+                            <div class="h-36 bg-gray-50 flex items-center justify-center p-4 border-b border-gray-100 relative group-hover:bg-blue-50/50 transition-colors">
+                                <i class="fa-solid fa-plug text-5xl text-gray-700"></i>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-800 text-base mb-1 truncate">Soldador Weller</h3>
+                                <p class="text-xs text-gray-500 mb-3">Cantidad: 20 (20 Disponible)</p>
+                                <div class="flex gap-1.5 text-[10px] font-bold">
+                                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded border border-green-200">DISPONIBLE - Verde</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Card 4 -->
+                        <div class="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-gray-200 overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+                            <div class="h-36 bg-gray-50 flex items-center justify-center p-4 border-b border-gray-100 relative group-hover:bg-blue-50/50 transition-colors">
+                                <i class="fa-solid fa-microchip text-5xl text-teal-600"></i>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-800 text-base mb-1 truncate">Arduino Uno R3</h3>
+                                <p class="text-xs text-gray-500 mb-3">Cantidad: 45 (26 Disponible)</p>
+                                <div class="flex flex-wrap gap-1.5 text-[10px] font-bold">
+                                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded border border-green-200">DISPONIBLE (26)</span>
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded border border-blue-200">PRESTADO (19)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- VIEW 2: ITEM DETAIL (P4) -->
+                <!-- ========================================== -->
+                <div id="view-detail" class="hide-view">
+                    
+                    <!-- Breadcrumb -->
+                    <div class="mb-5 flex items-center text-gray-600">
+                        <button onclick="navigate('view-inventory')" class="hover:text-brand transition font-medium flex items-center text-lg">
+                            <i class="fa-solid fa-chevron-left text-sm mr-2"></i> Inventario 
+                        </button>
+                        <span class="mx-2 text-gray-400">/</span> 
+                        <span id="detail-title" class="font-bold text-gray-800 text-lg">Multímetro Fluke 87V</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Left Column: Info & History -->
+                        <div class="lg:col-span-2 space-y-6">
+                            
+                            <!-- Item Metadata -->
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 flex flex-col sm:flex-row gap-5 shadow-sm">
+                                <div class="w-full sm:w-40 h-40 bg-gray-50 rounded border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-bolt text-5xl text-yellow-500 opacity-80"></i>
+                                </div>
+                                
+                                <div class="flex-1 space-y-2 text-sm text-gray-600">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+                                        <div class="md:col-span-2"><span class="font-medium text-gray-500 w-20 inline-block">Categoría:</span> Equipo</div>
+                                        <div class="md:col-span-2"><span class="font-medium text-gray-500 w-20 inline-block">Ubicación:</span> B206 / Bodega 1 / Mueble 2</div>
+                                        <div class="md:col-span-2"><span class="font-medium text-gray-500 w-20 inline-block">Código:</span> <span id="detail-code" class="text-gray-800">B206-B1-M02</span></div>
+                                        
+                                        <div class="md:col-span-2 mt-2 pt-2 border-t border-gray-100 flex items-center">
+                                            <span class="font-medium text-gray-500 w-20 inline-block">Total:</span> <span id="detail-total" class="font-bold text-gray-800">14</span> 
+                                            <span class="mx-3 text-gray-300">|</span> 
+                                            <span class="font-medium text-gray-500 mr-2">Operativa:</span> <span id="detail-disp" class="font-bold text-gray-800">12</span>
+                                        </div>
+                                        <div class="md:col-span-2 mt-1">
+                                            <span class="font-medium text-gray-500 w-20 inline-block">Estado:</span> 
+                                            <span class="text-gray-800">12 disponibles, 2 en uso/dañado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- History Table -->
+                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                                <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
+                                    <h3 class="font-bold text-gray-700 text-sm">Historial de estados</h3>
+                                </div>
+                                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-5 py-2.5 text-left font-semibold text-gray-600">Fecha</th>
+                                            <th class="px-5 py-2.5 text-left font-semibold text-gray-600">Cambio</th>
+                                            <th class="px-5 py-2.5 text-left font-semibold text-gray-600">Usuario</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 bg-white">
+                                        <tr>
+                                            <td class="px-5 py-3 text-gray-500">01/10 11:20</td>
+                                            <td class="px-5 py-3 text-gray-800">Disponible &rarr; <span class="text-red-600">Dañado (1)</span></td>
+                                            <td class="px-5 py-3 text-gray-500">Encargado</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-5 py-3 text-gray-500">12/09 09:05</td>
+                                            <td class="px-5 py-3 text-gray-800">Mantención &rarr; <span class="text-green-600">Disp. (1)</span></td>
+                                            <td class="px-5 py-3 text-gray-500">Encargado</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: Actions -->
+                        <div class="space-y-4">
+                            
+                            <!-- NUEVO: Botón Reservar -->
+                            <button onclick="navigate('view-reservation')" class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3.5 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 border border-transparent">
+                                <i class="fa-regular fa-calendar-plus text-lg"></i> Reservar Recurso
+                            </button>
+
+                            <!-- Botón Reporte -->
+                            <button onclick="openModal()" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-lg shadow-sm border border-gray-300 transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-signature text-gray-500"></i> Generar Reporte
+                            </button>
+
+                            <!-- Cambiar estado Form -->
+                            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 mt-2 shadow-sm">
+                                <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 text-sm">Cambiar estado</h3>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Nuevo estado</label>
+                                        <select class="w-full border border-gray-300 rounded p-2 outline-none focus:border-gray-500 bg-white text-sm">
+                                            <option selected>Dañado</option>
+                                            <option>En mantención</option>
+                                            <option>Disponible</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="flex gap-3">
+                                        <div class="w-1/3">
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Cant.</label>
+                                            <input type="number" min="1" value="1" class="w-full border border-gray-300 rounded p-2 outline-none focus:border-gray-500 bg-white text-sm">
+                                        </div>
+                                        <div class="w-2/3">
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Motivo</label>
+                                            <input type="text" value="Punta rota" class="w-full border border-gray-300 rounded p-2 outline-none focus:border-gray-500 bg-white text-sm">
+                                        </div>
+                                    </div>
+
+                                    <button onclick="showToast('Estado actualizado. Se registró el cambio.')" class="w-full bg-[#374151] hover:bg-gray-800 text-white font-medium py-2.5 rounded transition-colors mt-2 text-sm shadow-sm">
+                                        Guardar cambio
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- VIEW 3: RESERVATION FORM (P5) -->
+                <!-- ========================================== -->
+                <div id="view-reservation" class="hide-view">
+                    
+                    <!-- Breadcrumb -->
+                    <div class="mb-5 flex items-center text-gray-600 text-lg">
+                        <button onclick="navigate('view-detail')" class="hover:text-brand transition font-medium flex items-center">
+                            <i class="fa-solid fa-chevron-left text-sm mr-2"></i> Inventario 
+                        </button>
+                        <span class="mx-2 text-gray-400">/</span> 
+                        <span class="text-gray-600 detail-name-ref cursor-pointer hover:text-brand transition" onclick="navigate('view-detail')">Multímetro</span>
+                        <span class="mx-2 text-gray-400">/</span> 
+                        <span class="font-bold text-gray-800">Reservar</span>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden max-w-4xl">
+                        <!-- Header Form -->
+                        <div class="px-6 py-5 border-b border-gray-100">
+                            <h2 class="text-xl font-bold text-gray-800">Reservar recurso</h2>
+                            <p class="text-sm text-gray-500 mt-1">Recurso: <span class="detail-name-ref font-medium text-gray-700">Multímetro</span> <span class="mx-1">&middot;</span> Ubicación <span id="res-location" class="font-medium text-gray-700">B206-B1-M02</span></p>
+                        </div>
+
+                        <!-- Form Body -->
+                        <div class="p-6 space-y-5">
+                            
+                            <!-- Row 1: Date & Time -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                                    <input type="date" value="2026-10-08" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand text-sm text-gray-700">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hora inicio</label>
+                                    <select class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand text-sm text-gray-700 bg-white">
+                                        <option>08:30</option>
+                                        <option selected>10:00</option>
+                                        <option>11:30</option>
+                                        <option>14:00</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hora fin</label>
+                                    <select class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand text-sm text-gray-700 bg-white">
+                                        <option>10:00</option>
+                                        <option selected>11:30</option>
+                                        <option>13:00</option>
+                                        <option>15:30</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Qty & Course -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                <div class="md:col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                                    <input type="number" min="1" value="6" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand text-sm text-gray-700">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Asignatura / sala</label>
+                                    <input type="text" value="Física I - B302" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand text-sm text-gray-700">
+                                </div>
+                            </div>
+
+                            <!-- Info Banner -->
+                            <div class="bg-gray-100 p-3 rounded border border-gray-200 text-sm text-gray-700 flex items-center mt-2">
+                                <span class="font-bold">Disponibles en ese horario: <span id="res-available">14</span> operativas</span> 
+                                <span class="text-gray-500 ml-1">(2 reservadas por otro docente)</span>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex justify-end gap-3 pt-4">
+                                <button onclick="navigate('view-detail')" class="px-6 py-2.5 bg-gray-200 border border-gray-300 text-gray-800 rounded font-medium hover:bg-gray-300 transition text-sm">
+                                    Cancelar
+                                </button>
+                                <button onclick="confirmReservation()" class="px-6 py-2.5 bg-[#374151] hover:bg-gray-800 text-white rounded font-medium transition shadow text-sm">
+                                    Confirmar reserva
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: REPORT -->
+    <!-- ========================================== -->
+    <div id="modal-report" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-200" id="modal-content">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Generar Reporte</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de incidencia</label>
+                    <select class="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-brand">
+                        <option>Falla técnica</option>
+                        <option>Pieza faltante</option>
+                        <option>Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <textarea rows="3" class="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-brand resize-none" placeholder="Detalle del problema..."></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-2 bg-gray-50 rounded-b-lg">
+                <button onclick="closeModal()" class="px-4 py-2 bg-white border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
+                <button onclick="submitReport()" class="px-4 py-2 bg-brand text-white rounded text-sm font-medium hover:bg-brand-dark shadow-sm">Guardar Reporte</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-[150%] transition-transform duration-300 flex items-center gap-3 bg-gray-800 text-white px-4 py-3 rounded shadow-lg max-w-md border-l-4 border-green-500">
+        <i class="fa-solid fa-circle-info text-green-400"></i>
+        <div class="text-sm font-medium" id="toast-msg">Acción realizada con éxito.</div>
+        <button onclick="hideToast()" class="ml-2 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <script>
+        // Global State
+        let currentItem = { name: 'Multímetro Fluke 87V', code: 'B206-B1-M02', total: 14, disp: 12 };
+        
+        // DOM Elements
+        const views = {
+            'view-inventory': document.getElementById('view-inventory'),
+            'view-detail': document.getElementById('view-detail'),
+            'view-reservation': document.getElementById('view-reservation')
+        };
+        const toastEl = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        let toastTimeout;
+
+        // --- Auth Logic ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            const txt = document.getElementById('btn-text');
+            const spin = document.getElementById('btn-spinner');
+            
+            txt.textContent = 'Verificando...';
+            spin.classList.remove('hidden');
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('screen-login').classList.replace('show-screen', 'hide-screen');
+                setTimeout(() => {
+                    document.getElementById('screen-dashboard').classList.replace('hide-screen', 'show-screen');
+                    // Reset button state for logout
+                    txt.textContent = 'Iniciar Sesión';
+                    spin.classList.add('hidden');
+                    btn.disabled = false;
+                }, 100);
+            }, 600);
+        }
+
+        function handleLogout() {
+            document.getElementById('screen-dashboard').classList.replace('show-screen', 'hide-screen');
+            setTimeout(() => {
+                document.getElementById('screen-login').classList.replace('hide-screen', 'show-screen');
+                navigate('view-inventory'); // reset view
+            }, 300);
+        }
+
+        // --- Navigation Logic ---
+        function navigate(viewId, itemData = null) {
+            // Update Context Data if provided
+            if (itemData) {
+                currentItem = itemData;
+                updateContextUI();
+            }
+
+            // Hide all views
+            Object.values(views).forEach(v => {
+                v.classList.remove('show-view');
+                v.classList.add('hide-view');
+            });
+
+            // Show target view
+            views[viewId].classList.remove('hide-view');
+            // small delay to restart animation
+            setTimeout(() => {
+                views[viewId].classList.add('show-view');
+            }, 10);
+        }
+
+        function updateContextUI() {
+            // Detail View mappings
+            document.getElementById('detail-title').textContent = currentItem.name;
+            document.getElementById('detail-code').textContent = currentItem.code;
+            document.getElementById('detail-total').textContent = currentItem.total;
+            document.getElementById('detail-disp').textContent = currentItem.disp;
+            
+            // Reservation View mappings
+            document.querySelectorAll('.detail-name-ref').forEach(el => el.textContent = currentItem.name);
+            document.getElementById('res-location').textContent = currentItem.code;
+            document.getElementById('res-available').textContent = currentItem.disp;
+        }
+
+        // --- Modals & Toasts ---
+        function openModal() {
+            const m = document.getElementById('modal-report');
+            const c = document.getElementById('modal-content');
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                c.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const m = document.getElementById('modal-report');
+            const c = document.getElementById('modal-content');
+            m.classList.add('opacity-0');
+            c.classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 200);
+        }
+
+        function submitReport() {
+            closeModal();
+            showToast('Reporte generado y guardado en el sistema.');
+        }
+
+        function confirmReservation() {
+            showToast(`Reserva registrada: 6 unidades - 08/10/2026. Puede verla en "Mis reservas".`);
+            setTimeout(() => navigate('view-detail'), 800); // Auto go back after small delay
+        }
+
+        function showToast(msg) {
+            toastMsg.textContent = msg;
+            toastEl.classList.remove('translate-y-[150%]');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => hideToast(), 4000);
+        }
+
+        function hideToast() {
+            toastEl.classList.add('translate-y-[150%]');
+        }
+    </script>
+</body>
+</html>
