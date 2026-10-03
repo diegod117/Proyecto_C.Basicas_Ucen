@@ -1,21 +1,44 @@
 // PaginaReservas.tsx
-// Página de reservas. Por ahora es solo un borrador:
-// muestra cuántas reservas de prueba hay, para comprobar que los datos cargan.
-// Aquí se construirá el formulario de reserva.
-// Cubre: HU-03 (pendiente), RF-03
+// Página de reservas del laboratorio.
+// Permite al personal docente registrar nuevas reservas de materiales e instrumentos.
+// Cubre: HU-03 (página y formulario de reserva), RF-03
 
-import { listaReservasPrueba } from '../data/reservas';
+import { useState } from 'react';
+import FormularioReserva from '../components/FormularioReserva';
+import { obtenerReservas } from '../services/reservasService';
+import './PaginaReservas.css';
 
 // Componente PaginaReservas
-// No recibe props. Devuelve el contenido de la página de reservas.
+// Renderiza el encabezado del módulo y el formulario de nueva reserva.
 function PaginaReservas() {
+  // Estado local que se incrementa para forzar un re-renderizado
+  // cuando el formulario completa una reserva con éxito.
+  const [actualizaciones, setActualizaciones] = useState(0);
+
+  const listaReservas = obtenerReservas();
+
+  function manejarReservaCreada() {
+    setActualizaciones(function (valorAnterior) {
+      return valorAnterior + 1;
+    });
+  }
+
   return (
     <section className="contenido-pagina">
-      <h2>Reservas</h2>
-      <p>Pendiente: HU-03 (formulario para reservar un recurso).</p>
-      <p className="texto-secundario">
-        Reservas de prueba cargadas: {listaReservasPrueba.length}
-      </p>
+      <header className="pagina-reservas-header">
+        <h2>Reservas de Laboratorio</h2>
+        <p className="texto-secundario">
+          Módulo para solicitar recursos, instrumentos y espacios de trabajo.
+        </p>
+        <span className="contador-reservas-badge">
+          Reservas registradas: {listaReservas.length}
+        </span>
+      </header>
+
+      <div className="pagina-reservas-contenedor">
+        {/* Componente del formulario controlado */}
+        <FormularioReserva onReservaCreada={manejarReservaCreada} />
+      </div>
     </section>
   );
 }

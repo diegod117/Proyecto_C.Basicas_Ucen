@@ -72,3 +72,30 @@
 .boton-confirmar:hover {
   background-color: var(--color-principal-oscuro);
 }
+
+.boton-confirmar:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Mensajes informativos de validación y confirmación */
+.mensaje-error {
+  color: var(--color-danado);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.mensaje-exito {
+  color: var(--color-disponible);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 500;
+}

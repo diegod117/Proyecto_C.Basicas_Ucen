@@ -1,0 +1,29 @@
+/* PaginaReservas.css
+   Estilos para la página principal del módulo de reservas.
+   Cubre: HU-03, RF-03 */
+
+.pagina-reservas-header {
+  margin-bottom: 24px;
+}
+
+.pagina-reservas-header h2 {
+  margin: 0 0 8px 0;
+  color: var(--color-principal);
+}
+
+.contador-reservas-badge {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  margin-top: 6px;
+}
+
+.pagina-reservas-contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
