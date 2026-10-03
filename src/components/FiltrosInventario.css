@@ -1,0 +1,48 @@
+/* FiltrosInventario.css
+   Estilos de la barra de filtros del inventario. */
+
+/* Grilla de filtros: el buscador ocupa más espacio y los 3 select menos.
+   En pantallas angostas (celular) cada filtro ocupa una fila completa. */
+.filtros-inventario {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Cada filtro: el label arriba y el input/select abajo */
+.campo-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-filtro label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+}
+
+/* Cuando un filtro está seleccionado se marca con el azul principal */
+.campo-filtro input:focus,
+.campo-filtro select:focus {
+  outline: none;
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.2);
+}
+
+/* @media aplica estas reglas SOLO si la pantalla mide 700px o menos.
+   En celular, los filtros se apilan uno debajo del otro (RNF-01). */
+@media (max-width: 700px) {
+  .filtros-inventario {
+    grid-template-columns: 1fr;
+  }
+}

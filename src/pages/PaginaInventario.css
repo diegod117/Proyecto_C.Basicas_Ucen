@@ -1,0 +1,29 @@
+/* PaginaInventario.css
+   Estilos propios de la página de inventario. */
+
+.inventario-encabezado {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.inventario-encabezado h2 {
+  margin: 0 0 4px 0;
+}
+
+.inventario-encabezado p {
+  margin: 0;
+}
+
+/* Grilla de tarjetas.
+   "display: grid" ordena los elementos en filas y columnas.
+   "repeat(auto-fill, minmax(240px, 1fr))" significa:
+     - cada columna mide como mínimo 240px y crece para llenar el espacio (1fr)
+     - caben tantas columnas como entren en el ancho de la pantalla
+   Así, en un computador se ven 3 o 4 tarjetas por fila y en un celular 1,
+   sin escribir reglas distintas para cada pantalla (RNF-01). */
+.grilla-recursos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}

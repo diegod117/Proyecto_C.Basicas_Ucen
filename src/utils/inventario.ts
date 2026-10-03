@@ -12,6 +12,29 @@
 
 import type { Recurso, EstadoRecurso, CategoriaRecurso } from '../types/Recurso';
 
+// Lista con los 5 estados, en el orden en que queremos mostrarlos.
+// Sirve para recorrer todos los estados con un for (por ejemplo, para
+// dibujar las etiquetas de una tarjeta o las opciones de un filtro).
+export const listaEstadosRecurso: EstadoRecurso[] = [
+  'disponible',
+  'en_uso',
+  'danado',
+  'en_mantencion',
+  'dado_de_baja',
+];
+
+// Lista con las 6 categorías (RF-08). Se usa para las opciones del filtro
+// por categoría. Si se agrega una categoría nueva (RNF-05), se suma aquí
+// y en el tipo CategoriaRecurso.
+export const listaCategoriasRecurso: CategoriaRecurso[] = [
+  'instrumento',
+  'insumo',
+  'equipo',
+  'reactivo',
+  'mobiliario',
+  'instalacion',
+];
+
 // textoEstado
 // Recibe: un estado del recurso, por ejemplo 'danado'.
 // Devuelve: el texto para mostrar en pantalla, por ejemplo "Dañado".
@@ -69,4 +92,25 @@ export function calcularCantidadTotal(recurso: Recurso): number {
     cantidades.dado_de_baja;
 
   return total;
+}
+
+// obtenerEstadosConUnidades
+// Recibe: un recurso.
+// Devuelve: solo los estados que tienen al menos 1 unidad.
+// Ejemplo: el Arduino tiene 26 disponibles y 19 en uso, así que
+// devuelve ['disponible', 'en_uso'] (no tiene sentido mostrar "Dañado (0)").
+export function obtenerEstadosConUnidades(recurso: Recurso): EstadoRecurso[] {
+  const estadosConUnidades: EstadoRecurso[] = [];
+
+  for (const estado of listaEstadosRecurso) {
+    // recurso.cantidades[estado] lee la propiedad cuyo nombre está en la
+    // variable "estado". Ej: si estado es 'en_uso', lee recurso.cantidades.en_uso.
+    // Esto funciona porque en Recurso.ts las propiedades de CantidadesPorEstado
+    // se llaman igual que los valores de EstadoRecurso.
+    if (recurso.cantidades[estado] > 0) {
+      estadosConUnidades.push(estado);
+    }
+  }
+
+  return estadosConUnidades;
 }
