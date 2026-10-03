@@ -7,6 +7,7 @@
 
 import type { Incidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
+import { obtenerFechaActual } from '../utils/fechas';
 
 // ------------------------------------------------------------------
 // Lista en memoria
@@ -44,10 +45,16 @@ function obtenerIncidenciaPorId(id: number): Incidencia | undefined {
 // ------------------------------------------------------------------
 // agregarIncidencia
 // ------------------------------------------------------------------
-// Recibe una incidencia SIN id (el servicio le asigna uno automático).
-// Devuelve la incidencia ya guardada con su id.
-// Omit<Incidencia, 'id'> significa "una Incidencia pero sin el campo id".
-function agregarIncidencia(datos: Omit<Incidencia, 'id'>): Incidencia {
+// Recibe los datos que escribe el usuario en el formulario (sin id,
+// sin fecha y sin estado, porque esos los pone el servicio).
+// Devuelve la incidencia ya guardada con todos sus campos.
+//
+// Omit<Incidencia, 'id' | 'fecha' | 'estado'> significa:
+// "una Incidencia pero sin los campos id, fecha ni estado".
+// HU-10 pide que la fecha sea automática y el estado empiece en 'pendiente'.
+function agregarIncidencia(
+  datos: Omit<Incidencia, 'id' | 'fecha' | 'estado'>
+): Incidencia {
   // Generamos un id nuevo: tomamos el mayor id que exista y le sumamos 1.
   // Si la lista está vacía, el id será 1.
   let mayorId = 0;
@@ -59,6 +66,8 @@ function agregarIncidencia(datos: Omit<Incidencia, 'id'>): Incidencia {
 
   const nuevaIncidencia: Incidencia = {
     id: mayorId + 1,
+    fecha: obtenerFechaActual(), // fecha automática (HU-10)
+    estado: 'pendiente',         // toda incidencia nace como pendiente (HU-10)
     ...datos,
   };
 
