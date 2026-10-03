@@ -1,7 +1,10 @@
 // disponibilidad.ts
 // Funciones de utilidad para validar y calcular la disponibilidad de recursos.
 // Separa la lógica de negocio de la interfaz gráfica de usuario.
-// Cubre: HU-03 (validación de formulario), HU-07 (cruces de horarios), HU-08 (bloqueo por stock)
+// Cubre: HU-03 (validación de formulario), HU-07 (cruces de horarios y cálculo de stock), HU-08 (bloqueo por stock)
+
+import { obtenerRecursoPorId } from '../services/recursosService';
+import { obtenerReservas } from '../services/reservasService';
 
 // ------------------------------------------------------------------
 // validarCamposReserva
@@ -58,12 +61,6 @@ export function validarCamposReserva(
 // Recibe: fecha y horas de dos intervalos de tiempo (A y B).
 // Devuelve: true si ambos horarios chocan o se solapan en el mismo día,
 //           false si son en días distintos o están separados en el tiempo.
-//
-// ¿Cómo se deduce si chocan?
-// Dos intervalos NO se cruzan únicamente si:
-//   - El intervalo A termina antes o justo cuando empieza el B (finA <= inicioB)
-//   - O bien el intervalo B termina antes o justo cuando empieza el A (finB <= inicioA)
-// En cualquier otro caso, hay solapamiento de horario.
 export function seCruzanHorarios(
   fechaA: string,
   inicioA: string,
@@ -84,4 +81,56 @@ export function seCruzanHorarios(
 
   // 3. En caso contrario, se solapan
   return true;
+}
+
+// ------------------------------------------------------------------
+// calcularUnidadesDisponibles
+// ------------------------------------------------------------------
+// Recibe: ID del recurso, fecha y rango de horas solicitado.
+// Devuelve: la cantidad neta de unidades que quedan libres para ese horario.
+//
+// Lógica de cálculo:
+// 1. Busca el recurso en el inventario para conocer sus unidades operativas disponibles.
+// 2. Obtiene todas las reservas registradas.
+// 3. Resta la cantidad de cada reserva que coincida con el mismo recurso y cuyo
+//    horario se cruce con el horario solicitado.
+// 4. Retorna el remanente (mínimo 0).
+export function calcularUnidadesDisponibles(
+  recursoId: number,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string
+): number {
+  // 1. Obtener el recurso desde el servicio
+  const recurso = obtenerRecursoPorId(recursoId);
+  if (!recurso) {
+    return 0;
+  }
+
+  // Stock base que el laboratorio tiene en estado 'disponible'
+  let unidadesLibres = recurso.cantidades.disponible;
+
+  // 2. Consultar todas las reservas existentes
+  const reservas = obtenerReservas();
+
+  // 3. Recorrer las reservas y descontar las que ocupen este recurso en este horario
+  for (const reserva of reservas) {
+    if (reserva.recursoId === recursoId) {
+      const hayChoque = seCruzanHorarios(
+        fecha,
+        horaInicio,
+        horaFin,
+        reserva.fecha,
+        reserva.horaInicio,
+        reserva.horaFin
+      );
+
+      if (hayChoque) {
+        unidadesLibres = unidadesLibres - reserva.cantidad;
+      }
+    }
+  }
+
+  // 4. No permitir valores negativos por seguridad
+  return Math.max(0, unidadesLibres);
 }
