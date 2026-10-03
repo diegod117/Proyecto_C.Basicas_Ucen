@@ -1,6 +1,6 @@
 /* TablaReservas.css
    Estilos de la tabla de reservas de laboratorio.
-   Cubre: RF-03 (visualización del historial de reservas)
+   Cubre: RF-03 (visualización del historial de reservas y acción de cancelación)
    Usa las variables de diseño globales definidas en src/styles/global.css */
 
 .tabla-reservas-contenedor {
@@ -42,6 +42,7 @@
   padding: 12px 14px;
   border-bottom: 1px solid var(--color-borde);
   color: var(--color-texto);
+  vertical-align: middle;
 }
 
 .tabla-reservas tbody tr:hover {
@@ -52,4 +53,22 @@
   color: var(--color-texto-secundario);
   font-style: italic;
   padding: 16px 0;
+}
+
+/* Botón de acción para cancelar reserva (RF-03) */
+.boton-cancelar-reserva {
+  background-color: #fef2f2;
+  color: var(--color-danado);
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-cancelar-reserva:hover {
+  background-color: var(--color-danado);
+  color: #ffffff;
 }

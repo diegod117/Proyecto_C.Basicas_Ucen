@@ -1,8 +1,8 @@
 // PaginaReservas.tsx
 // Página de reservas del laboratorio.
 // Permite al personal docente registrar nuevas reservas de materiales e instrumentos
-// y consultar el historial ordenado de reservas activas.
-// Cubre: HU-03 (formulario), HU-07, HU-08 y RF-03 (tabla de reservas)
+// y consultar o cancelar reservas existentes.
+// Cubre: HU-03 (formulario), HU-07, HU-08 y RF-03 (tabla y cancelación)
 
 import { useState } from 'react';
 import FormularioReserva from '../components/FormularioReserva';
@@ -17,7 +17,7 @@ function PaginaReservas() {
 
   const listaReservas = obtenerReservas();
 
-  function manejarReservaCreada() {
+  function refrescarDatos() {
     setActualizaciones(function (valorAnterior) {
       return valorAnterior + 1;
     });
@@ -37,10 +37,13 @@ function PaginaReservas() {
 
       <div className="pagina-reservas-contenedor">
         {/* Formulario para registrar una nueva reserva */}
-        <FormularioReserva onReservaCreada={manejarReservaCreada} />
+        <FormularioReserva onReservaCreada={refrescarDatos} />
 
-        {/* Tabla con el historial de reservas ordenadas cronológicamente (M11) */}
-        <TablaReservas version={actualizaciones} />
+        {/* Tabla con el historial de reservas y botón de cancelación (M11, M12) */}
+        <TablaReservas
+          version={actualizaciones}
+          onReservaModificada={refrescarDatos}
+        />
       </div>
     </section>
   );
