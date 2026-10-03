@@ -16,10 +16,13 @@ interface PropsMenuNavegacion {
   // le avisa a App cuál página eligió el usuario, y App se encarga del resto.
   // "(pagina: Pagina) => void" = recibe una Pagina y no devuelve nada.
   onCambiarPagina: (pagina: Pagina) => void;
+  // Cantidad de alertas activas para mostrar en el badge del menú (HU-05).
+  // Es una prop numérica, tal como la campana con contador del mockup.
+  cantidadAlertas?: number;
 }
 
 // Componente MenuNavegacion
-// Recibe: paginaActual y onCambiarPagina (ver interface de arriba).
+// Recibe: paginaActual, onCambiarPagina y cantidadAlertas opcional.
 // Devuelve: la barra de navegación.
 function MenuNavegacion(props: PropsMenuNavegacion) {
   // Devuelve la clase CSS de un botón: si es la página actual,
@@ -62,7 +65,10 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
           className={obtenerClaseBoton('alertas')}
           onClick={() => props.onCambiarPagina('alertas')}
         >
-          Alertas
+          <span>Alertas</span>
+          {props.cantidadAlertas !== undefined && props.cantidadAlertas > 0 && (
+            <span className="badge-alertas-menu">{props.cantidadAlertas}</span>
+          )}
         </button>
       </nav>
     </header>

@@ -10,6 +10,7 @@ import PaginaInventario from './pages/PaginaInventario';
 import PaginaReservas from './pages/PaginaReservas';
 import PaginaIncidencias from './pages/PaginaIncidencias';
 import PaginaAlertas from './pages/PaginaAlertas';
+import { generarAlertas } from './utils/alertas';
 
 // Componente App
 // No recibe props. Devuelve la aplicación completa (menú + página actual).
@@ -21,6 +22,10 @@ function App() {
   // "<Pagina>" le dice a TypeScript que este dato solo puede ser
   // 'inventario', 'reservas', 'incidencias' o 'alertas' (ver types/Pagina.ts).
   const [paginaActual, setPaginaActual] = useState<Pagina>('inventario');
+
+  // Cantidad de alertas activas calculadas automáticamente a partir
+  // del inventario (HU-05). Se le pasa al menú como prop numérica.
+  const totalAlertas = generarAlertas().length;
 
   // Decide qué página mostrar según el valor de paginaActual.
   // No recibe nada. Devuelve el componente de la página que corresponde.
@@ -38,11 +43,13 @@ function App() {
 
   return (
     <div>
-      {/* Le pasamos al menú la página actual y la función para cambiarla.
-          Cuando el usuario hace clic en un botón del menú, el menú llama a
-          setPaginaActual, el estado cambia y React vuelve a dibujar App
-          mostrando la página nueva. */}
-      <MenuNavegacion paginaActual={paginaActual} onCambiarPagina={setPaginaActual} />
+      {/* Le pasamos al menú la página actual, la función para cambiarla
+          y el contador de alertas para la campana/badge (HU-05). */}
+      <MenuNavegacion
+        paginaActual={paginaActual}
+        onCambiarPagina={setPaginaActual}
+        cantidadAlertas={totalAlertas}
+      />
 
       <main>{mostrarPaginaActual()}</main>
     </div>
