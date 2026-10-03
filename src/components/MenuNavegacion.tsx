@@ -34,7 +34,7 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
 
   return (
     <header className="menu-navegacion">
-      <h1 className="menu-titulo">SGIL - Gestión de Inventario</h1>
+      <h1 className="menu-titulo">UCEN - Gestión de Inventario</h1>
 
       <nav className="menu-botones">
         {/* Al hacer clic, llamamos a la función que nos pasó App.
