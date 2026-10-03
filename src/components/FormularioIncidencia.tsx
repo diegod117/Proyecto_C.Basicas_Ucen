@@ -1,11 +1,13 @@
 // FormularioIncidencia.tsx
 // Formulario para registrar una incidencia en el laboratorio (HU-04).
 // Campos: recurso afectado, docente presente, descripción y personas afectadas.
-// El campo de detalle de afectación solo aparece si se marca el checkbox.
+// Valida que los campos obligatorios estén llenos antes de guardar.
+// RNF-02: el registro se completa en 5 pasos como máximo.
 // Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia)
 
 import { useState } from 'react';
 import { obtenerRecursos } from '../services/recursosService';
+import { agregarIncidencia } from '../services/incidenciasService';
 import './FormularioIncidencia.css';
 
 // Props que recibe el formulario desde la página.
@@ -18,7 +20,7 @@ interface PropsFormularioIncidencia {
 // Componente FormularioIncidencia
 // Recibe: onIncidenciaRegistrada (función que avisa a la página que se registró).
 // Devuelve: el formulario con los campos de la incidencia.
-function FormularioIncidencia(_props: PropsFormularioIncidencia) {
+function FormularioIncidencia(props: PropsFormularioIncidencia) {
   // Obtenemos la lista de recursos para llenar el <select>.
   // Viene del servicio de Johann (recursosService).
   const recursos = obtenerRecursos();
@@ -38,8 +40,73 @@ function FormularioIncidencia(_props: PropsFormularioIncidencia) {
   // Es el campo opcional ("?") del tipo Incidencia.
   const [detalleAfectacion, setDetalleAfectacion] = useState('');
 
+  // Mensaje de error que se muestra si falta algún campo obligatorio.
+  // Si es un texto vacío, no se muestra nada.
+  const [mensajeError, setMensajeError] = useState('');
+
+  // manejarEnvio
+  // Se ejecuta cuando el usuario hace clic en "Registrar".
+  // Recibe el evento del formulario. No devuelve nada.
+  function manejarEnvio(evento: React.FormEvent) {
+    // preventDefault evita que el navegador recargue la página
+    // (comportamiento por defecto de un <form>).
+    evento.preventDefault();
+
+    // Validación: los 3 campos obligatorios deben estar llenos.
+    // .trim() quita espacios al inicio y al final.
+    if (recursoId === '') {
+      setMensajeError('Debe seleccionar un recurso afectado.');
+      return;
+    }
+    if (docentePresente.trim() === '') {
+      setMensajeError('Debe indicar el docente presente.');
+      return;
+    }
+    if (descripcion.trim() === '') {
+      setMensajeError('Debe escribir una descripción de lo ocurrido.');
+      return;
+    }
+
+    // Si llegamos aquí, todo está bien. Limpiamos el error.
+    setMensajeError('');
+
+    // Guardamos la incidencia usando el servicio (D1).
+    // La fecha y el estado se asignan aquí (HU-10 pide fecha automática
+    // y estado "pendiente"). Por ahora usamos una fecha simple;
+    // en D5 se creará una función dedicada en utils/fechas.ts.
+    const ahora = new Date();
+    const fechaTexto =
+      ahora.getFullYear() + '-' +
+      String(ahora.getMonth() + 1).padStart(2, '0') + '-' +
+      String(ahora.getDate()).padStart(2, '0') + ' ' +
+      String(ahora.getHours()).padStart(2, '0') + ':' +
+      String(ahora.getMinutes()).padStart(2, '0');
+
+    agregarIncidencia({
+      recursoId: Number(recursoId),
+      fecha: fechaTexto,
+      docentePresente: docentePresente.trim(),
+      descripcion: descripcion.trim(),
+      hayPersonasAfectadas,
+      detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
+      registradaPor: 'Encargado (usuario actual)',
+      estado: 'pendiente',
+    });
+
+    // Limpiamos todos los campos para que el formulario quede listo
+    // para registrar otra incidencia.
+    setRecursoId('');
+    setDocentePresente('');
+    setDescripcion('');
+    setHayPersonasAfectadas(false);
+    setDetalleAfectacion('');
+
+    // Avisamos a la página que se registró una incidencia.
+    props.onIncidenciaRegistrada();
+  }
+
   return (
-    <form className="formulario-incidencia">
+    <form className="formulario-incidencia" onSubmit={manejarEnvio}>
       <h3 className="formulario-incidencia-titulo">Registrar incidencia</h3>
       <p className="formulario-incidencia-subtitulo">
         Registre un accidente o problema ocurrido en el laboratorio.
@@ -115,6 +182,16 @@ function FormularioIncidencia(_props: PropsFormularioIncidencia) {
           />
         </div>
       )}
+
+      {/* Mensaje de error: solo se muestra si hay texto en mensajeError */}
+      {mensajeError !== '' && (
+        <p className="mensaje-error">{mensajeError}</p>
+      )}
+
+      {/* Botón para registrar la incidencia */}
+      <button type="submit" className="boton-registrar">
+        Registrar incidencia
+      </button>
     </form>
   );
 }

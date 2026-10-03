@@ -1,0 +1,16 @@
+/* PaginaIncidencias.css
+   Estilos propios de la página de incidencias.
+   Los estilos del formulario están en FormularioIncidencia.css.
+   Los estilos comunes (contenido-pagina) están en global.css. */
+
+/* Mensaje verde que aparece tras registrar una incidencia */
+.mensaje-confirmacion {
+  background-color: #f0fdf4;
+  color: var(--color-disponible);
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
