@@ -10,20 +10,22 @@ import './TablaReservas.css';
 
 // Props que recibe la tabla
 interface TablaReservasProps {
+  // Clave que se actualiza desde el componente padre para refrescar los datos.
   version?: number;
+  // Callback opcional para avisar al padre cuando cambian las reservas.
   onReservaModificada?: () => void;
 }
 
 // Componente TablaReservas
-// Renderiza una tabla HTML con las reservas y un botón de cancelación con diálogo de confirmación.
+// Renderiza una tabla HTML con las reservas ordenadas y opción de cancelación.
 function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
-  // Estado local para forzar actualización inmediata de la tabla al cancelar
+  // Estado local para refrescar la tabla apenas se cancela una reserva.
   const [actualizacionInterna, setActualizacionInterna] = useState(0);
 
-  // 1. Obtenemos las reservas desde el servicio y clonamos para ordenar
+  // Obtenemos una copia de las reservas para no mutar el arreglo original al ordenar.
   const reservas = [...obtenerReservas()];
 
-  // 2. Ordenamiento cronológico con .sort()
+  // Ordenamiento cronológico: primero fecha, luego hora de inicio.
   reservas.sort(function (a, b) {
     if (a.fecha < b.fecha) {
       return -1;
@@ -40,20 +42,18 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
     return 0;
   });
 
-  // 3. Manejador para cancelar reserva con confirmación (RF-03)
+  // Cancela una reserva después de confirmar con el usuario.
   function manejarCancelar(id: number, nombreRecurso: string, fecha: string, horario: string) {
     const mensajeConfirmacion = `¿Estás seguro de que deseas cancelar la reserva de:\n${nombreRecurso}\nFecha: ${fecha} (${horario})?`;
-    
-    // window.confirm muestra un cuadro modal nativo del navegador con botones Aceptar/Cancelar
+
     const usuarioConfirmo = window.confirm(mensajeConfirmacion);
 
     if (usuarioConfirmo) {
       cancelarReserva(id);
-      // Forzar re-renderizado de la tabla
       setActualizacionInterna(function (prev) {
         return prev + 1;
       });
-      // Notificar al componente padre si definió el callback
+
       if (onReservaModificada) {
         onReservaModificada();
       }
@@ -105,12 +105,7 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
                         type="button"
                         className="boton-cancelar-reserva"
                         onClick={function () {
-                          manejarCancelar(
-                            reserva.id,
-                            nombreRecurso,
-                            reserva.fecha,
-                            horarioTexto
-                          );
+                          manejarCancelar(reserva.id, nombreRecurso, reserva.fecha, horarioTexto);
                         }}
                       >
                         Cancelar
