@@ -1,31 +1,31 @@
 // TablaReservas.tsx
 // Componente de tabla que lista las reservas registradas.
-// Ordena las reservas cronológicamente (por fecha y luego hora de inicio).
-// Cubre: RF-03 (listado y ordenamiento de reservas)
+// Ordena las reservas cronológicamente y permite cancelar reservas existentes.
+// Cubre: RF-03 (listado, ordenamiento y cancelación de reservas)
 
-import { obtenerReservas } from '../services/reservasService';
+import { useState } from 'react';
+import { obtenerReservas, cancelarReserva } from '../services/reservasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
 import './TablaReservas.css';
 
 // Props que recibe la tabla
 interface TablaReservasProps {
-  // Clave o trigger que se actualiza cada vez que se agrega o cancela una reserva
-  // para forzar a la tabla a re-renderizar los datos actualizados.
+  // Clave que se actualiza desde el componente padre para refrescar los datos.
   version?: number;
+  // Callback opcional para avisar al padre cuando cambian las reservas.
+  onReservaModificada?: () => void;
 }
 
 // Componente TablaReservas
-// Renderiza una tabla HTML estilizada con las reservas ordenadas por fecha.
-function TablaReservas({ version }: TablaReservasProps) {
-  // 1. Obtenemos las reservas desde el servicio
-  // Usamos el operador spread [...] para clonar el arreglo original antes de ordenar,
-  // ya que .sort() muta el arreglo sobre el cual se ejecuta y queremos respetar inmutabilidad.
+// Renderiza una tabla HTML con las reservas ordenadas y opción de cancelación.
+function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
+  // Estado local para refrescar la tabla apenas se cancela una reserva.
+  const [actualizacionInterna, setActualizacionInterna] = useState(0);
+
+  // Obtenemos una copia de las reservas para no mutar el arreglo original al ordenar.
   const reservas = [...obtenerReservas()];
 
-  // 2. Ordenamiento cronológico con .sort() paso a paso:
-  // - Si a.fecha < b.fecha, 'a' debe ir antes que 'b' (retornamos -1).
-  // - Si a.fecha > b.fecha, 'b' debe ir antes que 'a' (retornamos 1).
-  // - Si tienen la misma fecha, desempatamos comparando las horas de inicio.
+  // Ordenamiento cronológico: primero fecha, luego hora de inicio.
   reservas.sort(function (a, b) {
     if (a.fecha < b.fecha) {
       return -1;
@@ -42,8 +42,26 @@ function TablaReservas({ version }: TablaReservasProps) {
     return 0;
   });
 
+  // Cancela una reserva después de confirmar con el usuario.
+  function manejarCancelar(id: number, nombreRecurso: string, fecha: string, horario: string) {
+    const mensajeConfirmacion = `¿Estás seguro de que deseas cancelar la reserva de:\n${nombreRecurso}\nFecha: ${fecha} (${horario})?`;
+
+    const usuarioConfirmo = window.confirm(mensajeConfirmacion);
+
+    if (usuarioConfirmo) {
+      cancelarReserva(id);
+      setActualizacionInterna(function (prev) {
+        return prev + 1;
+      });
+
+      if (onReservaModificada) {
+        onReservaModificada();
+      }
+    }
+  }
+
   return (
-    <div className="tabla-reservas-contenedor" key={version}>
+    <div className="tabla-reservas-contenedor" key={`${version}-${actualizacionInterna}`}>
       <h3>Reservas programadas</h3>
 
       {reservas.length === 0 ? (
@@ -60,15 +78,16 @@ function TablaReservas({ version }: TablaReservasProps) {
                 <th>Cant.</th>
                 <th>Asignatura</th>
                 <th>Sala</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               {reservas.map(function (reserva) {
-                // Buscamos los datos completos del recurso a partir de su ID
                 const recurso = obtenerRecursoPorId(reserva.recursoId);
                 const nombreRecurso = recurso
                   ? `${recurso.nombre} (${recurso.ubicacion.codigo})`
                   : `Recurso #${reserva.recursoId}`;
+                const horarioTexto = `${reserva.horaInicio} - ${reserva.horaFin}`;
 
                 return (
                   <tr key={reserva.id}>
@@ -77,12 +96,21 @@ function TablaReservas({ version }: TablaReservasProps) {
                     </td>
                     <td>{reserva.docente}</td>
                     <td>{reserva.fecha}</td>
-                    <td>
-                      {reserva.horaInicio} - {reserva.horaFin}
-                    </td>
+                    <td>{horarioTexto}</td>
                     <td>{reserva.cantidad}</td>
                     <td>{reserva.asignatura}</td>
                     <td>{reserva.sala}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="boton-cancelar-reserva"
+                        onClick={function () {
+                          manejarCancelar(reserva.id, nombreRecurso, reserva.fecha, horarioTexto);
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                    </td>
                   </tr>
                 );
               })}

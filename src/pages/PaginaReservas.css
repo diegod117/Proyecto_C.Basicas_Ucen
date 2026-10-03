@@ -1,6 +1,6 @@
 /* PaginaReservas.css
    Estilos para la página principal del módulo de reservas.
-   Cubre: HU-03, RF-03 */
+   Cubre: HU-03, RF-03 y RNF-01 (móviles) */
 
 .pagina-reservas-header {
   margin-bottom: 24px;
@@ -26,4 +26,14 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .pagina-reservas-header {
+    margin-bottom: 16px;
+  }
+
+  .pagina-reservas-contenedor {
+    gap: 20px;
+  }
 }

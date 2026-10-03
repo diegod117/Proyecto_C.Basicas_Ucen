@@ -1,7 +1,7 @@
 // reservasService.ts
 // Servicio de reservas: es el ÚNICO lugar desde donde las páginas y componentes
 // leen y modifican las reservas de recursos del laboratorio.
-// Cubre: HU-03 (crear reserva), RF-03 (gestionar reservas)
+// Cubre: HU-03 (crear reserva), RF-03 (gestionar y cancelar reservas)
 
 // ¿Para qué sirve este servicio?
 // En lugar de que las pantallas importen directamente de src/data/reservas.ts,
@@ -25,9 +25,6 @@ export function obtenerReservas(): Reserva[] {
 // agregarReserva
 // Recibe: una reserva nueva sin su id.
 // Devuelve: nada.
-//
-// Omit<Reserva, 'id'> le indica a TypeScript que quien llama a esta función
-// debe pasar todos los datos de la reserva excepto el 'id', ya que este se genera automáticamente aquí.
 export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
   // Buscamos el ID más alto que exista actualmente
   let idMayor = 0;
@@ -48,4 +45,18 @@ export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
 
   // La guardamos en el arreglo en memoria
   listaReservas.push(reservaCompleta);
+}
+
+// cancelarReserva (RF-03)
+// Recibe: el ID de la reserva a cancelar.
+// Devuelve: true si se encontró y eliminó, o false si no existía.
+export function cancelarReserva(id: number): boolean {
+  for (let i = 0; i < listaReservas.length; i++) {
+    if (listaReservas[i].id === id) {
+      // splice(posicion, cantidadAEliminar) elimina el elemento del arreglo in-place
+      listaReservas.splice(i, 1);
+      return true;
+    }
+  }
+  return false;
 }

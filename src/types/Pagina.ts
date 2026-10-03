@@ -4,7 +4,6 @@
 // (para saber qué botón marcar). Por eso va en types/ y no repetido.
 // Cubre: navegación base (no corresponde a una HU específica)
 
-// Tipo unión: la página actual solo puede ser uno de estos tres textos.
-// Cuando se agregue una página nueva (ej: 'alertas' en HU-05),
-// se suma aquí y TypeScript nos avisará dónde falta manejarla.
-export type Pagina = 'inventario' | 'reservas' | 'incidencias';
+// Tipo unión: la página actual solo puede ser uno de estos cuatro textos.
+// Cubre: HU-05 (agrega la página de alertas)
+export type Pagina = 'inventario' | 'reservas' | 'incidencias' | 'alertas';

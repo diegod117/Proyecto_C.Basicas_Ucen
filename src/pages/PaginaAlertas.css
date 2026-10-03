@@ -1,0 +1,78 @@
+/* PaginaAlertas.css
+   Estilos de la página del panel de alertas (HU-05). */
+
+.pagina-alertas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pagina-alertas-titulos h2 {
+  margin: 0 0 6px 0;
+  color: var(--color-texto);
+}
+
+.pagina-alertas-titulos p {
+  margin: 0;
+}
+
+.contador-total-badge {
+  display: inline-block;
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid #fecaca;
+}
+
+/* Filtros por tipo de alerta */
+.filtros-alertas {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.boton-filtro-alerta {
+  background-color: white;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.boton-filtro-alerta:hover {
+  background-color: #f3f4f6;
+}
+
+.boton-filtro-alerta.activo {
+  background-color: var(--color-principal);
+  color: white;
+  border-color: var(--color-principal);
+}
+
+/* Grilla de tarjetas de alerta */
+.grid-alertas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* Mensaje si no hay alertas */
+.panel-alertas-vacio {
+  background-color: white;
+  border: 1px dashed var(--color-borde);
+  border-radius: 8px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--color-texto-secundario);
+}
