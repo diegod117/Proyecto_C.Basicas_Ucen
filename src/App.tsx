@@ -10,7 +10,7 @@
 function App() {
   return (
     <main className="contenedor-inicio">
-      <h1>SGIL - Gestión de Inventario</h1>
+      <h1>UCEN - Gestión de Inventario</h1>
       <p>Laboratorios del Departamento de Ciencias Básicas</p>
       <p className="texto-secundario">
         Proyecto base listo. Las pantallas se agregarán una historia de usuario a la vez.
