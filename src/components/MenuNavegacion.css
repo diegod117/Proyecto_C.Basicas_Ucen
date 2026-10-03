@@ -34,6 +34,9 @@
   padding: 8px 14px;
   font-size: 14px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .boton-menu:hover {
@@ -49,4 +52,25 @@
 
 .boton-menu-activo:hover {
   background-color: white;
+}
+
+/* Badge numérico para el contador de alertas (HU-05) */
+.badge-alertas-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 18px;
+  line-height: 1;
+}
+
+/* En el botón activo (blanco) el badge mantiene su color rojo destacado */
+.boton-menu-activo .badge-alertas-menu {
+  background-color: #dc2626;
+  color: white;
 }
