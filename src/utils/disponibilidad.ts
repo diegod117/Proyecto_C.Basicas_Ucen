@@ -1,7 +1,10 @@
 // disponibilidad.ts
 // Funciones de utilidad para validar y calcular la disponibilidad de recursos.
 // Separa la lógica de negocio de la interfaz gráfica de usuario.
-// Cubre: HU-03 (validación de formulario), HU-07 (cruces de horarios), HU-08 (bloqueo por stock)
+// Cubre: HU-03 (validación de formulario), HU-07 (cruces de horarios y cálculo de stock), HU-08 (bloqueo por stock)
+
+import { obtenerRecursoPorId } from '../services/recursosService';
+import { obtenerReservas } from '../services/reservasService';
 
 // ------------------------------------------------------------------
 // validarCamposReserva
@@ -41,13 +44,108 @@ export function validarCamposReserva(
   }
 
   // --- 2. Validación de coherencia horaria ---
-  // Las horas están en formato "HH:MM" de dos dígitos (ej: "08:30", "10:00").
-  // Por el estándar ISO 8601 / formato 24 horas, comparar cadenas de texto
-  // con <= respeta el mismo orden cronológico que comparar números o marcas de tiempo.
   if (horaFin <= horaInicio) {
     return 'La hora de fin debe ser posterior a la hora de inicio.';
   }
 
   // Si pasa todas las comprobaciones, no hay error
+  return '';
+}
+
+// ------------------------------------------------------------------
+// seCruzanHorarios
+// ------------------------------------------------------------------
+// Recibe: fecha y horas de dos intervalos de tiempo (A y B).
+// Devuelve: true si ambos horarios chocan o se solapan en el mismo día,
+//           false si son en días distintos o están separados en el tiempo.
+export function seCruzanHorarios(
+  fechaA: string,
+  inicioA: string,
+  finA: string,
+  fechaB: string,
+  inicioB: string,
+  finB: string
+): boolean {
+  // 1. Si son días diferentes, no hay cruce
+  if (fechaA !== fechaB) {
+    return false;
+  }
+
+  // 2. Si uno termina antes de que empiece el otro, no hay cruce
+  if (finA <= inicioB || finB <= inicioA) {
+    return false;
+  }
+
+  // 3. En caso contrario, se solapan
+  return true;
+}
+
+// ------------------------------------------------------------------
+// calcularUnidadesDisponibles
+// ------------------------------------------------------------------
+// Recibe: ID del recurso, fecha y rango de horas solicitado.
+// Devuelve: la cantidad neta de unidades que quedan libres para ese horario.
+export function calcularUnidadesDisponibles(
+  recursoId: number,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string
+): number {
+  const recurso = obtenerRecursoPorId(recursoId);
+  if (!recurso) {
+    return 0;
+  }
+
+  let unidadesLibres = recurso.cantidades.disponible;
+  const reservas = obtenerReservas();
+
+  for (const reserva of reservas) {
+    if (reserva.recursoId === recursoId) {
+      const hayChoque = seCruzanHorarios(
+        fecha,
+        horaInicio,
+        horaFin,
+        reserva.fecha,
+        reserva.horaInicio,
+        reserva.horaFin
+      );
+
+      if (hayChoque) {
+        unidadesLibres = unidadesLibres - reserva.cantidad;
+      }
+    }
+  }
+
+  return Math.max(0, unidadesLibres);
+}
+
+// ------------------------------------------------------------------
+// validarDisponibilidadReserva (HU-08)
+// ------------------------------------------------------------------
+// Recibe: ID del recurso, fecha, horario y la cantidad solicitada.
+// Devuelve: mensaje de error si la cantidad solicitada excede el stock libre,
+//           o '' si hay suficiente disponibilidad.
+export function validarDisponibilidadReserva(
+  recursoId: number,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  cantidadSolicitada: number
+): string {
+  const disponibles = calcularUnidadesDisponibles(
+    recursoId,
+    fecha,
+    horaInicio,
+    horaFin
+  );
+
+  if (disponibles === 0) {
+    return 'No hay unidades disponibles de este recurso para el horario seleccionado.';
+  }
+
+  if (cantidadSolicitada > disponibles) {
+    return `No se puede reservar: solicitó ${cantidadSolicitada} unidad(es), pero solo quedan ${disponibles} disponible(s) en ese horario.`;
+  }
+
   return '';
 }

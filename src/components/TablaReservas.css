@@ -1,0 +1,74 @@
+/* TablaReservas.css
+   Estilos de la tabla de reservas de laboratorio.
+   Cubre: RF-03 (visualización del historial de reservas y acción de cancelación)
+   Usa las variables de diseño globales definidas en src/styles/global.css */
+
+.tabla-reservas-contenedor {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: 24px;
+  width: 100%;
+}
+
+.tabla-reservas-contenedor h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--color-principal);
+}
+
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-reservas {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.tabla-reservas th {
+  background-color: #f8fafc;
+  color: var(--color-texto);
+  font-weight: 600;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--color-borde);
+  white-space: nowrap;
+}
+
+.tabla-reservas td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-borde);
+  color: var(--color-texto);
+  vertical-align: middle;
+}
+
+.tabla-reservas tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+.sin-reservas-texto {
+  color: var(--color-texto-secundario);
+  font-style: italic;
+  padding: 16px 0;
+}
+
+/* Botón de acción para cancelar reserva (RF-03) */
+.boton-cancelar-reserva {
+  background-color: #fef2f2;
+  color: var(--color-danado);
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.boton-cancelar-reserva:hover {
+  background-color: var(--color-danado);
+  color: #ffffff;
+}
