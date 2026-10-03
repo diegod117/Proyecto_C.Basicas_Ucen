@@ -61,6 +61,26 @@ export function obtenerLaboratorios(listaRecursos: Recurso[]): string[] {
   return laboratorios;
 }
 
+// hayFiltrosActivos
+// Recibe: los 4 filtros elegidos por el usuario.
+// Devuelve: true si el usuario está usando AL MENOS un filtro,
+// false si está todo en "Todos" y el buscador vacío.
+// Sirve para mostrar el botón "Limpiar filtros" solo cuando tiene sentido.
+export function hayFiltrosActivos(
+  textoBuscado: string,
+  categoria: string,
+  laboratorio: string,
+  estado: string,
+): boolean {
+  if (prepararTextoParaBuscar(textoBuscado) !== '') {
+    return true;
+  }
+  if (categoria !== SIN_FILTRO || laboratorio !== SIN_FILTRO || estado !== SIN_FILTRO) {
+    return true;
+  }
+  return false;
+}
+
 // filtrarRecursos
 // Recibe: la lista de recursos y los 4 filtros elegidos por el usuario.
 //   - textoBuscado: lo escrito en el buscador ('' = sin filtro)
