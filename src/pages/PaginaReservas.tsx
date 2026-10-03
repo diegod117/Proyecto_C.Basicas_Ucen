@@ -1,23 +1,23 @@
 // PaginaReservas.tsx
 // Página de reservas del laboratorio.
-// Permite al personal docente registrar nuevas reservas de materiales e instrumentos.
-// Cubre: HU-03 (página y formulario de reserva), RF-03
+// Permite al personal docente registrar nuevas reservas de materiales e instrumentos
+// y consultar o cancelar reservas existentes.
+// Cubre: HU-03 (formulario), HU-07, HU-08 y RF-03 (tabla y cancelación)
 
 import { useState } from 'react';
 import FormularioReserva from '../components/FormularioReserva';
+import TablaReservas from '../components/TablaReservas';
 import { obtenerReservas } from '../services/reservasService';
 import './PaginaReservas.css';
 
 // Componente PaginaReservas
-// Renderiza el encabezado del módulo y el formulario de nueva reserva.
+// Renderiza el encabezado del módulo, el formulario y la tabla de reservas.
 function PaginaReservas() {
-  // Estado local que se incrementa para forzar un re-renderizado
-  // cuando el formulario completa una reserva con éxito.
-  const [, setActualizaciones] = useState(0);
+  const [actualizaciones, setActualizaciones] = useState(0);
 
   const listaReservas = obtenerReservas();
 
-  function manejarReservaCreada() {
+  function refrescarDatos() {
     setActualizaciones(function (valorAnterior) {
       return valorAnterior + 1;
     });
@@ -36,8 +36,14 @@ function PaginaReservas() {
       </header>
 
       <div className="pagina-reservas-contenedor">
-        {/* Componente del formulario controlado */}
-        <FormularioReserva onReservaCreada={manejarReservaCreada} />
+        {/* Formulario para registrar una nueva reserva */}
+        <FormularioReserva onReservaCreada={refrescarDatos} />
+
+        {/* Tabla con el historial de reservas y botón de cancelación (M11, M12) */}
+        <TablaReservas
+          version={actualizaciones}
+          onReservaModificada={refrescarDatos}
+        />
       </div>
     </section>
   );
