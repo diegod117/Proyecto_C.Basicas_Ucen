@@ -15,6 +15,63 @@
   margin: 0;
 }
 
+/* Fila con el contador "Mostrando X de 10" y el botón para limpiar filtros */
+.inventario-contador {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Botón "Limpiar filtros" (se usa en el contador y en el mensaje vacío) */
+.boton-limpiar-filtros {
+  background-color: var(--color-principal);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.boton-limpiar-filtros:hover {
+  background-color: var(--color-principal-oscuro);
+}
+
+/* Versión pequeña del botón, al lado del contador.
+   Se ve como un enlace para que no compita con el resto de la página. */
+.boton-limpiar-pequeno {
+  background-color: transparent;
+  color: var(--color-principal);
+  padding: 4px 8px;
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.boton-limpiar-pequeno:hover {
+  background-color: #e8f0fe;
+}
+
+/* Mensaje cuando ningún recurso cumple los filtros */
+.inventario-sin-resultados {
+  text-align: center;
+  padding: 40px 16px;
+  background-color: white;
+  border: 1px dashed #cbd5e1; /* borde punteado: indica "aquí no hay nada" */
+  border-radius: 10px;
+}
+
+.sin-resultados-titulo {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 6px 0;
+}
+
+.inventario-sin-resultados .texto-secundario {
+  margin: 0 0 16px 0;
+}
+
 /* Grilla de tarjetas.
    "display: grid" ordena los elementos en filas y columnas.
    "repeat(auto-fill, minmax(240px, 1fr))" significa:
