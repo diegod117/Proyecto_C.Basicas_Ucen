@@ -51,6 +51,16 @@
   border-radius: 6px;
 }
 
+/* Mensaje verde que confirma que el cambio se guardó */
+.formulario-cambio-exito {
+  margin: 8px 0 0 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--color-disponible);
+  background-color: #dcfce7;
+  border-radius: 6px;
+}
+
 /* Botón gris oscuro, igual al "Guardar cambio" del mockup */
 .formulario-cambio-boton {
   margin-top: 12px;

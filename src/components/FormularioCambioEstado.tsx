@@ -8,7 +8,11 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { listaEstadosRecurso, textoEstado } from '../utils/inventario';
-import { obtenerEstadoOrigenInicial, validarCambioEstado } from '../utils/cambioEstado';
+import {
+  obtenerEstadoOrigenInicial,
+  validarCambioEstado,
+  textoResumenCambio,
+} from '../utils/cambioEstado';
 import { cambiarEstadoRecurso } from '../services/recursosService';
 import './FormularioCambioEstado.css';
 
@@ -34,6 +38,8 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
   const [cantidadTexto, setCantidadTexto] = useState('1');
   const [motivo, setMotivo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
+  // Mensaje verde que confirma el último cambio guardado
+  const [mensajeExito, setMensajeExito] = useState('');
 
   // guardarCambio
   // Recibe: el evento del formulario. No devuelve nada.
@@ -43,17 +49,35 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
     // preventDefault() evita eso, para manejar el envío nosotros.
     evento.preventDefault();
 
+    // Al intentar guardar de nuevo, borramos el mensaje de éxito anterior
+    setMensajeExito('');
+
     const error = validarCambioEstado(recurso, estadoOrigen, estadoNuevo, cantidadTexto, motivo);
     if (error !== '') {
       setMensajeError(error); // se muestra en rojo debajo del formulario
       return; // "return" corta la función: no se guarda nada
     }
 
-    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, Number(cantidadTexto));
+    const cantidad = Number(cantidadTexto);
+
+    // Dar de baja es un cambio importante (la unidad deja de usarse),
+    // así que pedimos confirmación. window.confirm muestra una ventana
+    // con "Aceptar" y "Cancelar": devuelve true o false según lo que elija.
+    if (estadoNuevo === 'dado_de_baja') {
+      const confirmado = window.confirm(
+        '¿Seguro que quieres dar de baja ' + cantidad + ' unidad(es) de "' + recurso.nombre + '"?',
+      );
+      if (!confirmado) {
+        return; // eligió "Cancelar": no se guarda nada
+      }
+    }
+
+    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad);
     if (seGuardo) {
       setMensajeError('');
+      setMensajeExito(textoResumenCambio(cantidad, estadoOrigen, estadoNuevo));
       setMotivo('');
-      props.onEstadoCambiado(); // avisamos a la página para que se redibuje
+      props.onEstadoCambiado(); // avisamos hacia arriba para que App redibuje todo
     } else {
       setMensajeError('No se pudo guardar el cambio. Revisa los datos.');
     }
@@ -118,6 +142,7 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
 
       {/* El mensaje de error solo aparece si hay uno (texto no vacío) */}
       {mensajeError !== '' && <p className="formulario-cambio-error">{mensajeError}</p>}
+      {mensajeExito !== '' && <p className="formulario-cambio-exito">{mensajeExito}</p>}
 
       <button type="submit" className="formulario-cambio-boton">
         Guardar cambio

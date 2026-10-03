@@ -69,3 +69,23 @@ export function validarCambioEstado(
   // Si llegamos hasta aquí, no hubo errores
   return '';
 }
+
+// textoResumenCambio
+// Recibe: la cantidad y los dos estados del cambio que se guardó.
+// Devuelve: un texto para confirmarle al usuario qué se hizo.
+// Ejemplo: "Cambio guardado: 1 unidad de Disponible → Dañado."
+export function textoResumenCambio(
+  cantidad: number,
+  estadoOrigen: EstadoRecurso,
+  estadoNuevo: EstadoRecurso,
+): string {
+  let textoUnidades = cantidad + ' unidades';
+  if (cantidad === 1) {
+    textoUnidades = '1 unidad';
+  }
+
+  return (
+    'Cambio guardado: ' + textoUnidades + ' de ' +
+    textoEstado(estadoOrigen) + ' → ' + textoEstado(estadoNuevo) + '.'
+  );
+}
