@@ -1,6 +1,6 @@
 /* FormularioReserva.css
    Estilos del componente FormularioReserva.
-   Cubre: HU-03, HU-07, HU-08 (estado deshabilitado de boton confirmar)
+   Cubre: HU-03, HU-07, HU-08 y RNF-01 (diseño responsivo para móviles)
    Usa las variables de color globales definidas en src/styles/global.css */
 
 .formulario-reserva {
@@ -126,4 +126,34 @@
   color: var(--color-danado);
   background-color: #fef2f2;
   border: 1px solid #fecaca;
+}
+
+/* ==================================================================
+   RNF-01: Adaptación responsiva para celulares y pantallas pequeñas
+   ================================================================== */
+@media (max-width: 768px) {
+  .formulario-reserva {
+    padding: 16px;
+  }
+
+  /* Apilar campos en columna vertical para facilidad táctil */
+  .grupo-campos {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* Tamaño de fuente a 16px para evitar auto-zoom molesto en navegadores móviles */
+  .campo input,
+  .campo select {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  /* Botón ocupa todo el ancho de la pantalla para fácil pulsación con el pulgar */
+  .boton-confirmar {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
 }

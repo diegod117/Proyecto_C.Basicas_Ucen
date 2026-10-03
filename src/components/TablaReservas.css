@@ -1,6 +1,6 @@
 /* TablaReservas.css
    Estilos de la tabla de reservas de laboratorio.
-   Cubre: RF-03 (visualización del historial de reservas y acción de cancelación)
+   Cubre: RF-03 (historial y cancelación) y RNF-01 (adaptabilidad en móviles)
    Usa las variables de diseño globales definidas en src/styles/global.css */
 
 .tabla-reservas-contenedor {
@@ -20,6 +20,7 @@
 .tabla-scroll {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tabla-reservas {
@@ -27,6 +28,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 14px;
+  min-width: 620px; /* Garantiza legibilidad forzando scroll suave en móviles */
 }
 
 .tabla-reservas th {
@@ -71,4 +73,24 @@
 .boton-cancelar-reserva:hover {
   background-color: var(--color-danado);
   color: #ffffff;
+}
+
+/* ==================================================================
+   RNF-01: Adaptación responsiva para móviles
+   ================================================================== */
+@media (max-width: 768px) {
+  .tabla-reservas-contenedor {
+    padding: 16px;
+  }
+
+  .tabla-reservas th,
+  .tabla-reservas td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .boton-cancelar-reserva {
+    padding: 8px 12px; /* Mayor área táctil para el dedo */
+    font-size: 12px;
+  }
 }
