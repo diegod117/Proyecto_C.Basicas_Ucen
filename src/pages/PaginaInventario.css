@@ -1,0 +1,8 @@
+/* PaginaInventario.css
+   Estilos propios de la página de inventario. */
+
+/* Vista previa temporal de una sola tarjeta (J3).
+   Se reemplaza por la grilla del listado en J4. */
+.vista-previa-tarjeta {
+  max-width: 300px;
+}
