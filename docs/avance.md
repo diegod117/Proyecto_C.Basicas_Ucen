@@ -157,6 +157,73 @@
 
 **Archivos tocados:** `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `src/utils/filtrosInventario.ts`, `docs/avance.md`.
 
+## 2026-10-03 — J8: ficha del recurso (Johann)
+
+**HU trabajada:** HU-02 (en progreso). Rama: `feature/hu-02-cambiar-estado`.
+
+**Qué se hizo:**
+- Componente nuevo `src/components/FichaRecurso.tsx` y `.css`. Muestra:
+  - la ruta "← Inventario / Nombre";
+  - la ubicación completa: torre, sala, bodega, mueble y código (RF-10);
+  - los datos de la planilla, con "No registrado" si faltan;
+  - el stock mínimo, solo si el recurso lo tiene;
+  - una tabla con las unidades de los 5 estados y el total (RF-01).
+- `TarjetaRecurso`: nueva prop `onSeleccionar(idRecurso)`. Toda la tarjeta se puede cliquear y se resalta al pasar el mouse.
+- `PaginaInventario`: `useState<number | null>` guarda el id del recurso abierto (`null` = ninguno). Si hay uno, muestra la ficha en vez del listado. Al volver, los filtros se mantienen.
+- Componente nuevo `src/components/MensajeSinResultados.tsx` y `.css`. Se separó de `PaginaInventario` para que la página no pasara las ~150 líneas.
+- `src/utils/inventario.ts`: se agregó `textoCampoOpcional()`.
+- `src/styles/global.css` (archivo compartido): se movieron ahí los colores de las etiquetas de estado (`.etiqueta-*`), porque ahora los usan `TarjetaRecurso` y `FichaRecurso`.
+- Se probó en el navegador:
+  - filtrar "Dañado" → abrir el multímetro → volver: el filtro sigue en "Dañado";
+  - la mesa (sin datos opcionales) muestra "No registrado";
+  - los guantes muestran su stock mínimo.
+
+**Archivos tocados:** `src/components/FichaRecurso.tsx`, `src/components/FichaRecurso.css`, `src/components/MensajeSinResultados.tsx`, `src/components/MensajeSinResultados.css`, `src/components/TarjetaRecurso.tsx`, `src/components/TarjetaRecurso.css`, `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `src/utils/inventario.ts`, `src/styles/global.css`, `docs/avance.md`.
+
+## 2026-10-03 — J9: formulario para cambiar el estado de un recurso (Johann)
+
+**HU trabajada:** HU-02 (en progreso). Rama: `feature/hu-02-cambiar-estado`.
+
+**Qué se hizo:**
+- Componente nuevo `src/components/FormularioCambioEstado.tsx` y `.css`, a la derecha de la ficha como en el mockup. Campos: estado actual (muestra cuántas unidades hay en cada uno), nuevo estado, cantidad y motivo.
+- Archivo nuevo `src/utils/cambioEstado.ts`:
+  - `obtenerEstadoOrigenInicial()`: si el recurso no tiene unidades disponibles, parte en el primer estado que sí tenga.
+  - `validarCambioEstado()`: estados distintos, cantidad entera mayor que 0, que no supere las unidades del estado de origen, y motivo obligatorio.
+- `src/services/recursosService.ts`: nueva función `cambiarEstadoRecurso()`. Resta en el estado de origen y suma en el nuevo, y vuelve a revisar las unidades para que nunca queden números negativos.
+- `FichaRecurso`: dos columnas (datos y formulario). Un `useState` contador la redibuja después de guardar, porque React no detecta solo que el servicio cambió los números.
+- El formulario usa `noValidate` para que todos los errores salgan con nuestros mensajes en español.
+- El motivo se pide y se valida, pero se guardará recién con el historial (HU-06, J11).
+- Se probó en el navegador:
+  - las 5 validaciones (mismo estado, cantidad 0, cantidad 2.5, 3 desde "Dañado" con solo 1 unidad, y sin motivo);
+  - un cambio válido (1 multímetro de Disponible a Dañado): la tabla quedó 11 / 2 y la tarjeta y el filtro "Dañado" se actualizaron;
+  - la campana parte con "En mantención" como estado inicial.
+
+**Archivos tocados:** `src/components/FormularioCambioEstado.tsx`, `src/components/FormularioCambioEstado.css`, `src/components/FichaRecurso.tsx`, `src/components/FichaRecurso.css`, `src/utils/cambioEstado.ts`, `src/services/recursosService.ts`, `docs/avance.md`.
+
+## 2026-10-03 — J10: alertas al momento, confirmaciones y cierre de HU-02 (Johann)
+
+**HU trabajada:** HU-02 (cierre), integrada con HU-05 de Diego. Rama: `feature/hu-02-cambiar-estado`.
+
+**Qué se hizo:**
+- Se trajo `main` a la rama (merge sin conflictos) para tener el panel y el contador de alertas.
+- `src/App.tsx` (archivo compartido):
+  - nuevo `useState` `cambiosInventario` con su función `registrarCambioInventario()`, que se pasa a `PaginaInventario`;
+  - al guardar un cambio de estado, el aviso sube formulario → ficha → página → App;
+  - App se redibuja y recalcula las alertas, así que el contador del menú se actualiza sin cambiar de página.
+- `FichaRecurso`: se quitó el contador local de J9. Ahora recibe `onEstadoCambiado` desde la página y se lo pasa al formulario.
+- `FormularioCambioEstado`:
+  - mensaje verde de confirmación, ej: "Cambio guardado: 1 unidad de Disponible → Dañado.";
+  - antes de pasar unidades a "Dado de baja" pide confirmación con `window.confirm`.
+- `src/utils/cambioEstado.ts`: nueva función `textoResumenCambio()`.
+- Componente nuevo `src/components/GrillaRecursos.tsx` y `.css`: la grilla (o el mensaje vacío) sale de `PaginaInventario`, para que la página no pase las ~150 líneas.
+- Se probó en el navegador:
+  - soldador 1 Disponible → Dañado: el contador sube de 6 a 7 al momento y aparece el mensaje verde;
+  - dar de baja con "Cancelar": no cambia nada;
+  - dar de baja con "Aceptar": se guarda, el contador vuelve a 6 (una unidad dada de baja no necesita reparación) y el soldador ya no aparece en Alertas.
+- Pendiente de decidir con el equipo: si una unidad "Dado de baja" puede volver a otro estado. Hoy se permite.
+
+**Archivos tocados:** `src/App.tsx`, `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `src/components/GrillaRecursos.tsx`, `src/components/GrillaRecursos.css`, `src/components/FichaRecurso.tsx`, `src/components/FormularioCambioEstado.tsx`, `src/components/FormularioCambioEstado.css`, `src/utils/cambioEstado.ts`, `docs/avance.md`.
+
 ## 2026-10-03 — Resolución de conflictos de merge en PR de reservas (Copilot)
 
 **HU trabajada:** HU-03 (mantenimiento del PR).

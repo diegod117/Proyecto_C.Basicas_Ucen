@@ -2,7 +2,8 @@
 // Tarjeta que muestra el resumen de UN recurso del inventario:
 // nombre, categoría, laboratorio, cantidad total y disponible,
 // y una etiqueta de color por cada estado que tenga unidades.
-// Cubre: HU-01, RF-02 (cantidad operativa), RF-08 (categoría), RF-10 (ubicación)
+// Al hacer clic en la tarjeta se abre la ficha del recurso (HU-02).
+// Cubre: HU-01, HU-02, RF-02 (cantidad operativa), RF-08 (categoría), RF-10 (ubicación)
 
 import type { Recurso } from '../types/Recurso';
 import {
@@ -18,10 +19,14 @@ import './TarjetaRecurso.css';
 // la tarjeta solo se encarga de CÓMO se ve.
 interface PropsTarjetaRecurso {
   recurso: Recurso;
+  // Función que se llama al hacer clic en la tarjeta. Recibe el id del
+  // recurso para que la página sepa CUÁL abrir. La tarjeta no abre la
+  // ficha por sí sola: solo avisa, y la página decide qué hacer.
+  onSeleccionar: (idRecurso: number) => void;
 }
 
 // Componente TarjetaRecurso
-// Recibe: un recurso (por props).
+// Recibe: un recurso y la función para seleccionarlo (por props).
 // Devuelve: la tarjeta con el resumen de ese recurso.
 function TarjetaRecurso(props: PropsTarjetaRecurso) {
   const recurso = props.recurso;
@@ -42,7 +47,8 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
   }
 
   return (
-    <article className="tarjeta-recurso">
+    // Al hacer clic en cualquier parte de la tarjeta, avisamos el id del recurso
+    <article className="tarjeta-recurso" onClick={() => props.onSeleccionar(recurso.id)}>
       <div className="tarjeta-cabecera">
         <span className="tarjeta-categoria">{textoCategoria(recurso.categoria)}</span>
         <span className="tarjeta-codigo">{recurso.ubicacion.codigo}</span>
