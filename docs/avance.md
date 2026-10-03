@@ -79,3 +79,22 @@
 - Se probó con texto vacío, solo espacios, sin tildes, en mayúsculas, con coincidencia parcial ("ard") y sin resultados.
 
 **Archivos tocados:** `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `src/utils/inventario.ts`, `docs/avance.md`.
+
+## 2026-10-03 — J6: filtros por categoría, laboratorio y estado (Johann)
+
+**HU trabajada:** HU-01 (en progreso). Rama: `feature/hu-01-listado-inventario`.
+
+**Qué se hizo:**
+- Componente nuevo `src/components/FiltrosInventario.tsx` y `.css`. Reúne el buscador por nombre (antes estaba en la página) y tres `<select>`: categoría, laboratorio (B307, B308, C210) y estado. El componente no guarda los filtros: los recibe por props y avisa los cambios con funciones, igual que `MenuNavegacion`.
+- `PaginaInventario`: un `useState` por filtro (4 en total).
+- Archivo nuevo `src/utils/filtrosInventario.ts`. Se separó de `inventario.ts` para no pasar las ~150 líneas. Contiene:
+  - `SIN_FILTRO`: la opción "Todos".
+  - `prepararTextoParaBuscar()`: movida desde `inventario.ts`.
+  - `obtenerCodigoLaboratorio()`: arma el código con torre + sala, ej: "B307".
+  - `obtenerLaboratorios()`: lista los laboratorios sin repetir.
+  - `filtrarRecursos()`: aplica los 4 filtros juntos. Reemplaza a `filtrarPorNombre()`.
+- `src/utils/inventario.ts`: se agregó `listaCategoriasRecurso`.
+- El filtro de estado muestra los recursos con al menos 1 unidad en ese estado. Ej: "Dañado" muestra el multímetro y los termómetros.
+- Se probaron 10 combinaciones de filtros, incluida una sin resultados (reactivo en B307).
+
+**Archivos tocados:** `src/components/FiltrosInventario.tsx`, `src/components/FiltrosInventario.css`, `src/utils/filtrosInventario.ts`, `src/utils/inventario.ts`, `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `docs/avance.md`.

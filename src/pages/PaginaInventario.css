@@ -15,34 +15,6 @@
   margin: 0;
 }
 
-/* Zona de filtros (por ahora solo el buscador por nombre) */
-.inventario-filtros {
-  display: flex;
-  flex-direction: column; /* el label arriba y el input abajo */
-  gap: 6px;
-  max-width: 400px;
-  margin-bottom: 20px;
-}
-
-.inventario-filtros label {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.inventario-filtros input {
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-}
-
-/* Cuando el input está seleccionado se marca con el azul principal */
-.inventario-filtros input:focus {
-  outline: none;
-  border-color: var(--color-principal);
-  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.2);
-}
-
 /* Grilla de tarjetas.
    "display: grid" ordena los elementos en filas y columnas.
    "repeat(auto-fill, minmax(240px, 1fr))" significa:

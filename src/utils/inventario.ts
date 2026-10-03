@@ -23,6 +23,18 @@ export const listaEstadosRecurso: EstadoRecurso[] = [
   'dado_de_baja',
 ];
 
+// Lista con las 6 categorías (RF-08). Se usa para las opciones del filtro
+// por categoría. Si se agrega una categoría nueva (RNF-05), se suma aquí
+// y en el tipo CategoriaRecurso.
+export const listaCategoriasRecurso: CategoriaRecurso[] = [
+  'instrumento',
+  'insumo',
+  'equipo',
+  'reactivo',
+  'mobiliario',
+  'instalacion',
+];
+
 // textoEstado
 // Recibe: un estado del recurso, por ejemplo 'danado'.
 // Devuelve: el texto para mostrar en pantalla, por ejemplo "Dañado".
@@ -80,54 +92,6 @@ export function calcularCantidadTotal(recurso: Recurso): number {
     cantidades.dado_de_baja;
 
   return total;
-}
-
-// prepararTextoParaBuscar
-// Recibe: un texto cualquiera, por ejemplo "Termómetro Digital".
-// Devuelve: el mismo texto en minúsculas y sin tildes: "termometro digital".
-// Sirve para comparar textos sin que importen las mayúsculas ni las tildes,
-// porque los usuarios muchas veces escriben "termometro" sin tilde.
-export function prepararTextoParaBuscar(texto: string): string {
-  let resultado = texto.toLowerCase();
-
-  // replaceAll reemplaza TODAS las apariciones de una letra por otra
-  resultado = resultado.replaceAll('á', 'a');
-  resultado = resultado.replaceAll('é', 'e');
-  resultado = resultado.replaceAll('í', 'i');
-  resultado = resultado.replaceAll('ó', 'o');
-  resultado = resultado.replaceAll('ú', 'u');
-  resultado = resultado.replaceAll('ü', 'u');
-
-  // trim() quita los espacios sobrantes al inicio y al final
-  return resultado.trim();
-}
-
-// filtrarPorNombre
-// Recibe: la lista de recursos y el texto que escribió el usuario.
-// Devuelve: una lista NUEVA solo con los recursos cuyo nombre contiene ese texto.
-// Si el texto está vacío, devuelve todos los recursos.
-// Ejemplo: con "ard" devuelve solo el Arduino Uno R3.
-export function filtrarPorNombre(listaRecursos: Recurso[], textoBuscado: string): Recurso[] {
-  const textoPreparado = prepararTextoParaBuscar(textoBuscado);
-
-  // Si no escribió nada, no hay nada que filtrar
-  if (textoPreparado === '') {
-    return listaRecursos;
-  }
-
-  const recursosEncontrados: Recurso[] = [];
-
-  for (const recurso of listaRecursos) {
-    const nombrePreparado = prepararTextoParaBuscar(recurso.nombre);
-
-    // includes() revisa si un texto contiene a otro.
-    // Ej: "arduino uno r3".includes("ard") es true.
-    if (nombrePreparado.includes(textoPreparado)) {
-      recursosEncontrados.push(recurso);
-    }
-  }
-
-  return recursosEncontrados;
 }
 
 // obtenerEstadosConUnidades
