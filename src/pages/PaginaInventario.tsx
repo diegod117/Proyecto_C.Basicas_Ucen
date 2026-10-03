@@ -17,14 +17,20 @@ import {
   SIN_FILTRO,
 } from '../utils/filtrosInventario';
 import FiltrosInventario from '../components/FiltrosInventario';
-import TarjetaRecurso from '../components/TarjetaRecurso';
+import GrillaRecursos from '../components/GrillaRecursos';
 import FichaRecurso from '../components/FichaRecurso';
-import MensajeSinResultados from '../components/MensajeSinResultados';
 import './PaginaInventario.css';
 
+interface PropsPaginaInventario {
+  // Viene de App. Se llama cuando se guarda un cambio de estado, para que
+  // App recalcule las alertas del menú y redibuje la página (HU-02, HU-05).
+  onInventarioCambiado: () => void;
+}
+
 // Componente PaginaInventario
-// No recibe props. Devuelve el contenido de la página de inventario.
-function PaginaInventario() {
+// Recibe: la función para avisar a App que el inventario cambió.
+// Devuelve: el contenido de la página de inventario.
+function PaginaInventario(props: PropsPaginaInventario) {
   // Un useState por cada filtro. Cada uno guarda lo que el usuario eligió.
   // Cuando cualquiera cambia, React vuelve a ejecutar esta función completa
   // y la lista filtrada de abajo se recalcula sola.
@@ -81,29 +87,6 @@ function PaginaInventario() {
     setIdRecursoSeleccionado(null);
   }
 
-  // mostrarResultados
-  // No recibe nada. Devuelve lo que va debajo de los filtros:
-  //   - si no hay recursos que cumplan los filtros: un mensaje con un botón
-  //   - si hay recursos: la grilla de tarjetas
-  // Usamos un if/else en una función aparte (como en App.tsx) para que
-  // el return de abajo se lea fácil.
-  function mostrarResultados() {
-    if (recursosFiltrados.length === 0) {
-      return <MensajeSinResultados onLimpiarFiltros={limpiarFiltros} />;
-    } else {
-      return (
-        <div className="grilla-recursos">
-          {/* .map() recorre la lista FILTRADA y por cada recurso devuelve una
-              TarjetaRecurso. La "key" (el id del recurso) le permite a React
-              saber qué tarjetas quitar o mantener cuando cambia un filtro. */}
-          {recursosFiltrados.map((recurso) => (
-            <TarjetaRecurso key={recurso.id} recurso={recurso} onSeleccionar={abrirFicha} />
-          ))}
-        </div>
-      );
-    }
-  }
-
   // Si hay una ficha abierta, mostramos SOLO la ficha (en vez del listado).
   // Buscamos el recurso por su id; si por algún motivo no existe
   // (undefined), no entramos al if y se muestra el listado normal.
@@ -112,7 +95,11 @@ function PaginaInventario() {
     if (recursoSeleccionado) {
       return (
         <section className="contenido-pagina">
-          <FichaRecurso recurso={recursoSeleccionado} onVolver={volverAlListado} />
+          <FichaRecurso
+            recurso={recursoSeleccionado}
+            onVolver={volverAlListado}
+            onEstadoCambiado={props.onInventarioCambiado}
+          />
         </section>
       );
     }
@@ -154,7 +141,12 @@ function PaginaInventario() {
         onCambiarEstado={setEstado}
       />
 
-      {mostrarResultados()}
+      {/* La grilla decide sola si muestra las tarjetas o el mensaje vacío */}
+      <GrillaRecursos
+        recursos={recursosFiltrados}
+        onSeleccionarRecurso={abrirFicha}
+        onLimpiarFiltros={limpiarFiltros}
+      />
     </section>
   );
 }

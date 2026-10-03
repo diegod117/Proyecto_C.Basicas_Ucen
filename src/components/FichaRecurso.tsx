@@ -6,7 +6,6 @@
 // A la derecha muestra el formulario para cambiar el estado.
 // Cubre: HU-02 (ficha y cambio de estado), RF-01 (estados), RF-10 (ubicación)
 
-import { useState } from 'react';
 import type { Recurso } from '../types/Recurso';
 import {
   textoCategoria,
@@ -23,28 +22,18 @@ interface PropsFichaRecurso {
   recurso: Recurso;
   // Función para volver al listado (la página decide qué hacer)
   onVolver: () => void;
+  // Función para avisar que se guardó un cambio de estado. La ficha no la
+  // usa: solo se la pasa al formulario. El aviso viaja así:
+  // formulario -> ficha -> página -> App (que redibuja todo).
+  onEstadoCambiado: () => void;
 }
 
 // Componente FichaRecurso
-// Recibe: el recurso a mostrar y la función para volver al listado.
+// Recibe: el recurso, la función para volver y la de aviso de cambio de estado.
 // Devuelve: la ficha completa del recurso.
 function FichaRecurso(props: PropsFichaRecurso) {
   const recurso = props.recurso;
   const ubicacion = recurso.ubicacion;
-
-  // ¿Por qué este useState?
-  // Al guardar un cambio de estado, el servicio modifica los números del
-  // recurso, pero React NO se entera solo: no sabe que debe redibujar.
-  // React solo redibuja cuando cambia un estado (useState) o una prop.
-  // Por eso, después de guardar, sumamos 1 a este contador: el estado
-  // cambia, React redibuja la ficha y muestra los números nuevos.
-  const [cantidadCambios, setCantidadCambios] = useState(0);
-
-  // registrarCambio
-  // No recibe ni devuelve nada. La llama el formulario después de guardar.
-  function registrarCambio() {
-    setCantidadCambios(cantidadCambios + 1);
-  }
 
   return (
     <div className="ficha-recurso">
@@ -129,7 +118,7 @@ function FichaRecurso(props: PropsFichaRecurso) {
           </table>
         </div>
 
-        <FormularioCambioEstado recurso={recurso} onEstadoCambiado={registrarCambio} />
+        <FormularioCambioEstado recurso={recurso} onEstadoCambiado={props.onEstadoCambiado} />
       </div>
     </div>
   );

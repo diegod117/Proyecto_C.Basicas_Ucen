@@ -40,16 +40,3 @@
 .boton-limpiar-pequeno:hover {
   background-color: #e8f0fe;
 }
-
-/* Grilla de tarjetas.
-   "display: grid" ordena los elementos en filas y columnas.
-   "repeat(auto-fill, minmax(240px, 1fr))" significa:
-     - cada columna mide como mínimo 240px y crece para llenar el espacio (1fr)
-     - caben tantas columnas como entren en el ancho de la pantalla
-   Así, en un computador se ven 3 o 4 tarjetas por fila y en un celular 1,
-   sin escribir reglas distintas para cada pantalla (RNF-01). */
-.grilla-recursos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-}
