@@ -1,0 +1,72 @@
+/* FormularioReserva.css
+   Estilos del componente FormularioReserva.
+   Cubre: HU-03 (interfaz de creación de reserva)
+   Usa las variables de color globales definidas en src/styles/global.css */
+
+.formulario-reserva {
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 600px;
+}
+
+.formulario-reserva h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--color-principal);
+}
+
+/* Fila de campos alineados horizontalmente */
+.grupo-campos {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Contenedor vertical de etiqueta + control de entrada */
+.campo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.campo label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-texto);
+}
+
+.campo input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--color-texto);
+  background-color: #ffffff;
+  font-family: inherit;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 2px rgba(26, 99, 187, 0.15);
+}
+
+/* Botón principal */
+.boton-confirmar {
+  background-color: var(--color-principal);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.boton-confirmar:hover {
+  background-color: var(--color-principal-oscuro);
+}
