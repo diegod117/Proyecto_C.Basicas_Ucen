@@ -1,6 +1,6 @@
 /* FormularioReserva.css
    Estilos del componente FormularioReserva.
-   Cubre: HU-03 (interfaz de creación de reserva)
+   Cubre: HU-03, HU-07 (aviso de disponibilidad en tiempo real)
    Usa las variables de color globales definidas en src/styles/global.css */
 
 .formulario-reserva {
@@ -98,4 +98,28 @@
   margin-bottom: 18px;
   font-size: 14px;
   font-weight: 500;
+}
+
+/* Aviso dinámico de disponibilidad en tiempo real (HU-07) */
+.aviso-disponibilidad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 18px;
+}
+
+.aviso-disponibilidad.hay-unidades {
+  color: var(--color-disponible);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.aviso-disponibilidad.sin-unidades {
+  color: var(--color-danado);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
 }
