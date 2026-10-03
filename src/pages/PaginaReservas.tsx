@@ -13,7 +13,7 @@ import './PaginaReservas.css';
 function PaginaReservas() {
   // Estado local que se incrementa para forzar un re-renderizado
   // cuando el formulario completa una reserva con éxito.
-  const [actualizaciones, setActualizaciones] = useState(0);
+  const [, setActualizaciones] = useState(0);
 
   const listaReservas = obtenerReservas();
 
