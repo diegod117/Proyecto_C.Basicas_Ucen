@@ -72,11 +72,17 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       }
     }
 
-    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad);
+    // El servicio cambia las cantidades Y registra el cambio en el historial
+    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad, motivo);
     if (seGuardo) {
       setMensajeError('');
       setMensajeExito(textoResumenCambio(cantidad, estadoOrigen, estadoNuevo));
       setMotivo('');
+      // Si el estado de origen quedó sin unidades (ej: "Dañado (0)"), elegimos
+      // otro que sí tenga, para que el siguiente cambio no dé error.
+      if (recurso.cantidades[estadoOrigen] === 0) {
+        setEstadoOrigen(obtenerEstadoOrigenInicial(recurso));
+      }
       props.onEstadoCambiado(); // avisamos hacia arriba para que App redibuje todo
     } else {
       setMensajeError('No se pudo guardar el cambio. Revisa los datos.');

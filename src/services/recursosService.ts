@@ -1,7 +1,8 @@
 // recursosService.ts
 // Servicio de recursos: es el ÚNICO lugar desde donde las páginas
 // obtienen los recursos del inventario.
-// Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados)
+// Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
+//        HU-06 (cada cambio de estado queda en el historial)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -13,6 +14,7 @@
 
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { listaRecursosPrueba } from '../data/recursos';
+import { registrarCambioEstado } from './historialService';
 
 // La lista de recursos que usa toda la aplicación.
 // Por ahora parte con los datos de prueba y vive en la memoria
@@ -46,8 +48,8 @@ export function obtenerRecursoPorId(id: number): Recurso | undefined {
 }
 
 // cambiarEstadoRecurso
-// Recibe: el id del recurso, el estado de origen, el estado nuevo y
-//         cuántas unidades se mueven de uno a otro.
+// Recibe: el id del recurso, el estado de origen, el estado nuevo,
+//         cuántas unidades se mueven de uno a otro y el motivo del cambio.
 // Devuelve: true si se pudo hacer el cambio, false si no.
 // Ejemplo: mover 1 multímetro de 'disponible' a 'danado' deja
 //          disponible: 12 -> 11 y danado: 1 -> 2. El total no cambia.
@@ -61,6 +63,7 @@ export function cambiarEstadoRecurso(
   estadoOrigen: EstadoRecurso,
   estadoNuevo: EstadoRecurso,
   cantidad: number,
+  motivo: string,
 ): boolean {
   const recurso = obtenerRecursoPorId(idRecurso);
 
@@ -77,6 +80,11 @@ export function cambiarEstadoRecurso(
   // que lean del servicio verán el cambio.
   recurso.cantidades[estadoOrigen] = recurso.cantidades[estadoOrigen] - cantidad;
   recurso.cantidades[estadoNuevo] = recurso.cantidades[estadoNuevo] + cantidad;
+
+  // Dejamos constancia del cambio en el historial (HU-06).
+  // Se hace AQUÍ, dentro del servicio, y no en el formulario: así es
+  // imposible cambiar un estado sin que quede registrado.
+  registrarCambioEstado(idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo);
 
   return true;
 }

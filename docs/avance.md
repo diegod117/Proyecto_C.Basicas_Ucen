@@ -235,3 +235,55 @@
 - Se validó con `npm run lint` y `npm run build`.
 
 **Archivos tocados:** `src/components/TablaReservas.tsx`, `src/components/TablaReservas.css`, `src/pages/PaginaReservas.tsx`, `docs/avance.md`.
+
+## 2026-10-03 — J11: registro del historial de cambios de estado (Johann)
+
+**HU trabajada:** HU-06 (en progreso). Rama: `feature/hu-06-historial-estados`.
+
+**Qué se hizo:**
+- Tipo nuevo `src/types/CambioEstado.ts`: id, recurso, fecha, estado anterior, estado nuevo, cantidad, motivo y usuario.
+- Datos de prueba nuevos `src/data/historialEstados.ts`: 3 registros (los 2 del multímetro del mockup y 1 de los termómetros), ordenados del más antiguo al más nuevo.
+- Servicio nuevo `src/services/historialService.ts`:
+  - `registrarCambioEstado()` pone sola la fecha (`obtenerFechaActual()` de Diego) y el usuario ('Encargado (usuario actual)', el mismo texto que usan las incidencias).
+  - `obtenerHistorialDeRecurso()` devuelve los cambios de un recurso, del más reciente al más antiguo.
+  - No hay funciones para borrar ni modificar registros (RNF-06).
+- `recursosService.cambiarEstadoRecurso()` ahora recibe el motivo y registra el cambio en el historial. Así es imposible cambiar un estado sin que quede registrado. `FormularioCambioEstado` le pasa el motivo.
+- Probado con un script: un cambio válido queda registrado primero con fecha y usuario; los cambios rechazados (99 unidades, un recurso que no existe) no dejan registro; los demás recursos no se ven afectados.
+- El historial todavía no se ve en pantalla: la tabla se agrega en J12.
+
+**Archivos tocados:** `src/types/CambioEstado.ts`, `src/data/historialEstados.ts`, `src/services/historialService.ts`, `src/services/recursosService.ts`, `src/components/FormularioCambioEstado.tsx`, `docs/avance.md`.
+
+## 2026-10-03 — J12: tabla del historial de estados en la ficha (Johann)
+
+**HU trabajada:** HU-06 (cierre). Rama: `feature/hu-06-historial-estados`.
+
+**Qué se hizo:**
+- Componente nuevo `src/components/TablaHistorial.tsx` y `.css`, con las columnas Fecha | Cambio | Motivo | Usuario, como en el mockup más el motivo. El cambio se muestra con las etiquetas de color de los estados. Si no hay cambios, muestra un aviso. En celular la tabla se desliza hacia el lado.
+- `FichaRecurso`: nueva columna izquierda con los datos y, debajo, el historial (`obtenerHistorialDeRecurso()`). Como App redibuja todo al guardar, el cambio nuevo aparece arriba al instante.
+- Corrección en `FormularioCambioEstado` (HU-02): si el estado de origen queda sin unidades después de guardar (ej: "Dañado (0)"), el formulario elige solo otro estado que tenga unidades.
+- Se probó en el navegador:
+  - el multímetro muestra sus 2 cambios del mockup;
+  - al guardar uno nuevo aparece primero;
+  - un error no agrega filas;
+  - el soldador muestra el aviso de historial vacío;
+  - al salir y volver a la ficha, el historial se mantiene.
+
+**Archivos tocados:** `src/components/TablaHistorial.tsx`, `src/components/TablaHistorial.css`, `src/components/FichaRecurso.tsx`, `src/components/FichaRecurso.css`, `src/components/FormularioCambioEstado.tsx`, `docs/avance.md`.
+
+## 2026-10-03 — J13: generar y validar el código de ubicación (Johann)
+
+**HU trabajada:** HU-11. Rama: `feature/hu-11-ubicacion`, creada desde `feature/hu-06-historial-estados` porque ese PR aún no estaba en `main` y las dos tocan `FichaRecurso`.
+
+**Qué se hizo:**
+- Archivo nuevo `src/utils/ubicacion.ts`:
+  - `generarCodigoUbicacion()` sigue la regla torre + sala - bodega - mueble ("B307-B1-M2"). Los recursos en la sala misma quedan como "B308-SALA". Usa `abreviarBodega()` y `abreviarMueble()`.
+  - `validarUbicacion()` devuelve la lista de problemas: sala que no es un número, bodega o mueble vacíos, o un código que no coincide con la ubicación.
+- Componente nuevo `src/components/AvisoUbicacion.tsx` y `.css`: un recuadro amarillo en la ficha, debajo de la ubicación, que aparece solo si hay problemas (devuelve `null` si está todo bien). Servirá para detectar errores al migrar la planilla Excel.
+- Se mantuvo el campo `codigo` en los datos porque lo usan Reservas (Martín) y Alertas (Diego).
+- Se probó:
+  - el código generado coincide con el de los 10 recursos de prueba;
+  - se detectan código mal escrito, sala vacía, sala con letras, y bodega y mueble vacíos;
+  - los espacios extra no cuentan como error;
+  - con un código roto a propósito (y luego restaurado), el aviso aparece en la ficha del multímetro y no en la de los demás.
+
+**Archivos tocados:** `src/utils/ubicacion.ts`, `src/components/AvisoUbicacion.tsx`, `src/components/AvisoUbicacion.css`, `src/components/FichaRecurso.tsx`, `docs/avance.md`.

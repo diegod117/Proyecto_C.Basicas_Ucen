@@ -49,6 +49,16 @@
   }
 }
 
+/* Columna izquierda: la tarjeta de datos y el historial, uno bajo el otro */
+.ficha-columna-izquierda {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* min-width: 0 permite que la tabla del historial se deslice hacia el lado
+     en celular, en vez de estirar toda la grilla */
+  min-width: 0;
+}
+
 /* Recuadro blanco con todos los datos */
 .ficha-tarjeta {
   background-color: white;
