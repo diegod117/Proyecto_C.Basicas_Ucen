@@ -1,0 +1,92 @@
+/* PaginaLogin.css
+   Estilos de la pantalla de inicio de sesión.
+   Usa los colores globales de src/styles/global.css.
+   Cubre: inicio de sesión (sección 3.4) y RNF-01 (se ve bien en celular) */
+
+/* Ocupa toda la pantalla y centra la tarjeta */
+.login-fondo {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: var(--color-principal);
+}
+
+/* flex-direction: column pone cada elemento debajo del anterior */
+.login-tarjeta {
+  background-color: white;
+  border-radius: 8px;
+  padding: 32px 24px;
+  /* width: 100% + max-width: en celular ocupa todo el ancho,
+     en PC no pasa de 380px */
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.login-titulo {
+  margin: 0;
+  font-size: 22px;
+  text-align: center;
+}
+
+.login-subtitulo {
+  margin: 6px 0 24px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-etiqueta {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.login-input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  font-size: 15px;
+  font-family: inherit;
+  margin-bottom: 16px;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 2px rgba(26, 99, 187, 0.15);
+}
+
+.login-error {
+  color: var(--color-danado);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.login-boton {
+  background-color: var(--color-principal);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-boton:hover:not(:disabled) {
+  background-color: var(--color-principal-oscuro);
+}
+
+/* Mientras espera a Firebase el botón se ve gris */
+.login-boton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}

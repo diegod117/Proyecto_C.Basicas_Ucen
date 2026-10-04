@@ -1,9 +1,11 @@
 // MenuNavegacion.tsx
 // Barra superior azul con el nombre del sistema y los botones
 // para cambiar de página (Inventario, Reservas, Incidencias).
-// Cubre: navegación base (no corresponde a una HU específica)
+// También muestra quién inició sesión y el botón para cerrar sesión.
+// Cubre: navegación base e inicio de sesión con roles (sección 3.4 de requerimientos)
 
 import type { Pagina } from '../types/Pagina';
+import type { Usuario, RolUsuario } from '../types/Usuario';
 import './MenuNavegacion.css';
 
 // Las "props" son los datos que un componente recibe desde su componente padre
@@ -19,10 +21,27 @@ interface PropsMenuNavegacion {
   // Cantidad de alertas activas para mostrar en el badge del menú (HU-05).
   // Es una prop numérica, tal como la campana con contador del mockup.
   cantidadAlertas?: number;
+  // Usuario conectado, para mostrar su nombre y su rol.
+  usuario: Usuario;
+  // Función de App que cierra la sesión.
+  onCerrarSesion: () => void;
+}
+
+// Recibe un rol. Devuelve el nombre del rol para mostrar en pantalla
+// (en los datos está en minúsculas y sin tildes).
+function nombreDelRol(rol: RolUsuario): string {
+  if (rol === 'encargado') {
+    return 'Encargado de laboratorio';
+  } else if (rol === 'docente') {
+    return 'Docente';
+  } else {
+    return 'Departamento';
+  }
 }
 
 // Componente MenuNavegacion
-// Recibe: paginaActual, onCambiarPagina y cantidadAlertas opcional.
+// Recibe: paginaActual, onCambiarPagina, cantidadAlertas opcional,
+// usuario y onCerrarSesion.
 // Devuelve: la barra de navegación.
 function MenuNavegacion(props: PropsMenuNavegacion) {
   // Devuelve la clase CSS de un botón: si es la página actual,
@@ -71,6 +90,16 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
           )}
         </button>
       </nav>
+
+      <div className="menu-usuario">
+        <div className="menu-usuario-datos">
+          <span className="menu-usuario-nombre">{props.usuario.nombre}</span>
+          <span className="menu-usuario-rol">{nombreDelRol(props.usuario.rol)}</span>
+        </div>
+        <button className="boton-menu" onClick={props.onCerrarSesion}>
+          Cerrar sesión
+        </button>
+      </div>
     </header>
   );
 }

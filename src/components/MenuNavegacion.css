@@ -74,3 +74,28 @@
   background-color: #dc2626;
   color: white;
 }
+
+/* Zona del usuario conectado: nombre, rol y botón "Cerrar sesión" */
+.menu-usuario {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* El nombre arriba y el rol debajo */
+.menu-usuario-datos {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.menu-usuario-nombre {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.menu-usuario-rol {
+  font-size: 12px;
+  opacity: 0.85;
+}
