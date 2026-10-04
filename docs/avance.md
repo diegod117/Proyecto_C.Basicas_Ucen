@@ -306,3 +306,20 @@
 **Pendiente:** ocultar acciones según el rol (RNF-03) y cambiar el texto fijo "Encargado (usuario actual)" de incidencias e historial por el usuario real.
 
 **Archivos tocados:** `package.json`, `package-lock.json`, `src/services/firebase.ts`, `src/services/authService.ts`, `src/types/Usuario.ts`, `src/data/usuarios.ts`, `src/pages/PaginaLogin.tsx`, `src/pages/PaginaLogin.css`, `src/App.tsx`, `src/components/MenuNavegacion.tsx`, `src/components/MenuNavegacion.css`, `docs/avance.md`.
+
+## 2026-10-04 — J15: funciones de permisos por rol (Johann)
+
+**Trabajado:** RNF-03 (fase 2, ver `docs/plan-fase-2.md`). Rama: `feature/rnf-03-permisos-rol`.
+
+**Qué se hizo:**
+- Archivo nuevo `src/utils/permisos.ts`: la tabla de permisos de la sección 1 del plan, pasada a funciones con `if/else`:
+  - `puedeVerPagina(rol, pagina)`: el docente no ve Incidencias ni Alertas.
+  - `puedeCambiarEstado(rol)`: solo el encargado.
+  - `puedeReservar(rol)`: el docente y el encargado.
+  - `puedeVerTodasLasReservas(rol)`: todos menos el docente, que verá solo las suyas.
+  - `puedeCancelarReserva(rol, esReservaPropia)`: el encargado cualquiera, el docente solo las suyas y el departamento ninguna.
+  - `puedeGestionarIncidencias(rol)`: solo el encargado registra y avanza incidencias.
+- Se probó con un script que llama a cada función con los tres roles: los resultados coinciden con la tabla del plan.
+- Todavía no cambia nada en pantalla: las funciones se empiezan a usar en J16 (menú) y J17 a J19 (páginas).
+
+**Archivos tocados:** `src/utils/permisos.ts`, `docs/avance.md`.
