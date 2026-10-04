@@ -288,68 +288,21 @@
 
 **Archivos tocados:** `src/utils/ubicacion.ts`, `src/components/AvisoUbicacion.tsx`, `src/components/AvisoUbicacion.css`, `src/components/FichaRecurso.tsx`, `docs/avance.md`.
 
-## 2026-10-03 — M1 a M5: servicio y formulario de reserva con fecha y horario (Martín)
+## 2026-10-04 — Inicio de sesión con Firebase (Johann)
 
-**HU trabajada:** HU-03 (solicitar reserva de recursos) y RF-03. Rama: `rama-martin` (PR #5).
-
-**Qué se hizo:**
-- `src/services/reservasService.ts` (M1): creación del servicio de reservas en memoria utilizando `[...listaReservasPrueba]` para no mutar el archivo original. Se implementaron las funciones `obtenerReservas()` y `agregarReserva()`, generando automáticamente el siguiente `id` correlativo mediante un recorrido con `for` sobre el arreglo (`idMayor + 1`).
-- `src/components/FormularioReserva.tsx/.css` (M2, M3): creación del formulario controlado con `useState` para fecha (`type="date"`), hora de inicio y fin (`type="time"`). Incorporación del selector `<select>` poblado dinámicamente con `obtenerRecursos()` de `recursosService` mostrando el nombre del recurso y su código de ubicación, junto con los campos de docente, cantidad numérica (`min="1"`), asignatura y sala de destino.
-- `src/utils/disponibilidad.ts` (M4): función `validarCamposReserva(...)` que centraliza la validación de los datos. Comprueba campos obligatorios, cantidad mínima positiva y verifica la coherencia horaria (rechaza solicitudes donde `horaFin <= horaInicio`).
-- `src/pages/PaginaReservas.tsx/.css` y `FormularioReserva.tsx` (M5): captura del evento `onSubmit` con `preventDefault()`, ejecución de validaciones y almacenamiento con `agregarReserva()`. Despliegue de avisos visuales de error (`.mensaje-error`) o confirmación (`.mensaje-exito`), limpieza automática de campos al guardar y notificación a la página para actualizar el contador de reservas registradas.
-
-**Decisiones y pruebas:**
-- Las páginas nunca acceden directo a `src/data/reservas.ts`: todo pasa por `reservasService` para que el desacople facilite integrar una base de datos o API en el futuro.
-- Se probó en el navegador: validación ante campos incompletos, detección de horario invertido (ej: inicio 11:00 y fin 09:00), y guardado exitoso de una reserva que aparece reflejada en el contador superior.
-
-**Archivos tocados:** `src/services/reservasService.ts`, `src/utils/disponibilidad.ts`, `src/components/FormularioReserva.tsx`, `src/components/FormularioReserva.css`, `src/pages/PaginaReservas.tsx`, `src/pages/PaginaReservas.css`.
-
-## 2026-10-03 — M6 a M8: cruces de horario y cálculo de disponibilidad en tiempo real (Martín)
-
-**HU trabajada:** HU-07 (disponibilidad por horario) y RF-03. Rama: `rama-HU-07` (PR #9).
+**Trabajado:** inicio de sesión con roles (sección 3.4 de requerimientos), base para RNF-03. No tiene HU propia. Rama: `feature/login-roles`.
 
 **Qué se hizo:**
-- `src/utils/disponibilidad.ts` (M6): implementación de `seCruzanHorarios(fechaA, inicioA, finA, fechaB, inicioB, finB)`. Comprueba si dos reservas coinciden en la misma fecha y si sus intervalos de horas se solapan, evaluando que no termine una antes de que inicie la otra (`finA <= inicioB || finB <= inicioA`).
-- `src/utils/disponibilidad.ts` (M7): función `calcularUnidadesDisponibles(recursoId, fecha, horaInicio, horaFin)`. Obtiene el stock físico disponible del recurso mediante `obtenerRecursoPorId()`, recorre las reservas existentes y descuenta las cantidades de aquellas que coincidan en horario. Retorna `Math.max(0, unidadesLibres)` para asegurar que nunca se calculen números negativos.
-- `src/components/FormularioReserva.tsx/.css` (M8): cálculo reactivo de disponibilidad en tiempo real. Tan pronto como el usuario selecciona el recurso, la fecha y un horario coherente, el formulario evalúa las unidades libres y despliega un recuadro informativo interactivo:
-  - Verde (`.hay-unidades`): `"✔ Disponibles en este horario: X unidad(es)"`.
-  - Rojo (`.sin-unidades`): `"✖ Sin unidades disponibles en este horario (todas reservadas)"`.
+- Se instaló el paquete `firebase` (v12) y se creó el proyecto `ucen-gestiondelaboratorio` en Firebase, con el inicio de sesión por correo y contraseña activado.
+- `src/services/firebase.ts`: conecta la app con el proyecto. La configuración queda en el repo porque no es secreta (identifica el proyecto, no da permisos), así nadie del equipo tiene que configurar nada.
+- `src/types/Usuario.ts`: `Usuario` (correo, nombre, rol) y `RolUsuario` ('encargado' | 'docente' | 'departamento').
+- `src/data/usuarios.ts`: tres usuarios de prueba, uno por rol. Firebase revisa la contraseña; el rol se saca de esta lista. Cada correo de la lista también debe estar creado en Firebase (Authentication > Usuarios).
+- `src/services/authService.ts`: `iniciarSesion()` (devuelve '' o el error en español), `cerrarSesion()` y `escucharSesion()`. Si una cuenta de Firebase no está en la lista, no puede entrar.
+- `src/pages/PaginaLogin.tsx/.css`: formulario de correo y contraseña. El botón se desactiva mientras Firebase responde.
+- `App.tsx`: sin sesión muestra el login. Un `useEffect` escucha a Firebase, así la sesión se mantiene al recargar la página. Mientras revisa, muestra "Cargando...".
+- `MenuNavegacion`: muestra el nombre y el rol del usuario y el botón "Cerrar sesión".
+- Se probó en el navegador: contraseña mala, login con los tres roles, recargar sin perder la sesión y cerrar sesión.
 
-**Decisiones y pruebas:**
-- La comparación de horas se realiza directamente con texto en formato `HH:MM`, lo cual es seguro y exacto bajo la codificación de 24 horas (ej. "08:30" < "10:00").
-- Se probó en el navegador: al modificar la fecha o cambiar la hora de inicio/fin, el aviso de disponibilidad se recalcula al instante sin necesidad de apretar ningún botón ni recargar.
+**Pendiente:** ocultar acciones según el rol (RNF-03) y cambiar el texto fijo "Encargado (usuario actual)" de incidencias e historial por el usuario real.
 
-**Archivos tocados:** `src/utils/disponibilidad.ts`, `src/components/FormularioReserva.tsx`, `src/components/FormularioReserva.css`.
-
-## 2026-10-03 — M9 y M10: validación de stock disponible y bloqueo de reservas (Martín)
-
-**HU trabajada:** HU-08 (validar disponibilidad al reservar) y RF-03. Rama: `rama-HU-07` (PR #9 / PR #14).
-
-**Qué se hizo:**
-- `src/utils/disponibilidad.ts` (M9): función `validarDisponibilidadReserva(...)`. Comprueba si la cantidad requerida excede las unidades libres en ese tramo horario y genera mensajes de error detallados (ej: `"No se puede reservar: solicitó X unidad(es), pero solo quedan Y disponible(s) en ese horario."` o si no quedan unidades). Se integró como paso de validación previo a `agregarReserva()`.
-- `src/components/FormularioReserva.tsx/.css` (M10): bloqueo reactivo del botón de confirmación (`.boton-confirmar`). Si `unidadesDisponibles === 0` o la cantidad solicitada supera las unidades disponibles, el botón recibe el atributo `disabled={bloqueoPorDisponibilidad}`, cambia su texto a `"Sin disponibilidad suficiente"` y adopta estilos grises inactivos (`cursor: not-allowed`).
-
-**Decisiones y pruebas:**
-- Se probó el caso de prueba real de la exposición: los Termómetros digitales (recurso ID 3, con 8 unidades disponibles en stock) tienen una reserva de prueba el `2026-10-09` de `08:30` a `10:00` por 8 unidades. Al seleccionar ese mismo recurso, fecha y rango en el formulario, el sistema muestra el aviso rojo de 0 unidades, desactiva el botón y previene el registro duplicado (el problema exacto reportado por los docentes). Al cambiar a un horario posterior (ej: 10:30 a 12:00), el botón se reactiva inmediatamente.
-
-**Archivos tocados:** `src/utils/disponibilidad.ts`, `src/components/FormularioReserva.tsx`, `src/components/FormularioReserva.css`.
-
-## 2026-10-03 — M11 a M13: listado cronológico de reservas, cancelación y diseño móvil (Martín)
-
-**HU trabajada:** RF-03 (gestión de reservas / "Mis reservas") y RNF-01 (diseño responsivo para móviles). Ramas: `martin-rf-03` y `martin-RNF-01` (PR #12 / PR #15).
-
-**Qué se hizo:**
-- `src/components/TablaReservas.tsx/.css` (M11): componente de tabla que muestra el listado de reservas programadas. Implementa ordenamiento cronológico con `.sort()` evaluando fecha y hora de inicio (`a.fecha` vs `b.fecha`, y `a.horaInicio` vs `b.horaInicio`). Resuelve el nombre del recurso y su código de ubicación usando `obtenerRecursoPorId()`. Si la lista queda vacía, presenta el aviso `"No hay reservas registradas en este momento."`.
-- `src/services/reservasService.ts` y `TablaReservas.tsx` (M12): incorporación de la función `cancelarReserva(id)` que localiza el índice de la reserva y la elimina del arreglo en memoria con `.splice(i, 1)`. En la tabla se añadió el botón `"Cancelar"` (`.boton-cancelar-reserva`) que solicita confirmación explícita mediante `window.confirm()` mostrando los datos de la reserva antes de proceder, refrescando la vista y notificando a `PaginaReservas` mediante `onReservaModificada`.
-- `src/components/FormularioReserva.css`, `TablaReservas.css` y `PaginaReservas.css` (M13): adaptación para dispositivos móviles según RNF-01:
-  - En `@media (max-width: 768px)`, los campos del formulario se apilan en columna (`flex-direction: column`) para facilitar la interacción táctil.
-  - Se fijó el tamaño de fuente de inputs y selectores en `16px` para evitar el molesto zoom automático que ejecutan los navegadores de celulares.
-  - La tabla se encapsuló en un contenedor `.tabla-scroll` con `overflow-x: auto; -webkit-overflow-scrolling: touch;` y ancho mínimo de 620px, permitiendo desplazamiento horizontal fluido sin desarmar la pantalla.
-  - Botones y controles ampliados con áreas de pulsación táctil optimizadas.
-
-**Decisiones y pruebas:**
-- Se comprobó la reactividad cruzada: al crear una reserva desde el formulario, aparece inmediatamente en la tabla en su orden cronológico correspondiente. Al cancelar una reserva, se actualiza la tabla, el contador de la página disminuye y ese cupo queda liberado al momento en el cálculo de disponibilidad horaria del formulario.
-- Se probó la interfaz en vista móvil (resoluciones de 375px y 412px): el formulario se manipula con comodidad con una mano y la tabla se desplaza horizontalmente sin desbordes.
-
-**Archivos tocados:** `src/services/reservasService.ts`, `src/components/TablaReservas.tsx`, `src/components/TablaReservas.css`, `src/components/FormularioReserva.css`, `src/pages/PaginaReservas.tsx`, `src/pages/PaginaReservas.css`, `docs/avance.md`.
-
+**Archivos tocados:** `package.json`, `package-lock.json`, `src/services/firebase.ts`, `src/services/authService.ts`, `src/types/Usuario.ts`, `src/data/usuarios.ts`, `src/pages/PaginaLogin.tsx`, `src/pages/PaginaLogin.css`, `src/App.tsx`, `src/components/MenuNavegacion.tsx`, `src/components/MenuNavegacion.css`, `docs/avance.md`.
