@@ -2,10 +2,12 @@
 // Barra superior azul con el nombre del sistema y los botones
 // para cambiar de página (Inventario, Reservas, Incidencias).
 // También muestra quién inició sesión y el botón para cerrar sesión.
-// Cubre: navegación base e inicio de sesión con roles (sección 3.4 de requerimientos)
+// Solo muestra los botones de las páginas que el rol puede ver.
+// Cubre: navegación base, inicio de sesión con roles (sección 3.4 de requerimientos) y RNF-03
 
 import type { Pagina } from '../types/Pagina';
 import type { Usuario, RolUsuario } from '../types/Usuario';
+import { puedeVerPagina } from '../utils/permisos';
 import './MenuNavegacion.css';
 
 // Las "props" son los datos que un componente recibe desde su componente padre
@@ -59,36 +61,47 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
       <h1 className="menu-titulo">UCEN - Gestión de Inventario</h1>
 
       <nav className="menu-botones">
-        {/* Al hacer clic, llamamos a la función que nos pasó App.
+        {/* Cada botón se dibuja SOLO si el rol del usuario puede ver esa
+            página (RNF-03). "condición && (...)" significa: si la condición
+            es true, dibuja lo de la derecha; si es false, no dibuja nada.
+            Al hacer clic, llamamos a la función que nos pasó App.
             Se escribe "() => ..." para que se ejecute SOLO al hacer clic,
             y no apenas se dibuja el botón. */}
-        <button
-          className={obtenerClaseBoton('inventario')}
-          onClick={() => props.onCambiarPagina('inventario')}
-        >
-          Inventario
-        </button>
-        <button
-          className={obtenerClaseBoton('reservas')}
-          onClick={() => props.onCambiarPagina('reservas')}
-        >
-          Reservas
-        </button>
-        <button
-          className={obtenerClaseBoton('incidencias')}
-          onClick={() => props.onCambiarPagina('incidencias')}
-        >
-          Incidencias
-        </button>
-        <button
-          className={obtenerClaseBoton('alertas')}
-          onClick={() => props.onCambiarPagina('alertas')}
-        >
-          <span>Alertas</span>
-          {props.cantidadAlertas !== undefined && props.cantidadAlertas > 0 && (
-            <span className="badge-alertas-menu">{props.cantidadAlertas}</span>
-          )}
-        </button>
+        {puedeVerPagina(props.usuario.rol, 'inventario') && (
+          <button
+            className={obtenerClaseBoton('inventario')}
+            onClick={() => props.onCambiarPagina('inventario')}
+          >
+            Inventario
+          </button>
+        )}
+        {puedeVerPagina(props.usuario.rol, 'reservas') && (
+          <button
+            className={obtenerClaseBoton('reservas')}
+            onClick={() => props.onCambiarPagina('reservas')}
+          >
+            Reservas
+          </button>
+        )}
+        {puedeVerPagina(props.usuario.rol, 'incidencias') && (
+          <button
+            className={obtenerClaseBoton('incidencias')}
+            onClick={() => props.onCambiarPagina('incidencias')}
+          >
+            Incidencias
+          </button>
+        )}
+        {puedeVerPagina(props.usuario.rol, 'alertas') && (
+          <button
+            className={obtenerClaseBoton('alertas')}
+            onClick={() => props.onCambiarPagina('alertas')}
+          >
+            <span>Alertas</span>
+            {props.cantidadAlertas !== undefined && props.cantidadAlertas > 0 && (
+              <span className="badge-alertas-menu">{props.cantidadAlertas}</span>
+            )}
+          </button>
+        )}
       </nav>
 
       <div className="menu-usuario">

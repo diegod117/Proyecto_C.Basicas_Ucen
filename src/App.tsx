@@ -15,6 +15,7 @@ import PaginaAlertas from './pages/PaginaAlertas';
 import PaginaLogin from './pages/PaginaLogin';
 import { generarAlertas } from './utils/alertas';
 import { escucharSesion, cerrarSesion } from './services/authService';
+import { puedeVerPagina } from './utils/permisos';
 
 // Componente App
 // No recibe props. Devuelve la aplicación completa (menú + página actual).
@@ -80,8 +81,17 @@ function App() {
   }
 
   // Decide qué página mostrar según el valor de paginaActual.
-  // No recibe nada. Devuelve el componente de la página que corresponde.
-  function mostrarPaginaActual() {
+  // Recibe el usuario conectado. Devuelve el componente de la página que corresponde.
+  // El usuario llega como parámetro porque usuarioActual puede ser null, y
+  // TypeScript no sabe que esta función solo se llama cuando hay sesión.
+  function mostrarPaginaActual(usuario: Usuario) {
+    // Protección extra (RNF-03): el menú ya oculta los botones de las páginas
+    // que el rol no puede ver, pero si por algún motivo paginaActual quedara
+    // en una de ellas, mostramos el inventario en su lugar.
+    if (!puedeVerPagina(usuario.rol, paginaActual)) {
+      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} />;
+    }
+
     if (paginaActual === 'inventario') {
       return <PaginaInventario onInventarioCambiado={registrarCambioInventario} />;
     } else if (paginaActual === 'reservas') {
@@ -115,7 +125,7 @@ function App() {
         onCerrarSesion={manejarCerrarSesion}
       />
 
-      <main>{mostrarPaginaActual()}</main>
+      <main>{mostrarPaginaActual(usuarioActual)}</main>
     </div>
   );
 }
