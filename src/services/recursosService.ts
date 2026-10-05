@@ -3,24 +3,71 @@
 // obtienen los recursos del inventario.
 // Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
 //        HU-06 (cada cambio de estado queda en el historial),
-//        RF-04 (reponer stock de un recurso)
+//        RF-04 (reponer stock de un recurso),
+//        RNF-06 (los recursos se cargan desde Firestore)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
-// Hoy vienen de una lista de prueba (src/data/recursos.ts), pero en el
-// futuro podrían venir de un backend. Cuando eso pase, solo se cambia
-// este archivo y las páginas siguen funcionando igual.
+// Los datos vienen de Firestore (la colección "recursos"), pero las páginas
+// no lo saben: siguen pidiéndolos con obtenerRecursos(), igual que antes.
 // Además, como todas las páginas leen de aquí, todas ven los mismos datos:
 // si alguien cambia el estado de un recurso, todos ven el cambio.
 
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { listaRecursosPrueba } from '../data/recursos';
 import { registrarCambioEstado, registrarReposicion } from './historialService';
+import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
+import { baseDatos } from './firebase';
 
-// La lista de recursos que usa toda la aplicación.
-// Por ahora parte con los datos de prueba y vive en la memoria
-// del navegador (si se recarga la página, vuelve a los datos de prueba).
-const listaRecursos: Recurso[] = listaRecursosPrueba;
+// La lista de recursos que usa toda la aplicación: es una COPIA EN MEMORIA
+// de la colección "recursos" de Firestore (ver docs/plan-fase-3.md).
+// Parte vacía y se llena con cargarRecursos() al iniciar sesión.
+// Las páginas leen esta copia, así no tienen que esperar a internet.
+const listaRecursos: Recurso[] = [];
+
+// cargarRecursos
+// No recibe nada. Descarga los recursos desde Firestore y llena la copia
+// en memoria. La llama cargarTodosLosDatos() (cargaDatos.ts) al iniciar sesión.
+// Devuelve una Promise<void>: "una promesa de que va a terminar", sin valor.
+// Si Firestore falla (ej: sin internet), lanza un error que atrapa cargaDatos.ts.
+export async function cargarRecursos(): Promise<void> {
+  // getDocs pide TODOS los documentos de la colección "recursos".
+  // "await" espera la respuesta de internet antes de seguir.
+  const resultado = await getDocs(collection(baseDatos, 'recursos'));
+
+  // Vaciamos la copia antes de llenarla. splice(0, largo) borra todos los
+  // elementos sin crear una lista nueva, así todos siguen usando la misma.
+  listaRecursos.splice(0, listaRecursos.length);
+
+  if (resultado.empty) {
+    // Primera vez: la colección está vacía, así que subimos los datos de
+    // prueba de src/data/recursos.ts. writeBatch ("lote") junta todas las
+    // escrituras y las envía de una sola vez: se guardan todas o ninguna.
+    const lote = writeBatch(baseDatos);
+    for (const recurso of listaRecursosPrueba) {
+      // El nombre del documento es el id como texto: el recurso 7 queda en "recursos/7"
+      lote.set(doc(baseDatos, 'recursos', String(recurso.id)), recurso);
+      listaRecursos.push(recurso);
+    }
+    await lote.commit();
+    return;
+  }
+
+  // Ya había datos: los copiamos a la memoria.
+  // documento.data() devuelve un objeto sin tipo; con "as Recurso" le
+  // decimos a TypeScript que tiene la forma de un Recurso (así lo guardamos).
+  for (const documento of resultado.docs) {
+    listaRecursos.push(documento.data() as Recurso);
+  }
+
+  // Firestore ordena los documentos por su nombre COMO TEXTO ("1", "10", "2"...).
+  // Los ordenamos por id como número para que el listado salga igual que antes.
+  // sort recibe una función que compara dos recursos: si el resultado es
+  // negativo, "a" va primero; si es positivo, "b" va primero.
+  listaRecursos.sort(function (a, b) {
+    return a.id - b.id;
+  });
+}
 
 // obtenerRecursos
 // Recibe: nada.
