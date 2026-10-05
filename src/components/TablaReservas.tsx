@@ -1,11 +1,14 @@
 // TablaReservas.tsx
 // Componente de tabla que lista las reservas registradas.
 // Ordena las reservas cronológicamente y permite cancelar reservas existentes.
-// Cubre: RF-03 (listado, ordenamiento y cancelación de reservas)
+// El docente solo ve y cancela sus propias reservas; el departamento solo consulta.
+// Cubre: RF-03 (listado, ordenamiento y cancelación de reservas) y RNF-03
 
 import { useState } from 'react';
-import { obtenerReservas, cancelarReserva } from '../services/reservasService';
+import { obtenerReservasVisibles, cancelarReserva } from '../services/reservasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
+import type { Usuario } from '../types/Usuario';
+import { puedeCancelarReserva, puedeVerTodasLasReservas } from '../utils/permisos';
 import './TablaReservas.css';
 
 // Props que recibe la tabla
@@ -14,16 +17,31 @@ interface TablaReservasProps {
   version?: number;
   // Callback opcional para avisar al padre cuando cambian las reservas.
   onReservaModificada?: () => void;
+  // Usuario conectado: decide qué reservas se ven y cuáles se pueden cancelar (RNF-03)
+  usuario: Usuario;
 }
 
 // Componente TablaReservas
 // Renderiza una tabla HTML con las reservas ordenadas y opción de cancelación.
-function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
+function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasProps) {
   // Estado local para refrescar la tabla apenas se cancela una reserva.
   const [actualizacionInterna, setActualizacionInterna] = useState(0);
 
-  // Obtenemos una copia de las reservas para no mutar el arreglo original al ordenar.
-  const reservas = [...obtenerReservas()];
+  // Obtenemos una copia de las reservas que este usuario puede ver (RNF-03),
+  // para no mutar el arreglo original al ordenar.
+  const reservas = [...obtenerReservasVisibles(usuario)];
+
+  // El docente ve "Mis reservas"; el encargado y el departamento ven todas.
+  let titulo = 'Reservas programadas';
+  let textoSinReservas = 'No hay reservas registradas en este momento.';
+  if (!puedeVerTodasLasReservas(usuario.rol)) {
+    titulo = 'Mis reservas';
+    textoSinReservas = 'No tienes reservas registradas.';
+  }
+
+  // La columna "Acción" solo existe si el rol puede cancelar al menos sus
+  // propias reservas (encargado y docente). El departamento no la ve.
+  const mostrarAcciones = puedeCancelarReserva(usuario.rol, true);
 
   // Ordenamiento cronológico: primero fecha, luego hora de inicio.
   reservas.sort(function (a, b) {
@@ -62,10 +80,10 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
 
   return (
     <div className="tabla-reservas-contenedor" key={`${version}-${actualizacionInterna}`}>
-      <h3>Reservas programadas</h3>
+      <h3>{titulo}</h3>
 
       {reservas.length === 0 ? (
-        <p className="sin-reservas-texto">No hay reservas registradas en este momento.</p>
+        <p className="sin-reservas-texto">{textoSinReservas}</p>
       ) : (
         <div className="tabla-scroll">
           <table className="tabla-reservas">
@@ -78,7 +96,7 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
                 <th>Cant.</th>
                 <th>Asignatura</th>
                 <th>Sala</th>
-                <th>Acción</th>
+                {mostrarAcciones && <th>Acción</th>}
               </tr>
             </thead>
             <tbody>
@@ -88,6 +106,10 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
                   ? `${recurso.nombre} (${recurso.ubicacion.codigo})`
                   : `Recurso #${reserva.recursoId}`;
                 const horarioTexto = `${reserva.horaInicio} - ${reserva.horaFin}`;
+
+                // ¿Esta reserva es del usuario conectado? (RNF-03)
+                const esReservaPropia = reserva.docente === usuario.nombre;
+                const sePuedeCancelar = puedeCancelarReserva(usuario.rol, esReservaPropia);
 
                 return (
                   <tr key={reserva.id}>
@@ -100,17 +122,23 @@ function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
                     <td>{reserva.cantidad}</td>
                     <td>{reserva.asignatura}</td>
                     <td>{reserva.sala}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="boton-cancelar-reserva"
-                        onClick={function () {
-                          manejarCancelar(reserva.id, nombreRecurso, reserva.fecha, horarioTexto);
-                        }}
-                      >
-                        Cancelar
-                      </button>
-                    </td>
+                    {mostrarAcciones && (
+                      <td>
+                        {/* El botón solo aparece si esta reserva se puede cancelar */}
+                        {sePuedeCancelar && (
+                          <button
+                            type="button"
+                            className="boton-cancelar-reserva"
+                            onClick={function () {
+                              manejarCancelar(reserva.id, nombreRecurso, reserva.fecha, horarioTexto);
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                        )}
+                        {!sePuedeCancelar && <span>—</span>}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
