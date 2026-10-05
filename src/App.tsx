@@ -97,7 +97,7 @@ function App() {
     } else if (paginaActual === 'reservas') {
       return <PaginaReservas usuario={usuario} />;
     } else if (paginaActual === 'incidencias') {
-      return <PaginaIncidencias />;
+      return <PaginaIncidencias usuario={usuario} />;
     } else {
       return <PaginaAlertas />;
     }
