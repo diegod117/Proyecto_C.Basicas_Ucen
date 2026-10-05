@@ -77,3 +77,23 @@
 .tabla-historial-cantidad {
   font-weight: 700;
 }
+
+/* D21: celular (375px). Menos relleno y un ancho mínimo: la tabla no se
+   aprieta y el contenedor la desliza hacia el lado. */
+@media (max-width: 768px) {
+  .tabla-historial-titulo,
+  .tabla-historial-vacia {
+    padding: var(--espacio-md);
+  }
+
+  .tabla-historial table {
+    min-width: 520px;
+  }
+
+  .tabla-historial th,
+  .tabla-historial td {
+    padding-left: var(--espacio-md);
+    padding-right: var(--espacio-md);
+  }
+}
+
