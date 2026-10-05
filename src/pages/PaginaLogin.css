@@ -168,6 +168,28 @@
 }
 
 /* =====================================================
+   ENLACE "¿OLVIDASTE TU CONTRASEÑA?"
+   ===================================================== */
+
+/* Es un <button> pero se ve como un enlace de texto azul.
+   También lo usa FormularioRecuperarContrasena para "Volver". */
+.login-enlace {
+  display: block;
+  margin: var(--espacio-md) auto 0;
+  padding: var(--espacio-xs);
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.login-enlace:hover {
+  text-decoration: underline;
+}
+
+/* =====================================================
    RESPONSIVE (RNF-01)
    ===================================================== */
 

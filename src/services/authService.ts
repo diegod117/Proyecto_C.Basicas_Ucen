@@ -4,12 +4,14 @@
 // del usuario en src/data/usuarios.ts.
 // Las páginas y componentes usan este servicio, nunca Firebase directo.
 // Así, si algún día cambiamos Firebase por otra cosa, solo se cambia aquí.
+// También envía el correo para recuperar la contraseña.
 // Cubre: inicio de sesión con roles (sección 3.4 de requerimientos), base para RNF-03
 
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { autenticacion } from './firebase';
@@ -54,7 +56,7 @@ function traducirError(codigo: string): string {
   } else if (codigo === 'auth/network-request-failed') {
     return 'No hay conexión a internet.';
   } else {
-    return 'No se pudo iniciar sesión (' + codigo + ').';
+    return 'Ocurrió un error inesperado (' + codigo + ').';
   }
 }
 
@@ -88,6 +90,32 @@ async function iniciarSesion(correo: string, contrasena: string): Promise<string
     return 'Tu cuenta no tiene un rol asignado. Habla con el encargado del sistema.';
   }
 
+  return '';
+}
+
+// ------------------------------------------------------------------
+// enviarCorreoRecuperacion
+// ------------------------------------------------------------------
+// Recibe el correo de la persona que olvidó su contraseña.
+// Devuelve '' si Firebase aceptó el pedido, o el mensaje de error.
+// Firebase envía un correo con un enlace a SU PROPIA página para crear
+// la contraseña nueva: nosotros no tenemos que hacer esa página.
+// Viene incluido en el plan gratuito de Firebase.
+async function enviarCorreoRecuperacion(correo: string): Promise<string> {
+  try {
+    await sendPasswordResetEmail(autenticacion, correo);
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      // Si el correo no tiene cuenta, respondemos IGUAL que si la tuviera.
+      // Así nadie puede usar este formulario para averiguar qué correos
+      // están registrados (la pantalla muestra un mensaje genérico).
+      if (error.code === 'auth/user-not-found') {
+        return '';
+      }
+      return traducirError(error.code);
+    }
+    return 'No se pudo enviar el correo.';
+  }
   return '';
 }
 
@@ -128,4 +156,4 @@ function escucharSesion(alCambiar: (usuario: Usuario | null) => void): () => voi
   return dejarDeEscuchar;
 }
 
-export { iniciarSesion, cerrarSesion, escucharSesion };
+export { iniciarSesion, cerrarSesion, escucharSesion, enviarCorreoRecuperacion };
