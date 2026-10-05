@@ -369,3 +369,107 @@
 **Pendiente (J21):** el botón "Cancelar" de la tabla todavía lo ven todos los roles.
 
 **Archivos tocados:** `src/utils/permisos.ts`, `src/components/FormularioReserva.tsx`, `src/pages/PaginaReservas.tsx`, `src/App.tsx`, `docs/avance.md`.
+
+## 2026-10-04 — M15 y M16: variables CSS base y fuente Inter (Martín)
+
+**Trabajado:** RNF-01 (fase 2, base visual compartida). Rama: `feature/diseno-base`.
+
+**Qué se hizo:**
+- **M15 — `src/styles/global.css`:** se expandió el bloque `:root` con las variables que usarán todos los archivos CSS de la Fase 2. Nuevas variables: `--color-principal-claro` (#e8f0fe), `--color-fondo-menu` (#f1f5f9), `--color-blanco`, colores de alerta (`--color-alerta-critica/advertencia/info`), sombras (`--sombra-tarjeta`, `--sombra-elevada`), bordes redondeados (`--radio-borde` 10px, `--radio-borde-sm` 6px, `--radio-pildora` 20px), espaciado (`--espacio-xs` a `--espacio-xl`) y dimensiones de layout (`--ancho-menu`, `--alto-header`). **Regla de oro:** ningún `.css` del proyecto puede usar colores o tamaños sueltos; siempre `var(--nombre)`.
+- **M16 — `index.html` + `global.css`:** se cargó la fuente **Inter** (400/500/600/700) desde Google Fonts con `<link>` + `preconnect` en `index.html`, sin instalar ningún paquete npm. En `global.css` se aplicó al `body` (`font-family: 'Inter', Arial, sans-serif`) y se definieron las tres clases de botón reutilizables: `.boton-principal` (azul relleno), `.boton-secundario` (borde azul, fondo transparente) y `.boton-peligro` (rojo relleno). Incluyen `:hover`, `:active` y `:disabled`.
+
+**Archivos tocados:** `src/styles/global.css`, `index.html`, `docs/avance.md`.
+
+## 2026-10-04 — M17: menú lateral y barra superior (Martín)
+
+**Trabajado:** RNF-01 (fase 2, layout de pantalla completa). Rama: `feature/diseno-menu-lateral`. **Se integró después de que J16 de Johann estuviera en `main`**, porque ambos tocan `App.tsx` y `MenuNavegacion`.
+
+**Qué se hizo:**
+- **`MenuNavegacion.css`:** reescrito completamente. El menú pasa de ser una barra horizontal a tener dos partes: un `<header class="app-header">` azul fijo arriba (título + datos del usuario + botón cerrar sesión) y un `<nav class="app-sidebar">` gris fijo a la izquierda (botones de navegación). Los botones del sidebar tienen borde izquierdo de 3px en azul cuando están activos.
+- **`MenuNavegacion.tsx`:** reestructurado para devolver `<header>` + `<nav>` con las nuevas clases en vez del antiguo `<header>` único.
+- **`App.tsx`:** el `<div>` raíz pasa a `div.app-layout` y el `<main>` recibe la clase `app-contenido`, que lo desplaza a la derecha del sidebar y debajo del header.
+- **En celular (max-width 768px):** el sidebar se convierte en fila horizontal debajo del header; el contenido ocupa todo el ancho.
+
+**Para Diego:** el `<main class="app-contenido">` ya aplica el margen izquierdo automáticamente; no hace falta tocarlo en los demás diseños.
+
+**Archivos tocados:** `src/components/MenuNavegacion.css`, `src/components/MenuNavegacion.tsx`, `src/App.tsx`, `docs/avance.md`.
+
+## 2026-10-04 — M18: rediseño de la pantalla de login (Martín)
+
+**Trabajado:** RNF-01 (fase 2). Rama: `feature/diseno-login`.
+
+**Qué se hizo:**
+- **`PaginaLogin.css`:** reescrito. Fondo de pantalla completa con degradado azul (`--color-principal` → `--color-principal-oscuro`). Tarjeta blanca con `overflow: hidden` y un `::before` que genera una franja decorativa azul de 6px en la parte superior (sin agregar un `<div>` extra). El cuerpo de la tarjeta se envuelve en `.login-tarjeta-cuerpo` para que el padding no pise la franja. Inputs con foco resaltado en azul y fondo blanco; botón con hover y estado deshabilitado.
+- **`PaginaLogin.tsx`:** único cambio en JSX — se envolvió el contenido del formulario en `<div class="login-tarjeta-cuerpo">`.
+
+**Archivos tocados:** `src/pages/PaginaLogin.css`, `src/pages/PaginaLogin.tsx`, `docs/avance.md`.
+
+## 2026-10-04 — M19: rediseño de reservas (Martín)
+
+**Trabajado:** RNF-01 / HU-03 (fase 2). Rama: `feature/diseno-reservas`.
+
+**Qué se hizo:**
+- **`PaginaReservas.css`:** encabezado de página con título grande, descripción en gris y badge de conteo en azul claro. Este patrón de encabezado se reutiliza en todas las páginas (coordinado con Diego).
+- **`FormularioReserva.css`:** tarjeta con `--sombra-tarjeta` y `--radio-borde`; inputs con foco azul; todos los valores migrados a `var()`.
+- **`TablaReservas.css`:** filas alternadas (**zebra striping**) con `--color-fondo-menu`; encabezados en `uppercase` con `letter-spacing`; hover en `--color-principal-claro`; botón cancelar compacto en rojo.
+- **`PaginaReservas.tsx`:** único cambio — clase `pagina-reservas-descripcion` al `<p>` del encabezado.
+
+**Archivos tocados:** `src/pages/PaginaReservas.css`, `src/pages/PaginaReservas.tsx`, `src/components/FormularioReserva.css`, `src/components/TablaReservas.css`, `docs/avance.md`.
+
+## 2026-10-04 — M20: rediseño de alertas (Martín)
+
+**Trabajado:** RNF-01 / HU-05 (fase 2). Rama: `feature/diseno-alertas`.
+
+**Qué se hizo:**
+- **`TarjetaAlerta.css`:** migrado a variables. La franja lateral de 5px a la izquierda ya existía; se ajustaron los colores para usar `--color-danado` (rojo), `--color-mantencion` (ámbar) y `--color-principal` (azul). Se agregó micro-animación de elevación en hover (`translateY(-3px)` + `--sombra-elevada`). Los badges de tipo se mantienen como píldoras redondeadas.
+- **`PaginaAlertas.css`:** mismo encabezado de página que M19. Filtros rediseñados como botones pastilla (`--radio-pildora`) dentro de una franja blanca con sombra. Grilla de tarjetas con `auto-fill + minmax(300px, 1fr)`. En celular los filtros se deslizan en fila horizontal con `overflow-x: auto`.
+
+**Archivos tocados:** `src/components/TarjetaAlerta.css`, `src/pages/PaginaAlertas.css`, `docs/avance.md`.
+
+## 2026-10-04 — M21: revisión en celular de todos los diseños (Martín)
+
+**Trabajado:** RNF-01 (fase 2, revisión responsiva). Rama: `feature/diseno-reservas`.
+
+**Qué se hizo:**
+Se revisaron todos los diseños de M17 a M20 a **375px de ancho** en las DevTools del navegador (Device Toolbar → resolución personalizada 375×812). Los cambios son solo CSS:
+
+- **`MenuNavegacion.css`** (`@media max-width: 420px`): oculta el rol del usuario para liberar espacio en el header, trunca el título con `text-overflow: ellipsis`, botones del sidebar con `min-height: 44px` (mínimo táctil según Apple HIG), botón "Cerrar sesión" más compacto.
+- **`global.css`** (`@media max-width: 420px`): `.contenido-pagina` con `padding: 16px 8px` en lugar de `24px 16px`. Evita que las tarjetas queden pegadas al borde en los celulares más angostos.
+- **`TablaReservas.css`** (`@media max-width: 420px`): gradiente sutil en `.tabla-scroll` que actúa como indicador visual de scroll horizontal. Botón "Cancelar" con `min-height: 36px`.
+- **`PaginaLogin.css`** (`@media max-width: 400px`): tarjeta a ancho completo con padding mínimo, botón con `min-height: 44px`.
+
+**Archivos tocados:** `src/components/MenuNavegacion.css`, `src/styles/global.css`, `src/components/TablaReservas.css`, `src/pages/PaginaLogin.css`, `docs/avance.md`.
+
+## 2026-10-04 — J19: incidencias según el rol (Johann)
+
+**Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-incidencias`.
+
+**Qué se hizo:**
+- `PaginaIncidencias.tsx` (archivo de Diego): recibe el usuario. Solo el encargado ve el formulario para registrar incidencias; el departamento ve un aviso en su lugar.
+- `TablaIncidencias.tsx` (archivo de Diego): recibe el usuario. Si el rol no puede gestionar incidencias, se oculta la columna "Acción" completa (encabezado y botones), en vez de dejarla vacía.
+- `App.tsx`: le pasa el usuario a `PaginaIncidencias`. El docente no ve esta página desde J16.
+- Se probó en el navegador:
+  - el encargado registra una incidencia y la avanza a "en revisión" y "resuelta";
+  - el departamento ve el aviso y la tabla sin la columna "Acción".
+- Se recuperaron las entradas de J16, J17 y J18 de esta bitácora, que se habían perdido al resolver conflictos de merge. Se tomaron de los commits de los PR #21 y #22.
+
+**Archivos tocados:** `src/pages/PaginaIncidencias.tsx`, `src/components/TablaIncidencias.tsx`, `src/App.tsx`, `docs/avance.md`.
+
+## 2026-10-04 — J20: el usuario real queda en el historial y en las incidencias (Johann)
+
+**Trabajado:** HU-06 y HU-10 (fase 2). Rama: `feature/usuario-real`.
+
+**Qué se hizo:**
+- Se eliminó el texto fijo "Encargado (usuario actual)". Ahora el nombre de quien inició sesión viaja como parámetro: login → `App` → página → componente → servicio.
+- Historial de estados (HU-06):
+  - `FichaRecurso` le pasa el usuario a `FormularioCambioEstado`.
+  - El formulario le entrega `usuario.nombre` a `cambiarEstadoRecurso()` (`recursosService.ts`), que se lo pasa a `registrarCambioEstado()` (`historialService.ts`).
+  - Se borró la constante `USUARIO_ACTUAL`.
+- Incidencias (HU-10):
+  - `PaginaIncidencias` le pasa el usuario a `FormularioIncidencia`, que guarda `registradaPor: usuario.nombre`.
+  - `TablaIncidencias` tiene una columna nueva "Registrada por" (archivo de Diego, avisado), porque antes ese dato se guardaba pero no se mostraba en ninguna pantalla.
+- Se probó en el navegador como encargado:
+  - un cambio de estado en la ficha del multímetro queda en el historial con su nombre;
+  - una incidencia nueva muestra su nombre en "Registrada por".
+
+**Archivos tocados:** `src/services/historialService.ts`, `src/services/recursosService.ts`, `src/components/FormularioCambioEstado.tsx`, `src/components/FichaRecurso.tsx`, `src/components/FormularioIncidencia.tsx`, `src/components/TablaIncidencias.tsx`, `src/pages/PaginaIncidencias.tsx`, `docs/avance.md`.

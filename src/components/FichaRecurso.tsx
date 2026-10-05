@@ -146,7 +146,11 @@ function FichaRecurso(props: PropsFichaRecurso) {
             Los demás roles ven los datos y el historial, pero en lugar
             del formulario aparece un aviso. */}
         {puedeCambiarEstado(props.usuario.rol) && (
-          <FormularioCambioEstado recurso={recurso} onEstadoCambiado={props.onEstadoCambiado} />
+          <FormularioCambioEstado
+            recurso={recurso}
+            onEstadoCambiado={props.onEstadoCambiado}
+            usuario={props.usuario}
+          />
         )}
         {!puedeCambiarEstado(props.usuario.rol) && (
           <p className="ficha-aviso-permiso">
