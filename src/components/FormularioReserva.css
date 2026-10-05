@@ -1,30 +1,41 @@
 /* FormularioReserva.css
-   Estilos del componente FormularioReserva.
-   Cubre: HU-03, HU-07, HU-08 y RNF-01 (diseño responsivo para móviles)
-   Usa las variables de color globales definidas en src/styles/global.css */
+   M19 — HU-03: rediseño del formulario de reservas.
+   Usa variables de global.css (nunca valores sueltos).
+   Mantiene toda la lógica de validación y disponibilidad sin cambios. */
+
+/* =====================================================
+   TARJETA DEL FORMULARIO
+   ===================================================== */
 
 .formulario-reserva {
-  background-color: #ffffff;
+  background-color: var(--color-blanco);
   border: 1px solid var(--color-borde);
-  border-radius: 8px;
-  padding: 24px;
-  max-width: 600px;
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-lg);
+  max-width: 620px;
+  box-shadow: var(--sombra-tarjeta);
 }
 
 .formulario-reserva h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin: 0 0 var(--espacio-lg) 0;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--color-principal);
 }
+
+/* =====================================================
+   GRUPOS DE CAMPOS
+   Dos campos lado a lado en PC; apilados en celular.
+   ===================================================== */
 
 /* Fila de campos alineados horizontalmente */
 .grupo-campos {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--espacio-md);
+  margin-bottom: var(--espacio-md);
 }
 
-/* Contenedor vertical de etiqueta + control de entrada */
+/* Contenedor vertical de etiqueta + input/select */
 .campo {
   display: flex;
   flex-direction: column;
@@ -32,46 +43,55 @@
 }
 
 .campo label {
-  font-size: 14px;
+  font-size: 0.825rem;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: var(--espacio-xs);
   color: var(--color-texto);
 }
 
 .campo input,
 .campo select {
-  padding: 8px 12px;
-  border: 1px solid var(--color-borde);
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 9px var(--espacio-md);
+  border: 1.5px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  font-size: 0.875rem;
   color: var(--color-texto);
-  background-color: #ffffff;
+  background-color: var(--color-fondo);
   font-family: inherit;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .campo input:focus,
 .campo select:focus {
   outline: none;
   border-color: var(--color-principal);
-  box-shadow: 0 0 0 2px rgba(26, 99, 187, 0.15);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.13);
 }
 
-/* Botón principal */
+/* =====================================================
+   BOTÓN CONFIRMAR
+   Usa variables; no duplica el estilo de .boton-principal
+   porque el botón de confirmar tiene su propio contexto.
+   ===================================================== */
+
 .boton-confirmar {
   background-color: var(--color-principal);
-  color: #ffffff;
+  color: var(--color-blanco);
   border: none;
-  border-radius: 4px;
-  padding: 10px 24px;
-  font-size: 15px;
+  border-radius: var(--radio-borde-sm);
+  padding: 10px var(--espacio-lg);
+  font-family: inherit;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 8px;
-  transition: background-color 0.2s ease;
+  margin-top: var(--espacio-sm);
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .boton-confirmar:hover:not(:disabled) {
   background-color: var(--color-principal-oscuro);
+  box-shadow: var(--sombra-tarjeta);
 }
 
 /* Estado inactivo cuando no hay disponibilidad (HU-08) */
@@ -80,27 +100,31 @@
   color: #f3f4f6;
   cursor: not-allowed;
   opacity: 0.8;
+  box-shadow: none;
 }
 
-/* Mensajes informativos de validación y confirmación */
+/* =====================================================
+   MENSAJES DE VALIDACIÓN Y CONFIRMACIÓN
+   ===================================================== */
+
 .mensaje-error {
   color: var(--color-danado);
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 4px;
-  padding: 10px 14px;
-  margin-bottom: 18px;
-  font-size: 14px;
+  border-radius: var(--radio-borde-sm);
+  padding: var(--espacio-sm) var(--espacio-md);
+  margin-bottom: var(--espacio-md);
+  font-size: 0.875rem;
 }
 
 .mensaje-exito {
   color: var(--color-disponible);
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
-  border-radius: 4px;
-  padding: 10px 14px;
-  margin-bottom: 18px;
-  font-size: 14px;
+  border-radius: var(--radio-borde-sm);
+  padding: var(--espacio-sm) var(--espacio-md);
+  margin-bottom: var(--espacio-md);
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
@@ -108,12 +132,12 @@
 .aviso-disponibilidad {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: var(--espacio-sm);
+  font-size: 0.875rem;
   font-weight: 600;
-  padding: 10px 14px;
-  border-radius: 6px;
-  margin-bottom: 18px;
+  padding: var(--espacio-sm) var(--espacio-md);
+  border-radius: var(--radio-borde-sm);
+  margin-bottom: var(--espacio-md);
 }
 
 .aviso-disponibilidad.hay-unidades {
@@ -128,32 +152,33 @@
   border: 1px solid #fecaca;
 }
 
-/* ==================================================================
-   RNF-01: Adaptación responsiva para celulares y pantallas pequeñas
-   ================================================================== */
+/* =====================================================
+   RESPONSIVE — celular (RNF-01)
+   ===================================================== */
+
 @media (max-width: 768px) {
   .formulario-reserva {
-    padding: 16px;
+    padding: var(--espacio-md);
   }
 
   /* Apilar campos en columna vertical para facilidad táctil */
   .grupo-campos {
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--espacio-sm);
+    margin-bottom: var(--espacio-sm);
   }
 
-  /* Tamaño de fuente a 16px para evitar auto-zoom molesto en navegadores móviles */
+  /* 16px evita el zoom automático en iOS al hacer foco en un input */
   .campo input,
   .campo select {
     font-size: 16px;
-    padding: 10px 12px;
+    padding: 10px var(--espacio-md);
   }
 
-  /* Botón ocupa todo el ancho de la pantalla para fácil pulsación con el pulgar */
+  /* Botón ocupa todo el ancho para fácil pulsación con el pulgar */
   .boton-confirmar {
     width: 100%;
-    padding: 12px 16px;
-    font-size: 16px;
+    padding: 12px var(--espacio-md);
+    font-size: 1rem;
   }
 }

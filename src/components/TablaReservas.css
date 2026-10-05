@@ -1,92 +1,151 @@
 /* TablaReservas.css
-   Estilos de la tabla de reservas de laboratorio.
-   Cubre: RF-03 (historial y cancelación) y RNF-01 (adaptabilidad en móviles)
-   Usa las variables de diseño globales definidas en src/styles/global.css */
+   M19 — RF-03: rediseño de la tabla de reservas.
+   Agrega filas alternadas (zebra striping) con --color-fondo-menu.
+   Usa variables de global.css (nunca valores sueltos). */
+
+/* =====================================================
+   CONTENEDOR DE LA TABLA
+   ===================================================== */
 
 .tabla-reservas-contenedor {
-  background-color: #ffffff;
+  background-color: var(--color-blanco);
   border: 1px solid var(--color-borde);
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-lg);
   width: 100%;
+  box-shadow: var(--sombra-tarjeta);
 }
 
 .tabla-reservas-contenedor h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
+  margin: 0 0 var(--espacio-md) 0;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--color-principal);
 }
 
+/* =====================================================
+   TABLA
+   ===================================================== */
+
+/* Wrapper con scroll horizontal para que en celular
+   la tabla no rompa el layout. */
 .tabla-scroll {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  border-radius: var(--radio-borde-sm);
 }
 
 .tabla-reservas {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 0.875rem;
   min-width: 620px;
 }
 
+/* Encabezados de columna */
 .tabla-reservas th {
-  background-color: #f8fafc;
+  background-color: var(--color-fondo-menu);
   color: var(--color-texto);
-  font-weight: 600;
-  padding: 12px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--espacio-sm) var(--espacio-md);
   border-bottom: 2px solid var(--color-borde);
   white-space: nowrap;
 }
 
+/* Celdas de datos */
 .tabla-reservas td {
-  padding: 12px 14px;
+  padding: var(--espacio-sm) var(--espacio-md);
   border-bottom: 1px solid var(--color-borde);
   color: var(--color-texto);
   vertical-align: middle;
 }
 
-.tabla-reservas tbody tr:hover {
-  background-color: #f1f5f9;
+/* Zebra striping: filas pares con fondo levemente gris.
+   Mejora la legibilidad sin necesitar bordes entre filas. */
+.tabla-reservas tbody tr:nth-child(even) {
+  background-color: var(--color-fondo-menu);
 }
 
+.tabla-reservas tbody tr:hover {
+  background-color: var(--color-principal-claro);
+}
+
+/* Mensaje cuando no hay reservas */
 .sin-reservas-texto {
   color: var(--color-texto-secundario);
   font-style: italic;
-  padding: 16px 0;
+  padding: var(--espacio-md) 0;
 }
+
+/* =====================================================
+   BOTÓN CANCELAR RESERVA
+   Estilo "peligro" compacto para usar dentro de la tabla.
+   ===================================================== */
 
 .boton-cancelar-reserva {
   background-color: #fef2f2;
   color: var(--color-danado);
   border: 1px solid #fecaca;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 12px;
+  border-radius: var(--radio-borde-sm);
+  padding: 5px var(--espacio-md);
+  font-family: inherit;
+  font-size: 0.775rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
 }
 
 .boton-cancelar-reserva:hover {
   background-color: var(--color-danado);
-  color: #ffffff;
+  color: var(--color-blanco);
 }
+
+/* =====================================================
+   RESPONSIVE — celular (RNF-01)
+   ===================================================== */
 
 @media (max-width: 768px) {
   .tabla-reservas-contenedor {
-    padding: 16px;
+    padding: var(--espacio-md);
   }
 
   .tabla-reservas th,
   .tabla-reservas td {
-    padding: 10px 8px;
-    font-size: 13px;
+    padding: var(--espacio-sm) var(--espacio-sm);
+    font-size: 0.8rem;
   }
 
   .boton-cancelar-reserva {
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 7px var(--espacio-sm);
+    font-size: 0.775rem;
+  }
+}
+
+/* M21: en 375px la tabla tiene scroll horizontal.
+   La sombra derecha da un indicio visual de que hay más contenido. */
+@media (max-width: 420px) {
+  .tabla-reservas-contenedor {
+    padding: var(--espacio-sm);
+  }
+
+  /* Gradiente sutil a la derecha para indicar scroll horizontal */
+  .tabla-scroll {
+    background:
+      linear-gradient(to right, var(--color-blanco) 0%, transparent 8%),
+      linear-gradient(to left,  var(--color-blanco) 0%, transparent 8%)
+      right center / 100% 100%;
+    background-attachment: local, scroll;
+  }
+
+  /* Botón cancelar más fácil de pulsar con el pulgar */
+  .boton-cancelar-reserva {
+    min-height: 36px;
+    padding: var(--espacio-sm) var(--espacio-sm);
   }
 }

@@ -336,6 +336,19 @@
 
 **Archivos tocados:** `src/App.tsx`, `src/components/MenuNavegacion.tsx`, `docs/avance.md`.
 
+## 2026-10-04 — J17: solo el encargado cambia el estado de un recurso (Johann)
+
+**Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-inventario`.
+
+**Qué se hizo:**
+- `FichaRecurso.tsx`: usa `puedeCambiarEstado(rol)`. El encargado ve el formulario de cambio de estado como antes. El docente y el departamento ven los datos, la ubicación y el historial, y en la columna derecha un aviso: "Solo el encargado de laboratorio puede cambiar el estado de un recurso."
+- `FichaRecurso.css`: clase `.ficha-aviso-permiso`, una tarjeta gris del mismo estilo que el formulario.
+- `PaginaInventario.tsx` recibe el usuario y se lo pasa a la ficha; `App.tsx` se lo pasa a la página.
+- Se probó en el navegador con los tres roles en la ficha del multímetro: el encargado puede guardar un cambio; el docente y el departamento ven el aviso.
+- Nota: `FichaRecurso.tsx` quedó en 161 líneas. Más adelante se puede separar la tabla "Unidades por estado" en su propio componente.
+
+**Archivos tocados:** `src/components/FichaRecurso.tsx`, `src/components/FichaRecurso.css`, `src/pages/PaginaInventario.tsx`, `src/App.tsx`, `docs/avance.md`.
+
 ## 2026-10-04 — J18: reservas según el rol (Johann)
 
 **Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-reservas`.
@@ -356,42 +369,3 @@
 **Pendiente (J21):** el botón "Cancelar" de la tabla todavía lo ven todos los roles.
 
 **Archivos tocados:** `src/utils/permisos.ts`, `src/components/FormularioReserva.tsx`, `src/pages/PaginaReservas.tsx`, `src/App.tsx`, `docs/avance.md`.
-
-## 2026-10-04 — D15 a D17: diseño del inventario (Diego)
-
-**Trabajado:** RNF-01 (fase 2, ver `docs/plan-fase-2.md`). HU-01. Rama: `feature/diseno-inventario` (PR #24).
-
-**Qué se hizo:**
-- `TarjetaRecurso.css` y `GrillaRecursos.css` (D15): las tarjetas usan las variables de `global.css` (`--sombra-tarjeta`, `--radio-borde`, colores) y no tienen bordes grises duros. Al pasar el mouse la tarjeta se eleva 4px (`transform: translateY(-4px)`) con `--sombra-elevada`. La grilla usa `--espacio-lg` y un poco de margen vertical para que la elevación no se corte.
-- `FiltrosInventario.css` (D16): los filtros van en una franja blanca con sombra suave. El buscador es más grande que los selectores, los labels van en mayúsculas pequeñas grises y los campos muestran un aro azul claro al enfocarse.
-- `PaginaInventario.tsx/.css` y `MensajeSinResultados.css` (D17): encabezado de página con título y descripción en gris ("Recursos de los laboratorios de las torres B y C"), con clases `.encabezado-pagina-*` pensadas para reutilizar en las demás páginas. El contador "Mostrando X de 10" y "Limpiar filtros" pasan debajo de los filtros. El mensaje de sin resultados usa variables y el estilo del botón principal.
-- Se avisó a Martín del cambio en el JSX de `PaginaInventario.tsx`.
-
-**Archivos tocados:** `src/components/TarjetaRecurso.css`, `src/components/GrillaRecursos.css`, `src/components/FiltrosInventario.css`, `src/pages/PaginaInventario.tsx`, `src/pages/PaginaInventario.css`, `src/components/MensajeSinResultados.css`, `docs/avance.md`.
-
-## 2026-10-04 — D18 y D19: diseño de la ficha y el historial (Diego)
-
-**Trabajado:** RNF-01 (fase 2). HU-02 y HU-06. Rama: `feature/diseno-ficha` (D18 integrado en el PR #25; D19 va en un PR aparte porque se subió después).
-
-**Qué se hizo:**
-- `FichaRecurso.css`, `FormularioCambioEstado.css` y `AvisoUbicacion.css` (D18): la ficha mantiene sus dos columnas (datos e historial a la izquierda, acciones a la derecha) con tarjetas blancas, sombra suave y variables de `global.css`. El botón "Guardar cambio" pasó de gris oscuro a azul principal. En escritorio el formulario queda fijo (`position: sticky`) mientras se baja por el historial. El aviso de ubicación lleva una franja de color a la izquierda.
-- `TablaHistorial.css` (D19): tarjeta blanca con cabeceras discretas en mayúsculas, separadores suaves y resaltado azul claro al pasar el mouse sobre una fila.
-- `global.css` (D19, archivo compartido): `.etiqueta` toma forma de píldora con `--radio-pildora`. Los colores por estado no cambian. Se avisó a Martín.
-
-**Archivos tocados:** `src/components/FichaRecurso.css`, `src/components/FormularioCambioEstado.css`, `src/components/AvisoUbicacion.css`, `src/components/TablaHistorial.css`, `src/styles/global.css`, `docs/avance.md`.
-
-## 2026-10-04 — D20: diseño de incidencias (Diego)
-
-**Trabajado:** RNF-01 (fase 2). HU-04 y HU-10. Rama: `feature/diseno-incidencias`.
-
-**Qué se hizo:**
-- `FormularioIncidencia.css`: tarjeta blanca con sombra, labels en mayúsculas pequeñas, aro azul claro al enfocar, checkbox con `accent-color` azul y botón "Registrar" con el estilo de `.boton-principal`. El error lleva una franja roja a la izquierda.
-- `TablaIncidencias.css`: tarjeta con cabeceras discretas y filas que se resaltan en azul claro. Los botones de acción son secundarios (azul para "Pasar a en revisión" y verde para "Marcar como resuelta"). La tabla se desliza hacia el lado en pantallas angostas (`overflow-x: auto`).
-- `EtiquetaEstadoIncidencia.css`: etiquetas en forma de píldora con los colores de estado de `global.css`.
-- `PaginaIncidencias.css`: el mensaje de confirmación usa variables y franja lateral verde.
-- Solo se tocaron `.css`, así que no hay conflicto con J19 de Johann.
-
-**Pendiente:** usar el encabezado `.encabezado-pagina` en `PaginaIncidencias.tsx`, en un commit aparte cuando Johann termine J19. Falta la revisión en celular (D21).
-
-**Archivos tocados:** `src/components/FormularioIncidencia.css`, `src/components/TablaIncidencias.css`, `src/components/EtiquetaEstadoIncidencia.css`, `src/pages/PaginaIncidencias.css`, `docs/avance.md`.
-

@@ -199,4 +199,34 @@
   .app-header-titulo {
     font-size: 0.875rem;
   }
+
+  /* Asegura altura mínima táctil (44px) en los botones del sidebar */
+  .boton-menu {
+    min-height: 44px;
+  }
+}
+
+/* M21: ajustes para pantallas muy pequeñas (375px — iPhone SE, Galaxy S)
+   Se prueban a 375px de ancho en las DevTools del navegador. */
+@media (max-width: 420px) {
+  /* Ocultar el rol del usuario para liberar espacio en el header */
+  .app-header-usuario-rol {
+    display: none;
+  }
+
+  /* Acortar el título del sistema si no cabe en una línea */
+  .app-header-titulo {
+    font-size: 0.8rem;
+    /* Truncar con puntos suspensivos si desborda */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+  }
+
+  /* Botón cerrar sesión más compacto */
+  .boton-cerrar-sesion {
+    font-size: 0.75rem;
+    padding: 5px var(--espacio-sm);
+  }
 }
