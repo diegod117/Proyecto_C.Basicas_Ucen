@@ -3,24 +3,21 @@
 // completa, datos de la planilla (serie, marca, proveedor, observación)
 // y cuántas unidades hay en cada estado.
 // Se abre al hacer clic en una tarjeta del inventario.
-// A la derecha muestra el formulario para cambiar el estado, y debajo
-// de los datos, el historial de cambios de estado.
-// El formulario solo lo ve el encargado; los demás roles ven un aviso.
+// A la derecha muestra los formularios "Cambiar estado" y "Reponer stock",
+// y debajo de los datos, el historial.
+// Los formularios solo los ve el encargado; los demás roles ven un aviso.
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
-//        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03
+//        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03,
+//        RF-04 (reponer stock)
 
 import type { Recurso } from '../types/Recurso';
 import type { Usuario } from '../types/Usuario';
-import { puedeCambiarEstado } from '../utils/permisos';
-import {
-  textoCategoria,
-  textoEstado,
-  textoCampoOpcional,
-  calcularCantidadTotal,
-  listaEstadosRecurso,
-} from '../utils/inventario';
+import { puedeCambiarEstado, puedeReponerStock } from '../utils/permisos';
+import { textoCategoria, textoCampoOpcional } from '../utils/inventario';
 import { obtenerHistorialDeRecurso } from '../services/historialService';
 import FormularioCambioEstado from './FormularioCambioEstado';
+import FormularioReponerStock from './FormularioReponerStock';
+import TablaUnidadesEstado from './TablaUnidadesEstado';
 import TablaHistorial from './TablaHistorial';
 import AvisoUbicacion from './AvisoUbicacion';
 import './FichaRecurso.css';
@@ -116,26 +113,8 @@ function FichaRecurso(props: PropsFichaRecurso) {
               )}
             </dl>
 
-            {/* Cantidad de unidades en cada estado (RF-01).
-                Aquí mostramos los 5 estados, incluso los que tienen 0,
-                para que el encargado vea el panorama completo. */}
-            <h3 className="ficha-subtitulo">Unidades por estado</h3>
-            <table className="ficha-tabla-estados">
-              <tbody>
-                {listaEstadosRecurso.map((estado) => (
-                  <tr key={estado}>
-                    <td>
-                      <span className={'etiqueta etiqueta-' + estado}>{textoEstado(estado)}</span>
-                    </td>
-                    <td className="ficha-tabla-numero">{recurso.cantidades[estado]}</td>
-                  </tr>
-                ))}
-                <tr className="ficha-tabla-total">
-                  <td>Total</td>
-                  <td className="ficha-tabla-numero">{calcularCantidadTotal(recurso)}</td>
-                </tr>
-              </tbody>
-            </table>
+            {/* Cantidad de unidades en cada estado (RF-01) */}
+            <TablaUnidadesEstado recurso={recurso} />
           </div>
 
           {/* Historial de cambios de estado (HU-06), como en el mockup */}
@@ -144,17 +123,30 @@ function FichaRecurso(props: PropsFichaRecurso) {
 
         {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
             Los demás roles ven los datos y el historial, pero en lugar
-            del formulario aparece un aviso. */}
+            de los formularios aparece un aviso. */}
         {puedeCambiarEstado(props.usuario.rol) && (
-          <FormularioCambioEstado
-            recurso={recurso}
-            onEstadoCambiado={props.onEstadoCambiado}
-            usuario={props.usuario}
-          />
+          <div className="ficha-columna-derecha">
+            <FormularioCambioEstado
+              recurso={recurso}
+              onEstadoCambiado={props.onEstadoCambiado}
+              usuario={props.usuario}
+            />
+            {/* Reponer stock: suma unidades nuevas (resuelve las alertas
+                de reposición). Usa el mismo aviso hacia App que el cambio
+                de estado, porque también cambia los números. */}
+            {puedeReponerStock(props.usuario.rol) && (
+              <FormularioReponerStock
+                recurso={recurso}
+                onStockRepuesto={props.onEstadoCambiado}
+                usuario={props.usuario}
+              />
+            )}
+          </div>
         )}
         {!puedeCambiarEstado(props.usuario.rol) && (
           <p className="ficha-aviso-permiso">
-            Solo el encargado de laboratorio puede cambiar el estado de un recurso.
+            Solo el encargado de laboratorio puede cambiar el estado o reponer el stock
+            de un recurso.
           </p>
         )}
       </div>

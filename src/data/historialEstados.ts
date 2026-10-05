@@ -11,6 +11,7 @@ import type { CambioEstado } from '../types/CambioEstado';
 export const listaHistorialPrueba: CambioEstado[] = [
   {
     id: 1,
+    tipo: 'cambio_estado',
     recursoId: 1, // Multímetro Fluke 87V
     fecha: '2026-09-12 09:05',
     estadoAnterior: 'en_mantencion',
@@ -21,6 +22,7 @@ export const listaHistorialPrueba: CambioEstado[] = [
   },
   {
     id: 2,
+    tipo: 'cambio_estado',
     recursoId: 6, // Termómetro digital
     fecha: '2026-09-25 16:40',
     estadoAnterior: 'disponible',
@@ -31,6 +33,7 @@ export const listaHistorialPrueba: CambioEstado[] = [
   },
   {
     id: 3,
+    tipo: 'cambio_estado',
     recursoId: 1, // Multímetro Fluke 87V
     fecha: '2026-10-01 11:20',
     estadoAnterior: 'disponible',

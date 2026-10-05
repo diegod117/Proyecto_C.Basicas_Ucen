@@ -1,7 +1,8 @@
 // historialService.ts
 // Servicio del historial de estados: guarda y entrega los registros de
 // cada cambio de estado de los recursos.
-// Cubre: HU-06 (historial de cambios de estado), RNF-06
+// También guarda las reposiciones de stock.
+// Cubre: HU-06 (historial de cambios de estado), RF-04 (reposición), RNF-06
 
 // RNF-06 pide que el historial "no se pierda ni se sobrescriba".
 // Por eso este servicio SOLO tiene funciones para AGREGAR y LEER registros.
@@ -34,6 +35,7 @@ export function registrarCambioEstado(
   // borran registros, este número nunca se repite.
   const nuevoRegistro: CambioEstado = {
     id: listaHistorial.length + 1,
+    tipo: 'cambio_estado',
     recursoId: recursoId,
     fecha: obtenerFechaActual(),
     estadoAnterior: estadoAnterior,
@@ -44,6 +46,34 @@ export function registrarCambioEstado(
   };
 
   // push() agrega el registro AL FINAL de la lista (no reemplaza nada)
+  listaHistorial.push(nuevoRegistro);
+  return nuevoRegistro;
+}
+
+// registrarReposicion
+// Recibe: el id del recurso, cuántas unidades nuevas llegaron, el motivo
+//         (ej: "Compra orden 123") y el nombre del usuario conectado.
+// Devuelve: el registro que se guardó.
+// Funciona igual que registrarCambioEstado, pero con tipo 'reposicion'.
+export function registrarReposicion(
+  recursoId: number,
+  cantidad: number,
+  motivo: string,
+  nombreUsuario: string,
+): CambioEstado {
+  const nuevoRegistro: CambioEstado = {
+    id: listaHistorial.length + 1,
+    tipo: 'reposicion',
+    recursoId: recursoId,
+    fecha: obtenerFechaActual(),
+    // Las unidades nuevas no vienen de ningún estado: entran a "disponible"
+    estadoAnterior: 'disponible',
+    estadoNuevo: 'disponible',
+    cantidad: cantidad,
+    motivo: motivo.trim(),
+    usuario: nombreUsuario,
+  };
+
   listaHistorial.push(nuevoRegistro);
   return nuevoRegistro;
 }

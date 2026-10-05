@@ -2,7 +2,8 @@
 // Servicio de recursos: es el ÚNICO lugar desde donde las páginas
 // obtienen los recursos del inventario.
 // Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
-//        HU-06 (cada cambio de estado queda en el historial)
+//        HU-06 (cada cambio de estado queda en el historial),
+//        RF-04 (reponer stock de un recurso)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -14,7 +15,7 @@
 
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { listaRecursosPrueba } from '../data/recursos';
-import { registrarCambioEstado } from './historialService';
+import { registrarCambioEstado, registrarReposicion } from './historialService';
 
 // La lista de recursos que usa toda la aplicación.
 // Por ahora parte con los datos de prueba y vive en la memoria
@@ -87,6 +88,39 @@ export function cambiarEstadoRecurso(
   // Se hace AQUÍ, dentro del servicio, y no en el formulario: así es
   // imposible cambiar un estado sin que quede registrado.
   registrarCambioEstado(idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario);
+
+  return true;
+}
+
+// reponerStock
+// Recibe: el id del recurso, cuántas unidades NUEVAS llegaron, el motivo
+//         (ej: "Compra orden 123") y el nombre del usuario conectado.
+// Devuelve: true si se pudo reponer, false si no.
+// Ejemplo: los guantes tienen 2 cajas disponibles y llegan 10:
+//          disponible pasa de 2 a 12 y el total sube de 2 a 12.
+// A diferencia de cambiarEstadoRecurso, aquí el total SÍ cambia, porque
+// entran unidades que antes no estaban en el inventario. Esto es lo que
+// resuelve una alerta de reposición (HU-09).
+export function reponerStock(
+  idRecurso: number,
+  cantidad: number,
+  motivo: string,
+  nombreUsuario: string,
+): boolean {
+  const recurso = obtenerRecursoPorId(idRecurso);
+
+  if (recurso === undefined) {
+    return false; // no existe un recurso con ese id
+  }
+  if (cantidad < 1) {
+    return false; // no se puede reponer 0 ni un número negativo
+  }
+
+  recurso.cantidades.disponible = recurso.cantidades.disponible + cantidad;
+
+  // Igual que en los cambios de estado, la reposición queda registrada
+  // en el historial desde el servicio (RNF-06).
+  registrarReposicion(idRecurso, cantidad, motivo, nombreUsuario);
 
   return true;
 }
