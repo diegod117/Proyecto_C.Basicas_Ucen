@@ -1,79 +1,114 @@
 /* FormularioCambioEstado.css
-   Estilos del recuadro "Cambiar estado" (basado en el mockup). */
+   Estilos del recuadro "Cambiar estado" (basado en el mockup).
+   D18: tarjeta blanca de acciones a la derecha de la ficha, con las
+   variables de global.css y botón principal azul. */
 
 .formulario-cambio-estado {
   display: flex;
   flex-direction: column; /* cada label e input uno debajo del otro */
   gap: 6px;
-  background-color: #f9fafb;
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
-  padding: 20px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espacio-lg);
 }
 
 .formulario-cambio-titulo {
-  margin: 0 0 8px 0;
-  padding-bottom: 8px;
-  font-size: 15px;
+  margin: 0 0 var(--espacio-sm) 0;
+  padding-bottom: var(--espacio-sm);
+  font-size: 1rem;
+  font-weight: 600;
   border-bottom: 1px solid var(--color-borde);
 }
 
 .formulario-cambio-estado label {
-  font-size: 13px;
-  font-weight: bold;
-  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-secundario);
   margin-top: 6px;
 }
 
 .formulario-cambio-estado select,
 .formulario-cambio-estado input {
-  padding: 9px 10px;
+  padding: 10px 12px;
+  font-family: inherit;
   font-size: 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: white;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.formulario-cambio-estado select:hover,
+.formulario-cambio-estado input:hover {
+  border-color: var(--color-principal);
 }
 
 .formulario-cambio-estado select:focus,
 .formulario-cambio-estado input:focus {
   outline: none;
   border-color: var(--color-principal);
-  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.2);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
 /* Mensaje de error en rojo */
 .formulario-cambio-error {
-  margin: 8px 0 0 0;
-  padding: 8px 10px;
+  margin: var(--espacio-sm) 0 0 0;
+  padding: var(--espacio-sm) 10px;
   font-size: 13px;
   color: var(--color-danado);
   background-color: #fee2e2;
-  border-radius: 6px;
+  border-radius: var(--radio-borde-sm);
 }
 
 /* Mensaje verde que confirma que el cambio se guardó */
 .formulario-cambio-exito {
-  margin: 8px 0 0 0;
-  padding: 8px 10px;
+  margin: var(--espacio-sm) 0 0 0;
+  padding: var(--espacio-sm) 10px;
   font-size: 13px;
   color: var(--color-disponible);
   background-color: #dcfce7;
-  border-radius: 6px;
+  border-radius: var(--radio-borde-sm);
 }
 
-/* Botón gris oscuro, igual al "Guardar cambio" del mockup */
+/* Botón "Guardar cambio": mismo aspecto que .boton-principal de global.css */
 .formulario-cambio-boton {
-  margin-top: 12px;
+  margin-top: var(--espacio-md);
   padding: 11px;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  background-color: #374151;
-  border: none;
-  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-blanco);
+  background-color: var(--color-principal);
+  border: 2px solid var(--color-principal);
+  border-radius: var(--radio-borde-sm);
   cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .formulario-cambio-boton:hover {
-  background-color: #1f2937;
+  background-color: var(--color-principal-oscuro);
+  border-color: var(--color-principal-oscuro);
+  box-shadow: var(--sombra-tarjeta);
+}
+
+.formulario-cambio-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* En escritorio el formulario se queda a la vista mientras se baja por
+   los datos y el historial de la columna izquierda */
+@media (min-width: 801px) {
+  .formulario-cambio-estado {
+    position: sticky;
+    top: var(--espacio-md);
+  }
 }

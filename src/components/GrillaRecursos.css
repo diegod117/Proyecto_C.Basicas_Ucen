@@ -11,5 +11,8 @@
 .grilla-recursos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  gap: var(--espacio-lg);
+  /* Un poco de espacio arriba y abajo para que la sombra y la elevación
+     de las tarjetas (D15) no se vean cortadas. */
+  padding: var(--espacio-xs) 0 var(--espacio-md);
 }

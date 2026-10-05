@@ -1,13 +1,20 @@
 /* FiltrosInventario.css
-   Estilos de la barra de filtros del inventario. */
+   Estilos de la barra de filtros del inventario.
+   D16: los filtros van en una franja blanca y el buscador es más grande.
+   Todos los colores, sombras y radios vienen de global.css. */
 
-/* Grilla de filtros: el buscador ocupa más espacio y los 3 select menos.
+/* Franja blanca: fondo, esquinas redondeadas y sombra suave, igual que
+   las tarjetas. El buscador ocupa más espacio que los 3 select.
    En pantallas angostas (celular) cada filtro ocupa una fila completa. */
 .filtros-inventario {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
+  grid-template-columns: 2.4fr 1fr 1fr 1fr;
+  gap: var(--espacio-md);
+  padding: var(--espacio-md) var(--espacio-lg);
+  margin-bottom: var(--espacio-lg);
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
 }
 
 /* Cada filtro: el label arriba y el input/select abajo */
@@ -18,25 +25,50 @@
 }
 
 .campo-filtro label {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-secundario);
 }
 
 .campo-filtro input,
 .campo-filtro select {
   padding: 10px 12px;
+  font-family: inherit;
   font-size: 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: white;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease;
 }
 
-/* Cuando un filtro está seleccionado se marca con el azul principal */
+/* Buscador más grande: más alto y con letra más grande que los select */
+.campo-filtro input {
+  padding: 14px 16px;
+  font-size: 16px;
+}
+
+.campo-filtro input::placeholder {
+  color: var(--color-texto-secundario);
+}
+
+/* Al pasar el mouse el borde se marca un poco */
+.campo-filtro input:hover,
+.campo-filtro select:hover {
+  border-color: var(--color-principal);
+}
+
+/* Cuando un filtro está seleccionado se marca con el azul principal.
+   El aro de enfoque usa el azul claro de las variables. */
 .campo-filtro input:focus,
 .campo-filtro select:focus {
   outline: none;
   border-color: var(--color-principal);
-  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.2);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
 /* @media aplica estas reglas SOLO si la pantalla mide 700px o menos.
@@ -44,5 +76,6 @@
 @media (max-width: 700px) {
   .filtros-inventario {
     grid-template-columns: 1fr;
+    padding: var(--espacio-md);
   }
 }

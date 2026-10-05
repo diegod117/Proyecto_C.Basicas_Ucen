@@ -2,6 +2,7 @@
 // Componente de formulario para reservar recursos del laboratorio.
 // Implementa el patrón de "formulario controlado" con React useState.
 // Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (desactivar botón por falta de stock)
+// y RNF-03 (el docente reserva siempre a su propio nombre)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -12,20 +13,32 @@ import {
   calcularUnidadesDisponibles,
   validarDisponibilidadReserva,
 } from '../utils/disponibilidad';
+import type { Usuario } from '../types/Usuario';
+import { puedeReservarAOtroDocente } from '../utils/permisos';
 import './FormularioReserva.css';
 
 // Props que recibe el formulario
 interface FormularioReservaProps {
   onReservaCreada?: () => void;
+  // Usuario conectado: decide qué nombre va en el campo "Docente" (RNF-03)
+  usuario: Usuario;
 }
 
 // Componente FormularioReserva
 // Permite al docente seleccionar el recurso, fecha y horario.
 // Desactiva el botón de confirmación si no hay disponibilidad suficiente en ese tramo.
-function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
+function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps) {
   // --- Estados controlados del formulario ---
   const [recursoId, setRecursoId] = useState('');
-  const [docente, setDocente] = useState('Prof. Martín Zepeda');
+  // Campo "Docente" (RNF-03):
+  //   - Si el usuario es docente, el campo parte con su nombre y queda bloqueado.
+  //   - Si es el encargado, parte vacío y puede escribir el nombre del profesor.
+  const sePuedeEditarDocente = puedeReservarAOtroDocente(usuario.rol);
+  let docenteInicial = usuario.nombre;
+  if (sePuedeEditarDocente) {
+    docenteInicial = '';
+  }
+  const [docente, setDocente] = useState(docenteInicial);
   const [fecha, setFecha] = useState('');
   const [horaInicio, setHoraInicio] = useState('');
   const [horaFin, setHoraFin] = useState('');
@@ -97,6 +110,12 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
       return;
     }
 
+    // El docente también es obligatorio (antes se rellenaba con un nombre fijo)
+    if (docente.trim() === '') {
+      setMensajeError('Debe indicar el nombre del docente.');
+      return;
+    }
+
     // 2. Validación de disponibilidad física en ese horario (HU-08)
     const errorDisponibilidad = validarDisponibilidadReserva(
       Number(recursoId),
@@ -114,7 +133,7 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     // 3. Guardar en el servicio
     agregarReserva({
       recursoId: Number(recursoId),
-      docente: docente.trim() === '' ? 'Prof. Martín Zepeda' : docente,
+      docente: docente.trim(),
       fecha,
       horaInicio,
       horaFin,
@@ -172,7 +191,9 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
           <input
             id="campo-docente"
             type="text"
+            placeholder="Nombre del profesor"
             value={docente}
+            disabled={!sePuedeEditarDocente}
             onChange={function (evento) {
               setDocente(evento.target.value);
               setMensajeError('');
