@@ -29,4 +29,11 @@ export const listaUsuarios: Usuario[] = [
     nombre: 'Luis Sergio Torres',
     rol: 'departamento',
   },
+  // Cuenta real de un integrante del equipo (sirve para probar
+  // "¿Olvidaste tu contraseña?", porque le llega el correo de verdad).
+  {
+    correo: 'johann.cortes@alumnos.ucentral.cl',
+    nombre: 'Johann Cortés',
+    rol: 'encargado',
+  },
 ];
