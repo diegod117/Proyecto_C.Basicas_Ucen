@@ -146,3 +146,22 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* D21: celular (375px). Menos relleno y campos con letra de 16px para que
+   el celular no haga zoom solo al tocar un campo. */
+@media (max-width: 768px) {
+  .formulario-incidencia {
+    padding: var(--espacio-md);
+  }
+
+  .campo-formulario input,
+  .campo-formulario select,
+  .campo-formulario textarea {
+    font-size: 16px;
+  }
+
+  .campo-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+}

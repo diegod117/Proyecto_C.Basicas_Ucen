@@ -78,4 +78,14 @@
     grid-template-columns: 1fr;
     padding: var(--espacio-md);
   }
+
+  /* D21: letra de 16px en los campos para que el celular no haga zoom
+     solo al tocarlos. El buscador sigue siendo más alto que los select. */
+  .campo-filtro select {
+    font-size: 16px;
+  }
+
+  .campo-filtro input {
+    padding: 12px 14px;
+  }
 }

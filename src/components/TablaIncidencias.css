@@ -111,3 +111,20 @@
   font-weight: 600;
   padding-left: var(--espacio-sm);
 }
+
+/* D21: celular (375px). La tabla tiene un ancho mínimo: en vez de
+   aplastar las columnas, el contenedor (overflow-x: auto) la desliza. */
+@media (max-width: 768px) {
+  .tabla-incidencias {
+    min-width: 640px;
+  }
+
+  .tabla-incidencias-titulo {
+    padding: var(--espacio-md);
+  }
+
+  /* La fecha y la descripción no se parten en renglones de una palabra */
+  .tabla-incidencias td:first-child {
+    white-space: nowrap;
+  }
+}

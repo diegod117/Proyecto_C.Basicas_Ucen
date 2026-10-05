@@ -112,3 +112,16 @@
     top: var(--espacio-md);
   }
 }
+
+/* D21: celular (375px). Menos relleno y campos con letra de 16px: así el
+   navegador del celular no hace zoom solo al tocar un campo. */
+@media (max-width: 768px) {
+  .formulario-cambio-estado {
+    padding: var(--espacio-md);
+  }
+
+  .formulario-cambio-estado select,
+  .formulario-cambio-estado input {
+    font-size: 16px;
+  }
+}
