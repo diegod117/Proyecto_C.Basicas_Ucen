@@ -34,10 +34,13 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
   const [motivo, setMotivo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
+  // true mientras se espera a Firestore: desactiva el botón para no guardar dos veces
+  const [guardando, setGuardando] = useState(false);
 
   // guardarReposicion
   // Recibe: el evento del formulario. No devuelve nada.
-  function guardarReposicion(evento: FormEvent) {
+  // Es "async" porque el servicio guarda en Firestore y hay que esperarlo.
+  async function guardarReposicion(evento: FormEvent) {
     evento.preventDefault();
     setMensajeExito('');
 
@@ -48,7 +51,9 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
     }
 
     const cantidad = Number(cantidadTexto);
-    const seGuardo = reponerStock(recurso.id, cantidad, motivo, props.usuario.nombre);
+    setGuardando(true);
+    const seGuardo = await reponerStock(recurso.id, cantidad, motivo, props.usuario.nombre);
+    setGuardando(false);
 
     if (seGuardo) {
       setMensajeError('');
@@ -59,7 +64,7 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
       setMotivo('');
       props.onStockRepuesto();
     } else {
-      setMensajeError('No se pudo reponer el stock. Revisa los datos.');
+      setMensajeError('No se pudo reponer el stock. Revisa tu conexión e inténtalo de nuevo.');
     }
   }
 
@@ -99,8 +104,9 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
       {mensajeError !== '' && <p className="formulario-cambio-error">{mensajeError}</p>}
       {mensajeExito !== '' && <p className="formulario-cambio-exito">{mensajeExito}</p>}
 
-      <button type="submit" className="formulario-cambio-boton">
-        Agregar unidades
+      <button type="submit" className="formulario-cambio-boton" disabled={guardando}>
+        {guardando && 'Guardando...'}
+        {!guardando && 'Agregar unidades'}
       </button>
     </form>
   );

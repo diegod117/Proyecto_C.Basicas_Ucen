@@ -49,10 +49,13 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
   // Si es un texto vacío, no se muestra nada.
   const [mensajeError, setMensajeError] = useState('');
 
+  // Estado para saber si estamos esperando a que Firestore guarde.
+  const [guardando, setGuardando] = useState(false);
+
   // manejarEnvio
   // Se ejecuta cuando el usuario hace clic en "Registrar".
   // Recibe el evento del formulario. No devuelve nada.
-  function manejarEnvio(evento: React.FormEvent) {
+  async function manejarEnvio(evento: React.FormEvent) {
     // preventDefault evita que el navegador recargue la página
     // (comportamiento por defecto de un <form>).
     evento.preventDefault();
@@ -72,32 +75,41 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       return;
     }
 
-    // Si llegamos aquí, todo está bien. Limpiamos el error.
+    // Si llegamos aquí, todo está bien. Limpiamos el error y activamos "guardando".
     setMensajeError('');
+    setGuardando(true);
 
-    // Guardamos la incidencia usando el servicio (D1).
-    // El servicio se encarga de asignar la fecha automática y el estado
-    // "pendiente" (D5), así que solo enviamos los datos del formulario.
-    agregarIncidencia({
-      recursoId: Number(recursoId),
-      docentePresente: docentePresente.trim(),
-      descripcion: descripcion.trim(),
-      hayPersonasAfectadas,
-      detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
-      // Antes era un texto fijo; ahora es el nombre de quien inició sesión
-      registradaPor: props.usuario.nombre,
-    });
+    try {
+      // Guardamos la incidencia usando el servicio (D1).
+      // El servicio se encarga de asignar la fecha automática y el estado
+      // "pendiente" (D5), así que solo enviamos los datos del formulario.
+      await agregarIncidencia({
+        recursoId: Number(recursoId),
+        docentePresente: docentePresente.trim(),
+        descripcion: descripcion.trim(),
+        hayPersonasAfectadas,
+        detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
+        // Antes era un texto fijo; ahora es el nombre de quien inició sesión
+        registradaPor: props.usuario.nombre,
+      });
 
-    // Limpiamos todos los campos para que el formulario quede listo
-    // para registrar otra incidencia.
-    setRecursoId('');
-    setDocentePresente('');
-    setDescripcion('');
-    setHayPersonasAfectadas(false);
-    setDetalleAfectacion('');
+      // Limpiamos todos los campos para que el formulario quede listo
+      // para registrar otra incidencia.
+      setRecursoId('');
+      setDocentePresente('');
+      setDescripcion('');
+      setHayPersonasAfectadas(false);
+      setDetalleAfectacion('');
 
-    // Avisamos a la página que se registró una incidencia.
-    props.onIncidenciaRegistrada();
+      // Avisamos a la página que se registró una incidencia.
+      props.onIncidenciaRegistrada();
+    } catch (error) {
+      console.error('Error al guardar incidencia:', error);
+      setMensajeError('Error al guardar la incidencia. Revise su conexión.');
+    } finally {
+      // Ya terminamos de intentar guardar (haya funcionado o no)
+      setGuardando(false);
+    }
   }
 
   return (
@@ -184,8 +196,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       )}
 
       {/* Botón para registrar la incidencia */}
-      <button type="submit" className="boton-registrar">
-        Registrar incidencia
+      <button type="submit" className="boton-registrar" disabled={guardando}>
+        {guardando ? 'Guardando...' : 'Registrar incidencia'}
       </button>
     </form>
   );

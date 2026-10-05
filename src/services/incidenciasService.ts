@@ -8,14 +8,15 @@
 import type { Incidencia, EstadoIncidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
 import { obtenerFechaActual } from '../utils/fechas';
+import { collection, getDocs, setDoc, doc, updateDoc } from 'firebase/firestore';
+import { baseDatos } from './firebase';
 
 // ------------------------------------------------------------------
 // Lista en memoria
 // ------------------------------------------------------------------
-// Copiamos los datos de prueba a una lista que se puede modificar.
-// Al recargar el navegador, los datos vuelven a los originales
-// (para el MVP está bien, ver nota en plan-implementacion.md).
-const incidencias: Incidencia[] = [...listaIncidenciasPrueba];
+// Esta es la copia local de los datos. Empieza vacía y se llena al
+// llamar a cargarIncidencias() al iniciar sesión.
+let incidencias: Incidencia[] = [];
 
 // ------------------------------------------------------------------
 // obtenerIncidencias
@@ -52,9 +53,9 @@ function obtenerIncidenciaPorId(id: number): Incidencia | undefined {
 // Omit<Incidencia, 'id' | 'fecha' | 'estado'> significa:
 // "una Incidencia pero sin los campos id, fecha ni estado".
 // HU-10 pide que la fecha sea automática y el estado empiece en 'pendiente'.
-function agregarIncidencia(
+async function agregarIncidencia(
   datos: Omit<Incidencia, 'id' | 'fecha' | 'estado'>
-): Incidencia {
+): Promise<Incidencia> {
   // Generamos un id nuevo: tomamos el mayor id que exista y le sumamos 1.
   // Si la lista está vacía, el id será 1.
   let mayorId = 0;
@@ -71,6 +72,11 @@ function agregarIncidencia(
     ...datos,
   };
 
+  // Guardamos en Firestore primero
+  const docRef = doc(baseDatos, 'incidencias', nuevaIncidencia.id.toString());
+  await setDoc(docRef, nuevaIncidencia);
+
+  // Si Firestore no falló, actualizamos la copia local en memoria
   incidencias.push(nuevaIncidencia);
   return nuevaIncidencia;
 }
@@ -83,10 +89,20 @@ function agregarIncidencia(
 // Busca la incidencia en la lista y le actualiza el estado.
 // Devuelve true si la encontró y la actualizó, o false si no existía.
 // Cubre: HU-10 (avanzar incidencia de pendiente -> en_revision -> resuelta)
-function cambiarEstadoIncidencia(
+async function cambiarEstadoIncidencia(
   id: number,
   nuevoEstado: EstadoIncidencia
-): boolean {
+): Promise<boolean> {
+  // Primero actualizamos en Firestore
+  try {
+    const docRef = doc(baseDatos, 'incidencias', id.toString());
+    await updateDoc(docRef, { estado: nuevoEstado });
+  } catch (error) {
+    console.error('Error al actualizar estado en Firestore:', error);
+    return false;
+  }
+
+  // Si Firestore funcionó, actualizamos en memoria
   for (const incidencia of incidencias) {
     if (incidencia.id === id) {
       incidencia.estado = nuevoEstado;
@@ -94,6 +110,28 @@ function cambiarEstadoIncidencia(
     }
   }
   return false;
+}
+
+// ------------------------------------------------------------------
+// cargarIncidencias (D22)
+// ------------------------------------------------------------------
+// Descarga las incidencias desde Firestore y las guarda en memoria.
+// Si la colección está vacía, sube los datos de prueba automáticamente.
+export async function cargarIncidencias(): Promise<void> {
+  const coleccion = collection(baseDatos, 'incidencias');
+  const snapshot = await getDocs(coleccion);
+
+  if (snapshot.empty) {
+    console.log('Colección incidencias vacía, subiendo datos de prueba...');
+    for (const incidencia of listaIncidenciasPrueba) {
+      const docRef = doc(baseDatos, 'incidencias', incidencia.id.toString());
+      await setDoc(docRef, incidencia);
+    }
+    const nuevoSnapshot = await getDocs(coleccion);
+    incidencias = nuevoSnapshot.docs.map(d => d.data() as Incidencia);
+  } else {
+    incidencias = snapshot.docs.map(d => d.data() as Incidencia);
+  }
 }
 
 // ------------------------------------------------------------------

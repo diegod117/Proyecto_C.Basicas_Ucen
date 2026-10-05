@@ -44,11 +44,14 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
   const [mensajeError, setMensajeError] = useState('');
   // Mensaje verde que confirma el último cambio guardado
   const [mensajeExito, setMensajeExito] = useState('');
+  // true mientras se espera a Firestore: desactiva el botón para no guardar dos veces
+  const [guardando, setGuardando] = useState(false);
 
   // guardarCambio
   // Recibe: el evento del formulario. No devuelve nada.
   // Valida los datos y, si están bien, guarda el cambio en el servicio.
-  function guardarCambio(evento: FormEvent) {
+  // Es "async" porque el servicio guarda en Firestore y hay que esperarlo.
+  async function guardarCambio(evento: FormEvent) {
     // Por defecto, enviar un <form> recarga toda la página.
     // preventDefault() evita eso, para manejar el envío nosotros.
     evento.preventDefault();
@@ -76,8 +79,10 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       }
     }
 
-    // El servicio cambia las cantidades Y registra el cambio en el historial
-    const seGuardo = cambiarEstadoRecurso(
+    // El servicio cambia las cantidades Y registra el cambio en el historial.
+    // "await" espera a que Firestore responda antes de seguir.
+    setGuardando(true);
+    const seGuardo = await cambiarEstadoRecurso(
       recurso.id,
       estadoOrigen,
       estadoNuevo,
@@ -85,6 +90,7 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       motivo,
       props.usuario.nombre,
     );
+    setGuardando(false);
     if (seGuardo) {
       setMensajeError('');
       setMensajeExito(textoResumenCambio(cantidad, estadoOrigen, estadoNuevo));
@@ -96,7 +102,7 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       }
       props.onEstadoCambiado(); // avisamos hacia arriba para que App redibuje todo
     } else {
-      setMensajeError('No se pudo guardar el cambio. Revisa los datos.');
+      setMensajeError('No se pudo guardar el cambio. Revisa tu conexión e inténtalo de nuevo.');
     }
   }
 
@@ -161,8 +167,9 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       {mensajeError !== '' && <p className="formulario-cambio-error">{mensajeError}</p>}
       {mensajeExito !== '' && <p className="formulario-cambio-exito">{mensajeExito}</p>}
 
-      <button type="submit" className="formulario-cambio-boton">
-        Guardar cambio
+      <button type="submit" className="formulario-cambio-boton" disabled={guardando}>
+        {guardando && 'Guardando...'}
+        {!guardando && 'Guardar cambio'}
       </button>
     </form>
   );
