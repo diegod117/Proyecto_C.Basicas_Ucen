@@ -102,7 +102,9 @@
   padding: 10px var(--espacio-md);
   border: 1.5px solid var(--color-borde);
   border-radius: var(--radio-borde-sm);
-  font-size: 0.9rem;
+  /* 16px (1rem) como mínimo: en iPhone, si un campo tiene letra más chica,
+     Safari hace zoom al tocarlo y NO lo deshace al entrar a la app (RNF-01) */
+  font-size: 1rem;
   font-family: inherit;
   color: var(--color-texto);
   background-color: var(--color-fondo);
