@@ -1,11 +1,13 @@
 // PaginaLogin.tsx
 // Pantalla de inicio de sesión: correo y contraseña.
 // Es lo primero que se ve si nadie ha iniciado sesión.
+// Desde aquí también se puede pedir un correo para recuperar la contraseña.
 // Cubre: inicio de sesión con roles (sección 3.4 de requerimientos)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { iniciarSesion } from '../services/authService';
+import FormularioRecuperarContrasena from '../components/FormularioRecuperarContrasena';
 import './PaginaLogin.css';
 
 // Componente PaginaLogin
@@ -21,6 +23,10 @@ function PaginaLogin() {
   // true mientras esperamos la respuesta de Firebase.
   // Sirve para desactivar el botón y que no se haga clic dos veces.
   const [esperandoRespuesta, setEsperandoRespuesta] = useState(false);
+
+  // true cuando la persona hizo clic en "¿Olvidaste tu contraseña?".
+  // En ese caso la tarjeta muestra el formulario de recuperación.
+  const [mostrarRecuperacion, setMostrarRecuperacion] = useState(false);
 
   // manejarEnvio
   // Recibe el evento del formulario. No devuelve nada.
@@ -50,6 +56,20 @@ function PaginaLogin() {
   let textoBoton = 'Iniciar sesión';
   if (esperandoRespuesta) {
     textoBoton = 'Ingresando...';
+  }
+
+  // Si eligió recuperar la contraseña, mostramos ese formulario en la
+  // misma tarjeta. Le pasamos el correo que ya escribió y una función
+  // para volver al login.
+  if (mostrarRecuperacion) {
+    return (
+      <div className="login-fondo">
+        <FormularioRecuperarContrasena
+          correoInicial={correo}
+          onVolver={() => setMostrarRecuperacion(false)}
+        />
+      </div>
+    );
   }
 
   return (
@@ -93,6 +113,15 @@ function PaginaLogin() {
 
           <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
             {textoBoton}
+          </button>
+
+          {/* type="button" para que este botón NO envíe el formulario de login */}
+          <button
+            type="button"
+            className="login-enlace"
+            onClick={() => setMostrarRecuperacion(true)}
+          >
+            ¿Olvidaste tu contraseña?
           </button>
         </div>
       </form>

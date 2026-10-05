@@ -25,3 +25,7 @@ const appFirebase = initializeApp(configuracionFirebase);
 
 // getAuth nos da el módulo de autenticación (login/logout) de Firebase.
 export const autenticacion = getAuth(appFirebase);
+
+// Idioma de los correos que envía Firebase (por ejemplo, el de
+// "Olvidaste tu contraseña"). Sin esto llegarían en inglés.
+autenticacion.languageCode = 'es';
