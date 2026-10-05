@@ -89,11 +89,11 @@ function App() {
     // que el rol no puede ver, pero si por algún motivo paginaActual quedara
     // en una de ellas, mostramos el inventario en su lugar.
     if (!puedeVerPagina(usuario.rol, paginaActual)) {
-      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} />;
+      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} usuario={usuario} />;
     }
 
     if (paginaActual === 'inventario') {
-      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} />;
+      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} usuario={usuario} />;
     } else if (paginaActual === 'reservas') {
       return <PaginaReservas />;
     } else if (paginaActual === 'incidencias') {

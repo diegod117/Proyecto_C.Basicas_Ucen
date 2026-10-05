@@ -19,16 +19,20 @@ import {
 import FiltrosInventario from '../components/FiltrosInventario';
 import GrillaRecursos from '../components/GrillaRecursos';
 import FichaRecurso from '../components/FichaRecurso';
+import type { Usuario } from '../types/Usuario';
 import './PaginaInventario.css';
 
 interface PropsPaginaInventario {
   // Viene de App. Se llama cuando se guarda un cambio de estado, para que
   // App recalcule las alertas del menú y redibuje la página (HU-02, HU-05).
   onInventarioCambiado: () => void;
+  // Usuario conectado. La página no lo usa: solo se lo pasa a la ficha,
+  // que decide si muestra el formulario de cambio de estado (RNF-03).
+  usuario: Usuario;
 }
 
 // Componente PaginaInventario
-// Recibe: la función para avisar a App que el inventario cambió.
+// Recibe: la función para avisar a App que el inventario cambió y el usuario conectado.
 // Devuelve: el contenido de la página de inventario.
 function PaginaInventario(props: PropsPaginaInventario) {
   // Un useState por cada filtro. Cada uno guarda lo que el usuario eligió.
@@ -99,6 +103,7 @@ function PaginaInventario(props: PropsPaginaInventario) {
             recurso={recursoSeleccionado}
             onVolver={volverAlListado}
             onEstadoCambiado={props.onInventarioCambiado}
+            usuario={props.usuario}
           />
         </section>
       );
