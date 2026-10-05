@@ -107,24 +107,14 @@ function PaginaInventario(props: PropsPaginaInventario) {
 
   return (
     <section className="contenido-pagina">
-      <div className="inventario-encabezado">
-        <h2>Inventario de laboratorios</h2>
-        <div className="inventario-contador">
-          {/* ".length" es la cantidad de elementos que tiene la lista */}
-          <p className="texto-secundario">
-            Mostrando {recursosFiltrados.length} de {listaRecursos.length} recursos
-          </p>
-          {/* "condición && <elemento>" dibuja el elemento SOLO si la condición
-              es true. Aquí: el botón aparece solo si hay algún filtro activo.
-              onClick recibe la función limpiarFiltros SIN paréntesis: así
-              React la ejecuta recién cuando el usuario hace clic. */}
-          {filtrosActivos && (
-            <button className="boton-limpiar-pequeno" onClick={limpiarFiltros}>
-              Limpiar filtros
-            </button>
-          )}
-        </div>
-      </div>
+      {/* Encabezado de página (D17): título grande y una línea de descripción
+          en gris. Las demás páginas usan las mismas clases (encabezado-pagina). */}
+      <header className="encabezado-pagina">
+        <h2 className="encabezado-pagina-titulo">Inventario</h2>
+        <p className="encabezado-pagina-descripcion">
+          Recursos de los laboratorios de las torres B y C
+        </p>
+      </header>
 
       {/* Le pasamos a FiltrosInventario los valores actuales y las funciones
           "set" de cada useState. Cuando el usuario cambia un filtro, el
@@ -140,6 +130,22 @@ function PaginaInventario(props: PropsPaginaInventario) {
         onCambiarLaboratorio={setLaboratorio}
         onCambiarEstado={setEstado}
       />
+
+      <div className="inventario-contador">
+        {/* ".length" es la cantidad de elementos que tiene la lista */}
+        <p className="texto-secundario">
+          Mostrando {recursosFiltrados.length} de {listaRecursos.length} recursos
+        </p>
+        {/* "condición && <elemento>" dibuja el elemento SOLO si la condición
+            es true. Aquí: el botón aparece solo si hay algún filtro activo.
+            onClick recibe la función limpiarFiltros SIN paréntesis: así
+            React la ejecuta recién cuando el usuario hace clic. */}
+        {filtrosActivos && (
+          <button className="boton-limpiar-pequeno" onClick={limpiarFiltros}>
+            Limpiar filtros
+          </button>
+        )}
+      </div>
 
       {/* La grilla decide sola si muestra las tarjetas o el mensaje vacío */}
       <GrillaRecursos
