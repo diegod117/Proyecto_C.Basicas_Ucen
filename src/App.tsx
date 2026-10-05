@@ -1,8 +1,10 @@
 // App.tsx
 // Componente principal de la aplicación.
 // Si nadie ha iniciado sesión, muestra la pantalla de login.
-// Si hay sesión, muestra el menú arriba y, debajo, la página que el usuario eligió.
-// Cubre: navegación base e inicio de sesión con roles (sección 3.4 de requerimientos)
+// Si hay sesión, primero descarga los datos desde Firestore (CargadorDatos)
+// y luego muestra el menú arriba y, debajo, la página que el usuario eligió.
+// Cubre: navegación base, inicio de sesión con roles (sección 3.4 de requerimientos)
+//        y RNF-06 (los datos vienen de Firestore)
 
 import { useState, useEffect } from 'react';
 import type { Pagina } from './types/Pagina';
@@ -13,6 +15,7 @@ import PaginaReservas from './pages/PaginaReservas';
 import PaginaIncidencias from './pages/PaginaIncidencias';
 import PaginaAlertas from './pages/PaginaAlertas';
 import PaginaLogin from './pages/PaginaLogin';
+import CargadorDatos from './components/CargadorDatos';
 import { generarAlertas } from './utils/alertas';
 import { escucharSesion, cerrarSesion } from './services/authService';
 import { puedeVerPagina } from './utils/permisos';
@@ -114,24 +117,27 @@ function App() {
   }
 
   return (
-    // M17: div raíz para el nuevo layout de pantalla completa.
-    // MenuNavegacion ahora devuelve el header (fijo arriba) y el
-    // sidebar (fijo a la izquierda). El <main> tiene la clase
-    // "app-contenido" para que se desplace a la derecha del sidebar
-    // y debajo del header (ver MenuNavegacion.css).
-    <div className="app-layout">
-      {/* Le pasamos al menú la página actual, la función para cambiarla,
-          el contador de alertas (HU-05) y el usuario conectado. */}
-      <MenuNavegacion
-        paginaActual={paginaActual}
-        onCambiarPagina={setPaginaActual}
-        cantidadAlertas={totalAlertas}
-        usuario={usuarioActual}
-        onCerrarSesion={manejarCerrarSesion}
-      />
+    // CargadorDatos descarga los datos desde Firestore y recién entonces
+    // muestra lo que tiene adentro. key={correo}: si cambia el usuario,
+    // React crea un CargadorDatos nuevo y se vuelven a descargar los datos.
+    <CargadorDatos key={usuarioActual.correo} onDatosListos={registrarCambioInventario}>
+      {/* M17: layout de pantalla completa. MenuNavegacion devuelve el header
+          (fijo arriba) y el sidebar (fijo a la izquierda). El <main> tiene la
+          clase "app-contenido" para no quedar tapado (ver MenuNavegacion.css). */}
+      <div className="app-layout">
+        {/* Le pasamos al menú la página actual, la función para cambiarla,
+            el contador de alertas (HU-05) y el usuario conectado. */}
+        <MenuNavegacion
+          paginaActual={paginaActual}
+          onCambiarPagina={setPaginaActual}
+          cantidadAlertas={totalAlertas}
+          usuario={usuarioActual}
+          onCerrarSesion={manejarCerrarSesion}
+        />
 
-      <main className="app-contenido">{mostrarPaginaActual(usuarioActual)}</main>
-    </div>
+        <main className="app-contenido">{mostrarPaginaActual(usuarioActual)}</main>
+      </div>
+    </CargadorDatos>
   );
 }
 
