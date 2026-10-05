@@ -13,9 +13,15 @@
 // Además, como todas las páginas leen de aquí, todas ven los mismos datos:
 // si alguien cambia el estado de un recurso, todos ven el cambio.
 
-import type { Recurso, EstadoRecurso } from '../types/Recurso';
+import type { Recurso, EstadoRecurso, CantidadesPorEstado } from '../types/Recurso';
+import type { CambioEstado } from '../types/CambioEstado';
 import { listaRecursosPrueba } from '../data/recursos';
-import { registrarCambioEstado, registrarReposicion } from './historialService';
+import {
+  crearRegistroCambioEstado,
+  crearRegistroReposicion,
+  agregarRegistroAlLote,
+  agregarRegistroEnMemoria,
+} from './historialService';
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
@@ -99,22 +105,25 @@ export function obtenerRecursoPorId(id: number): Recurso | undefined {
 // Recibe: el id del recurso, el estado de origen, el estado nuevo,
 //         cuántas unidades se mueven de uno a otro, el motivo del cambio
 //         y el nombre del usuario conectado (para el historial, HU-06).
-// Devuelve: true si se pudo hacer el cambio, false si no.
+// Devuelve: una Promise<boolean>: true si se guardó, false si no.
 // Ejemplo: mover 1 multímetro de 'disponible' a 'danado' deja
 //          disponible: 12 -> 11 y danado: 1 -> 2. El total no cambia.
+//
+// Es "async" porque guarda en Firestore (por internet). Quien la llama
+// debe usar "await" para esperar el resultado.
 //
 // El formulario ya valida los datos antes de llamar a esta función, pero
 // el servicio vuelve a revisar lo más importante (que el recurso exista y
 // que haya unidades suficientes). Así los datos nunca quedan con números
 // negativos, aunque alguien llame a esta función desde otra parte.
-export function cambiarEstadoRecurso(
+export async function cambiarEstadoRecurso(
   idRecurso: number,
   estadoOrigen: EstadoRecurso,
   estadoNuevo: EstadoRecurso,
   cantidad: number,
   motivo: string,
   nombreUsuario: string,
-): boolean {
+): Promise<boolean> {
   const recurso = obtenerRecursoPorId(idRecurso);
 
   if (recurso === undefined) {
@@ -124,36 +133,37 @@ export function cambiarEstadoRecurso(
     return false; // cantidad inválida o no hay suficientes unidades
   }
 
-  // Restamos en el estado de origen y sumamos en el estado nuevo.
-  // Como "recurso" apunta al MISMO objeto que está en listaRecursos,
-  // al modificarlo aquí se modifica en la lista, y todas las páginas
-  // que lean del servicio verán el cambio.
-  recurso.cantidades[estadoOrigen] = recurso.cantidades[estadoOrigen] - cantidad;
-  recurso.cantidades[estadoNuevo] = recurso.cantidades[estadoNuevo] + cantidad;
+  // Calculamos las cantidades nuevas en una COPIA ({ ...objeto } copia
+  // todos sus campos). Todavía no tocamos el recurso en memoria: primero
+  // hay que ver si Firestore acepta el cambio.
+  const nuevasCantidades = { ...recurso.cantidades };
+  nuevasCantidades[estadoOrigen] = nuevasCantidades[estadoOrigen] - cantidad;
+  nuevasCantidades[estadoNuevo] = nuevasCantidades[estadoNuevo] + cantidad;
 
-  // Dejamos constancia del cambio en el historial (HU-06).
-  // Se hace AQUÍ, dentro del servicio, y no en el formulario: así es
-  // imposible cambiar un estado sin que quede registrado.
-  registrarCambioEstado(idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario);
+  // Registro para el historial (HU-06). Se crea AQUÍ, dentro del servicio,
+  // y no en el formulario: así es imposible cambiar un estado sin que quede registrado.
+  const registro = crearRegistroCambioEstado(
+    idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario,
+  );
 
-  return true;
+  return guardarCambioConHistorial(recurso, nuevasCantidades, registro);
 }
 
 // reponerStock
 // Recibe: el id del recurso, cuántas unidades NUEVAS llegaron, el motivo
 //         (ej: "Compra orden 123") y el nombre del usuario conectado.
-// Devuelve: true si se pudo reponer, false si no.
+// Devuelve: una Promise<boolean>: true si se guardó, false si no.
 // Ejemplo: los guantes tienen 2 cajas disponibles y llegan 10:
 //          disponible pasa de 2 a 12 y el total sube de 2 a 12.
 // A diferencia de cambiarEstadoRecurso, aquí el total SÍ cambia, porque
 // entran unidades que antes no estaban en el inventario. Esto es lo que
 // resuelve una alerta de reposición (HU-09).
-export function reponerStock(
+export async function reponerStock(
   idRecurso: number,
   cantidad: number,
   motivo: string,
   nombreUsuario: string,
-): boolean {
+): Promise<boolean> {
   const recurso = obtenerRecursoPorId(idRecurso);
 
   if (recurso === undefined) {
@@ -163,11 +173,45 @@ export function reponerStock(
     return false; // no se puede reponer 0 ni un número negativo
   }
 
-  recurso.cantidades.disponible = recurso.cantidades.disponible + cantidad;
+  const nuevasCantidades = { ...recurso.cantidades };
+  nuevasCantidades.disponible = nuevasCantidades.disponible + cantidad;
 
   // Igual que en los cambios de estado, la reposición queda registrada
   // en el historial desde el servicio (RNF-06).
-  registrarReposicion(idRecurso, cantidad, motivo, nombreUsuario);
+  const registro = crearRegistroReposicion(idRecurso, cantidad, motivo, nombreUsuario);
 
+  return guardarCambioConHistorial(recurso, nuevasCantidades, registro);
+}
+
+// guardarCambioConHistorial
+// Recibe: el recurso, sus cantidades nuevas y el registro del historial.
+// Devuelve: una Promise<boolean>: true si se guardó, false si Firestore falló.
+// La usan cambiarEstadoRecurso y reponerStock, que guardan lo mismo:
+// las cantidades del recurso + un registro del historial.
+async function guardarCambioConHistorial(
+  recurso: Recurso,
+  nuevasCantidades: CantidadesPorEstado,
+  registro: CambioEstado,
+): Promise<boolean> {
+  // writeBatch ("lote"): las dos escrituras se envían juntas y Firestore
+  // guarda LAS DOS o NINGUNA. Así nunca queda un cambio de cantidades sin
+  // su registro en el historial, ni un registro sin su cambio.
+  const lote = writeBatch(baseDatos);
+  // update cambia solo el campo "cantidades" del documento del recurso
+  lote.update(doc(baseDatos, 'recursos', String(recurso.id)), { cantidades: nuevasCantidades });
+  agregarRegistroAlLote(lote, registro);
+
+  try {
+    await lote.commit(); // aquí se envía todo a Firestore
+  } catch (error) {
+    console.error('Error al guardar en Firestore:', error);
+    return false; // no se guardó nada: la memoria queda como estaba
+  }
+
+  // Firestore aceptó el cambio: recién ahora actualizamos la copia en memoria.
+  // Como "recurso" apunta al MISMO objeto que está en listaRecursos, todas
+  // las páginas que lean del servicio verán el cambio.
+  recurso.cantidades = nuevasCantidades;
+  agregarRegistroEnMemoria(registro);
   return true;
 }

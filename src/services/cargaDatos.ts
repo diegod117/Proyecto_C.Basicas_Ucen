@@ -9,6 +9,7 @@
 // reservas), se suma aquí con un "await" más. Avisar al grupo antes.
 
 import { cargarRecursos } from './recursosService';
+import { cargarHistorial } from './historialService';
 import { cargarIncidencias } from './incidenciasService';
 
 // cargarTodosLosDatos
@@ -18,6 +19,7 @@ import { cargarIncidencias } from './incidenciasService';
 export async function cargarTodosLosDatos(): Promise<string> {
   try {
     await cargarRecursos();
+    await cargarHistorial();
     await cargarIncidencias();
   } catch (error) {
     // console.error muestra el error técnico en la consola del navegador
