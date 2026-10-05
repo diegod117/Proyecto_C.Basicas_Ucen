@@ -1,0 +1,17 @@
+/* FormularioReponerStock.css
+   El recuadro usa las clases de FormularioCambioEstado.css para verse
+   igual que "Cambiar estado". Aquí solo va lo propio de este formulario. */
+
+/* Línea "Disponibles: 2 · Mínimo: 5" debajo del título */
+.reponer-stock-actual {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+}
+
+/* "Cambiar estado" queda fijo en pantalla en PC (position: sticky).
+   Este recuadro va debajo, así que no debe quedarse fijo. Se usan las dos
+   clases juntas para que esta regla gane sobre la de FormularioCambioEstado.css. */
+.formulario-cambio-estado.formulario-reponer-stock {
+  position: static;
+}

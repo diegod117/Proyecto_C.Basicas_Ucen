@@ -1,7 +1,8 @@
 // TablaHistorial.tsx
 // Tabla "Historial de estados" que va debajo de la ficha de un recurso.
 // Muestra cada cambio de estado: cuándo, qué cambió, por qué y quién.
-// Cubre: HU-06 (ver el historial de cambios de estado), RNF-06
+// También muestra las reposiciones de stock (unidades nuevas que llegaron).
+// Cubre: HU-06 (ver el historial de cambios de estado), RF-04, RNF-06
 
 import type { CambioEstado } from '../types/CambioEstado';
 import { textoEstado } from '../utils/inventario';
@@ -46,15 +47,31 @@ function TablaHistorial(props: PropsTablaHistorial) {
                 <tr key={cambio.id}>
                   <td className="tabla-historial-fecha">{cambio.fecha}</td>
                   <td className="tabla-historial-cambio">
-                    {/* Ej: [Disponible] → [Dañado] (1) */}
-                    <span className={'etiqueta etiqueta-' + cambio.estadoAnterior}>
-                      {textoEstado(cambio.estadoAnterior)}
-                    </span>
-                    {' → '}
-                    <span className={'etiqueta etiqueta-' + cambio.estadoNuevo}>
-                      {textoEstado(cambio.estadoNuevo)}
-                    </span>
-                    <span className="tabla-historial-cantidad"> ({cambio.cantidad})</span>
+                    {/* Reposición. Ej: Reposición +10 → [Disponible] */}
+                    {cambio.tipo === 'reposicion' && (
+                      <>
+                        <span className="tabla-historial-reposicion">
+                          Reposición +{cambio.cantidad}
+                        </span>
+                        {' → '}
+                        <span className="etiqueta etiqueta-disponible">
+                          {textoEstado('disponible')}
+                        </span>
+                      </>
+                    )}
+                    {/* Cambio de estado. Ej: [Disponible] → [Dañado] (1) */}
+                    {cambio.tipo === 'cambio_estado' && (
+                      <>
+                        <span className={'etiqueta etiqueta-' + cambio.estadoAnterior}>
+                          {textoEstado(cambio.estadoAnterior)}
+                        </span>
+                        {' → '}
+                        <span className={'etiqueta etiqueta-' + cambio.estadoNuevo}>
+                          {textoEstado(cambio.estadoNuevo)}
+                        </span>
+                        <span className="tabla-historial-cantidad"> ({cambio.cantidad})</span>
+                      </>
+                    )}
                   </td>
                   <td>{cambio.motivo}</td>
                   <td>{cambio.usuario}</td>

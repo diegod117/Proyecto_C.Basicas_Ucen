@@ -39,6 +39,18 @@ export function puedeCambiarEstado(rol: RolUsuario): boolean {
   }
 }
 
+// puedeReponerStock
+// Recibe: el rol del usuario.
+// Devuelve: true si puede agregar unidades nuevas a un recurso (reposición).
+// Igual que cambiar estado: solo el encargado edita el inventario (RNF-03).
+export function puedeReponerStock(rol: RolUsuario): boolean {
+  if (rol === 'encargado') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // puedeReservar
 // Recibe: el rol del usuario.
 // Devuelve: true si puede reservar un recurso (HU-03).

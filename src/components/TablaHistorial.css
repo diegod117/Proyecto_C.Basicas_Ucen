@@ -97,3 +97,8 @@
   }
 }
 
+/* Texto "Reposición +10" en el historial: verde, porque entran unidades */
+.tabla-historial-reposicion {
+  font-weight: 700;
+  color: var(--color-disponible);
+}
