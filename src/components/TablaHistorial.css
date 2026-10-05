@@ -1,24 +1,26 @@
 /* TablaHistorial.css
-   Estilos de la tabla "Historial de estados" (basada en el mockup). */
+   Estilos de la tabla "Historial de estados" (basada en el mockup).
+   D19: tarjeta blanca con sombra, encabezado discreto, filas con
+   separadores suaves y efecto al pasar el mouse. */
 
 .tabla-historial {
-  background-color: white;
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
-  overflow: hidden; /* para que el fondo gris del título respete las esquinas */
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  overflow: hidden; /* para que el fondo del título respete las esquinas */
 }
 
 .tabla-historial-titulo {
   margin: 0;
-  padding: 12px 20px;
-  font-size: 15px;
-  background-color: #f9fafb;
+  padding: var(--espacio-md) var(--espacio-lg);
+  font-size: 1rem;
+  font-weight: 600;
   border-bottom: 1px solid var(--color-borde);
 }
 
 .tabla-historial-vacia {
   margin: 0;
-  padding: 16px 20px;
+  padding: var(--espacio-md) var(--espacio-lg);
   font-size: 14px;
   color: var(--color-texto-secundario);
 }
@@ -37,16 +39,28 @@
 
 .tabla-historial th {
   text-align: left;
-  padding: 10px 20px;
-  font-weight: bold;
-  color: #4b5563;
-  background-color: #f3f4f6;
+  padding: 10px var(--espacio-lg);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-secundario);
+  background-color: var(--color-fondo-menu);
 }
 
 .tabla-historial td {
-  padding: 10px 20px;
+  padding: 12px var(--espacio-lg);
   border-top: 1px solid var(--color-borde);
   vertical-align: middle;
+}
+
+/* La fila se resalta con el azul claro al pasar el mouse */
+.tabla-historial tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.tabla-historial tbody tr:hover {
+  background-color: var(--color-principal-claro);
 }
 
 /* white-space: nowrap evita que la fecha y el cambio se partan en dos
@@ -61,5 +75,5 @@
 }
 
 .tabla-historial-cantidad {
-  font-weight: bold;
+  font-weight: 700;
 }

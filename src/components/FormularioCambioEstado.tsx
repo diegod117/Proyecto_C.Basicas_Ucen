@@ -2,7 +2,7 @@
 // Formulario para que el encargado cambie el estado de algunas unidades
 // de un recurso. Ej: pasar 1 multímetro de "Disponible" a "Dañado".
 // Se muestra a la derecha de la ficha del recurso, como en el mockup.
-// Cubre: HU-02, RF-01
+// Cubre: HU-02, RF-01, HU-06 (el historial guarda quién hizo el cambio)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -14,6 +14,7 @@ import {
   textoResumenCambio,
 } from '../utils/cambioEstado';
 import { cambiarEstadoRecurso } from '../services/recursosService';
+import type { Usuario } from '../types/Usuario';
 import './FormularioCambioEstado.css';
 
 interface PropsFormularioCambioEstado {
@@ -21,10 +22,13 @@ interface PropsFormularioCambioEstado {
   // Se llama después de guardar, para avisarle a la página que los datos
   // cambiaron y que tiene que volver a dibujarse con los números nuevos.
   onEstadoCambiado: () => void;
+  // Usuario conectado: su nombre queda en el historial (HU-06)
+  usuario: Usuario;
 }
 
 // Componente FormularioCambioEstado
-// Recibe: el recurso y la función para avisar que se guardó un cambio.
+// Recibe: el recurso, la función para avisar que se guardó un cambio
+// y el usuario conectado.
 // Devuelve: el formulario "Cambiar estado".
 function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
   const recurso = props.recurso;
@@ -73,7 +77,14 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
     }
 
     // El servicio cambia las cantidades Y registra el cambio en el historial
-    const seGuardo = cambiarEstadoRecurso(recurso.id, estadoOrigen, estadoNuevo, cantidad, motivo);
+    const seGuardo = cambiarEstadoRecurso(
+      recurso.id,
+      estadoOrigen,
+      estadoNuevo,
+      cantidad,
+      motivo,
+      props.usuario.nombre,
+    );
     if (seGuardo) {
       setMensajeError('');
       setMensajeExito(textoResumenCambio(cantidad, estadoOrigen, estadoNuevo));

@@ -1,7 +1,8 @@
 // TablaIncidencias.tsx
 // Tabla que muestra el historial de todas las incidencias registradas (HU-10).
-// Cada fila muestra: fecha, recurso afectado, descripción, estado y una acción
-// para avanzar el estado: de 'pendiente' -> 'en_revision' -> 'resuelta'.
+// Cada fila muestra: fecha, recurso afectado, descripción, quién la registró,
+// estado y una acción para avanzar el estado:
+// de 'pendiente' -> 'en_revision' -> 'resuelta'.
 // El nombre del recurso se obtiene a partir de su recursoId usando
 // obtenerRecursoPorId() del servicio de Johann.
 // La columna "Acción" solo la ve el encargado; el departamento solo consulta.
@@ -81,6 +82,7 @@ function TablaIncidencias(props: PropsTablaIncidencias) {
             <th>Fecha</th>
             <th>Recurso afectado</th>
             <th>Descripción</th>
+            <th>Registrada por</th>
             <th>Estado</th>
             {/* La columna "Acción" solo existe si el rol puede gestionar */}
             {mostrarAcciones && <th>Acción</th>}
@@ -92,6 +94,8 @@ function TablaIncidencias(props: PropsTablaIncidencias) {
               <td>{incidencia.fecha}</td>
               <td>{nombreDelRecurso(incidencia.recursoId)}</td>
               <td>{incidencia.descripcion}</td>
+              {/* Nombre del usuario que inició sesión al registrarla (HU-10) */}
+              <td>{incidencia.registradaPor}</td>
               <td><EtiquetaEstadoIncidencia estado={incidencia.estado} /></td>
               {mostrarAcciones && (
                 <td>
