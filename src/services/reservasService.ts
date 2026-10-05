@@ -13,7 +13,7 @@ import type { Reserva } from '../types/Reserva';
 import type { Usuario } from '../types/Usuario';
 import { listaReservasPrueba } from '../data/reservas';
 import { puedeVerTodasLasReservas } from '../utils/permisos';
-import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
 // Esta lista es la copia en memoria de la base de datos de Firestore.
@@ -83,10 +83,19 @@ export async function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): Promise
 // cancelarReserva (RF-03)
 // Recibe: el ID de la reserva a cancelar.
 // Devuelve: true si se encontró y eliminó, o false si no existía.
-export function cancelarReserva(id: number): boolean {
+export async function cancelarReserva(id: number): Promise<boolean> {
+  // Primero intentamos borrar de Firestore
+  try {
+    const docRef = doc(baseDatos, 'reservas', id.toString());
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error('Error al cancelar reserva en Firestore:', error);
+    return false;
+  }
+
+  // Si Firestore funcionó, la borramos de la memoria
   for (let i = 0; i < listaReservas.length; i++) {
     if (listaReservas[i].id === id) {
-      // splice(posicion, cantidadAEliminar) elimina el elemento del arreglo in-place
       listaReservas.splice(i, 1);
       return true;
     }
