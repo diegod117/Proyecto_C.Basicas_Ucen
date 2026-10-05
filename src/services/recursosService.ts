@@ -4,7 +4,8 @@
 // Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
 //        HU-06 (cada cambio de estado queda en el historial),
 //        RF-04 (reponer stock de un recurso),
-//        RNF-06 (los recursos se cargan desde Firestore)
+//        RNF-06 (los recursos se cargan desde Firestore),
+//        agregar recursos nuevos desde la página de inventario
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -13,10 +14,12 @@
 // Además, como todas las páginas leen de aquí, todas ven los mismos datos:
 // si alguien cambia el estado de un recurso, todos ven el cambio.
 
-import type { Recurso, EstadoRecurso, CantidadesPorEstado } from '../types/Recurso';
+import type { Recurso, EstadoRecurso, CantidadesPorEstado, DatosNuevoRecurso } from '../types/Recurso';
 import type { CambioEstado } from '../types/CambioEstado';
 import { listaRecursosPrueba } from '../data/recursos';
+import { armarRecurso } from '../utils/nuevoRecurso';
 import {
+  crearRegistroAlta,
   crearRegistroCambioEstado,
   crearRegistroReposicion,
   agregarRegistroAlLote,
@@ -214,4 +217,49 @@ async function guardarCambioConHistorial(
   recurso.cantidades = nuevasCantidades;
   agregarRegistroEnMemoria(registro);
   return true;
+}
+
+// agregarRecurso
+// Recibe: los datos del formulario "Agregar recurso" (ya validados con
+//         validarNuevoRecurso) y el nombre del usuario conectado.
+// Devuelve: una Promise con el recurso creado, o null si Firestore falló.
+// Guarda en un solo lote el recurso nuevo y su registro de "alta" en el
+// historial: se guardan los dos o ninguno (igual que guardarCambioConHistorial).
+export async function agregarRecurso(
+  datos: DatosNuevoRecurso,
+  nombreUsuario: string,
+): Promise<Recurso | null> {
+  // El id nuevo es el mayor que exista + 1. Si dos personas agregan al mismo
+  // tiempo con el mismo id, las reglas de Firestore rechazan al segundo
+  // (sería modificar un recurso existente, y eso no está permitido).
+  let mayorId = 0;
+  for (const recurso of listaRecursos) {
+    if (recurso.id > mayorId) {
+      mayorId = recurso.id;
+    }
+  }
+
+  const recursoNuevo = armarRecurso(datos, mayorId + 1);
+  const registro = crearRegistroAlta(
+    recursoNuevo.id,
+    recursoNuevo.cantidades.disponible,
+    nombreUsuario,
+  );
+
+  const lote = writeBatch(baseDatos);
+  lote.set(doc(baseDatos, 'recursos', String(recursoNuevo.id)), recursoNuevo);
+  agregarRegistroAlLote(lote, registro);
+
+  try {
+    await lote.commit();
+  } catch (error) {
+    console.error('Error al agregar el recurso en Firestore:', error);
+    return null; // no se guardó nada
+  }
+
+  // Firestore aceptó: recién ahora lo agregamos a la copia en memoria.
+  // Como los ids van en aumento, queda al final y la lista sigue ordenada.
+  listaRecursos.push(recursoNuevo);
+  agregarRegistroEnMemoria(registro);
+  return recursoNuevo;
 }

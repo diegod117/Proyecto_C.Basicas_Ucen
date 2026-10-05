@@ -1,0 +1,118 @@
+/* FormularioNuevoRecurso.css
+   Estilos del formulario "Agregar recurso". También los usan sus partes:
+   CamposUbicacionRecurso y CamposDetalleRecurso.
+   Los botones usan .boton-principal y .boton-secundario de global.css. */
+
+/* Tarjeta blanca que contiene todo el formulario */
+.nuevo-recurso {
+  max-width: 720px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espacio-lg);
+}
+
+.nuevo-recurso-titulo {
+  margin: 0 0 var(--espacio-xs) 0;
+  font-size: 1.4rem;
+}
+
+/* Cada grupo de campos (Recurso, Ubicación, Datos de la planilla).
+   <fieldset> agrupa campos relacionados y <legend> es su título. */
+.nuevo-recurso-grupo {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  padding: var(--espacio-md);
+  margin: var(--espacio-md) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-md);
+}
+
+.nuevo-recurso-grupo legend {
+  padding: 0 var(--espacio-xs);
+  font-weight: 600;
+  color: var(--color-principal);
+}
+
+/* Dos campos uno al lado del otro (en celular bajan, ver abajo) */
+.nuevo-recurso-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espacio-md);
+}
+
+/* El texto del <label> va arriba y el campo debajo */
+.nuevo-recurso-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+}
+
+.nuevo-recurso-campo input,
+.nuevo-recurso-campo select {
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+}
+
+.nuevo-recurso-campo input:focus,
+.nuevo-recurso-campo select:focus {
+  outline: none;
+  border-color: var(--color-principal);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px var(--color-principal-claro);
+}
+
+/* "Código de ubicación: B307-B1-M2" (se genera solo) */
+.nuevo-recurso-codigo {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-texto-secundario);
+}
+
+.nuevo-recurso-codigo strong {
+  color: var(--color-principal);
+}
+
+.nuevo-recurso-error {
+  margin: var(--espacio-md) 0 0 0;
+  padding: var(--espacio-sm) 10px;
+  font-size: 13px;
+  color: var(--color-danado);
+  background-color: #fee2e2;
+  border-radius: var(--radio-borde-sm);
+}
+
+/* Botones "Cancelar" y "Agregar recurso", a la derecha */
+.nuevo-recurso-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-sm);
+  margin-top: var(--espacio-lg);
+}
+
+/* Celular (RNF-01): campos uno debajo del otro y letra de 16px para que
+   el iPhone no haga zoom al tocarlos */
+@media (max-width: 768px) {
+  .nuevo-recurso {
+    padding: var(--espacio-md);
+  }
+
+  .nuevo-recurso-fila {
+    grid-template-columns: 1fr;
+  }
+
+  .nuevo-recurso-campo input,
+  .nuevo-recurso-campo select {
+    font-size: 16px;
+  }
+}
