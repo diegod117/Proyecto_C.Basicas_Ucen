@@ -1,78 +1,160 @@
 /* PaginaAlertas.css
-   Estilos de la página del panel de alertas (HU-05). */
+   M20 — HU-05: rediseño de la página de alertas.
+   Encabezado con título + descripción + badge de total.
+   Filtros en franja blanca con botones tipo pastilla.
+   Todos los colores usan var() de global.css (nunca valores sueltos). */
+
+/* =====================================================
+   ENCABEZADO DE PÁGINA
+   Mismo patrón que PaginaReservas (ver plan-fase-2, sección 5):
+   título grande + descripción en gris + badge de conteo.
+   ===================================================== */
 
 .pagina-alertas-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--espacio-md);
+  margin-bottom: var(--espacio-xl);
+  padding-bottom: var(--espacio-md);
+  border-bottom: 1px solid var(--color-borde);
 }
 
 .pagina-alertas-titulos h2 {
-  margin: 0 0 6px 0;
-  color: var(--color-texto);
+  margin: 0 0 var(--espacio-xs) 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-principal);
 }
 
 .pagina-alertas-titulos p {
   margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
 }
 
+/* Badge con el conteo total de alertas activas (rojo = urgencia) */
 .contador-total-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   background-color: #fee2e2;
   color: #991b1b;
   font-weight: 700;
   font-size: 0.85rem;
-  padding: 6px 14px;
-  border-radius: 16px;
+  padding: var(--espacio-sm) var(--espacio-md);
+  border-radius: var(--radio-pildora);
   border: 1px solid #fecaca;
+  white-space: nowrap;
+  align-self: center;
 }
 
-/* Filtros por tipo de alerta */
+/* =====================================================
+   FILTROS POR TIPO DE ALERTA
+   Fila de botones pastilla que filtra las tarjetas visibles.
+   El botón activo se rellena de azul principal.
+   ===================================================== */
+
 .filtros-alertas {
   display: flex;
-  gap: 8px;
+  gap: var(--espacio-sm);
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: var(--espacio-lg);
+  padding: var(--espacio-sm) var(--espacio-md);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
 }
 
 .boton-filtro-alerta {
-  background-color: white;
+  background-color: transparent;
   color: var(--color-texto);
-  border: 1px solid var(--color-borde);
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 0.85rem;
+  border: 1.5px solid var(--color-borde);
+  border-radius: var(--radio-pildora);
+  padding: 5px var(--espacio-md);
+  font-family: inherit;
+  font-size: 0.825rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease;
 }
 
 .boton-filtro-alerta:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-fondo-menu);
+  border-color: var(--color-texto-secundario);
 }
 
+/* Estado activo: azul relleno */
 .boton-filtro-alerta.activo {
   background-color: var(--color-principal);
-  color: white;
+  color: var(--color-blanco);
   border-color: var(--color-principal);
 }
 
-/* Grilla de tarjetas de alerta */
-.grid-alertas {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+.boton-filtro-alerta.activo:hover {
+  background-color: var(--color-principal-oscuro);
+  border-color: var(--color-principal-oscuro);
 }
 
-/* Mensaje si no hay alertas */
+/* =====================================================
+   GRILLA DE TARJETAS
+   ===================================================== */
+
+/* auto-fill + minmax: en PC, 2-3 columnas según el ancho;
+   en celular, una sola columna automáticamente. */
+.grid-alertas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--espacio-md);
+}
+
+/* =====================================================
+   ESTADO VACÍO
+   Cuando no hay alertas activas o el filtro no tiene resultados.
+   ===================================================== */
+
 .panel-alertas-vacio {
-  background-color: white;
+  background-color: var(--color-blanco);
   border: 1px dashed var(--color-borde);
-  border-radius: 8px;
-  padding: 40px 16px;
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-xl) var(--espacio-md);
   text-align: center;
   color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+}
+
+/* =====================================================
+   RESPONSIVE — celular (RNF-01)
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .pagina-alertas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: var(--espacio-lg);
+  }
+
+  .pagina-alertas-titulos h2 {
+    font-size: 1.3rem;
+  }
+
+  /* En celular los filtros se desplazan en fila horizontal */
+  .filtros-alertas {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--espacio-sm);
+  }
+
+  .boton-filtro-alerta {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Una sola columna de tarjetas */
+  .grid-alertas {
+    grid-template-columns: 1fr;
+  }
 }

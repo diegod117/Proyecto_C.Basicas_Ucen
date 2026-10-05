@@ -1,66 +1,95 @@
 /* TarjetaAlerta.css
-   Estilos de la tarjeta de alerta individual (HU-05). */
+   M20 — HU-05: rediseño de las tarjetas de alerta.
+   Característica principal: franja de color a la izquierda
+   según el tipo de alerta (reparación, mantención, reposición).
+   Todos los colores usan var() de global.css (nunca valores sueltos). */
 
+/* =====================================================
+   TARJETA BASE
+   ===================================================== */
+
+/* Tarjeta blanca con franja de color a la izquierda.
+   border-left-width: 5px define el grosor de la franja;
+   el color lo sobreescribe cada modificador (.tarjeta-alerta-*). */
 .tarjeta-alerta {
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
   border: 1px solid var(--color-borde);
   border-left-width: 5px;
-  padding: 16px;
+  padding: var(--espacio-md);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: var(--espacio-sm);
+  box-shadow: var(--sombra-tarjeta);
+  /* Micro-animación: la tarjeta se eleva un poco al pasar el mouse */
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .tarjeta-alerta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-elevada);
 }
 
+/* =====================================================
+   PARTES DE LA TARJETA
+   ===================================================== */
+
+/* Encabezado: badge de tipo + fecha */
 .tarjeta-alerta-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-sm);
 }
 
+/* Badge de tipo de alerta (texto + posible ícono) */
 .tarjeta-alerta-badge {
-  font-size: 0.8rem;
+  font-size: 0.775rem;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 3px var(--espacio-sm);
+  border-radius: var(--radio-pildora);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--espacio-xs);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
+/* Fecha de la alerta (esquina derecha del encabezado) */
 .tarjeta-alerta-fecha {
   font-size: 0.75rem;
   color: var(--color-texto-secundario);
+  white-space: nowrap;
 }
 
+/* Mensaje principal de la alerta */
 .tarjeta-alerta-mensaje {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-texto);
-  line-height: 1.4;
+  line-height: 1.45;
   font-weight: 500;
 }
 
+/* Pie de la tarjeta: recurso afectado u otras notas */
 .tarjeta-alerta-footer {
-  padding-top: 8px;
+  padding-top: var(--espacio-sm);
   border-top: 1px dashed var(--color-borde);
   font-size: 0.8rem;
   color: var(--color-texto-secundario);
 }
 
-/* Colores según el tipo de alerta (HU-05) */
+/* =====================================================
+   MODIFICADORES POR TIPO — franjas y badges de color
 
-/* Mantención: amarillo / ámbar */
+   Reparación  → rojo   (--color-alerta-critica / --color-danado)
+   Mantención  → ámbar  (--color-alerta-advertencia / --color-mantencion)
+   Reposición  → azul   (--color-alerta-info / --color-principal)
+   ===================================================== */
+
+/* ── Mantención: ámbar (recurso en mantención, stock bajo aviso) */
 .tarjeta-alerta-mantencion {
-  border-left-color: #d97706;
+  border-left-color: var(--color-mantencion);
 }
 
 .tarjeta-alerta-mantencion .tarjeta-alerta-badge {
@@ -69,9 +98,9 @@
   border: 1px solid #fde68a;
 }
 
-/* Reparación: rojo (recurso dañado) */
+/* ── Reparación: rojo (recurso dañado que necesita reparación) */
 .tarjeta-alerta-reparacion {
-  border-left-color: #dc2626;
+  border-left-color: var(--color-danado);
 }
 
 .tarjeta-alerta-reparacion .tarjeta-alerta-badge {
@@ -80,9 +109,9 @@
   border: 1px solid #fecaca;
 }
 
-/* Reposición: azul (bajo stock) */
+/* ── Reposición: azul (stock muy bajo o agotado) */
 .tarjeta-alerta-reposicion {
-  border-left-color: #2563eb;
+  border-left-color: var(--color-principal);
 }
 
 .tarjeta-alerta-reposicion .tarjeta-alerta-badge {

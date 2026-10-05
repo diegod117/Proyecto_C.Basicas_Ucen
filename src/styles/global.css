@@ -104,6 +104,14 @@ h1 {
   color: var(--color-texto-secundario);
 }
 
+/* M21: reduce el padding lateral en pantallas muy pequeñas (375px).
+   Sin esto, las tarjetas y tablas quedan demasiado apretadas. */
+@media (max-width: 420px) {
+  .contenido-pagina {
+    padding: var(--espacio-md) var(--espacio-sm);
+  }
+}
+
 /* =====================================================
    BOTONES BASE (M16 — RNF-01)
    Tres estilos usados en TODAS las páginas.
