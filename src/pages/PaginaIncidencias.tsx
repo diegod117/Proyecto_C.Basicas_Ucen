@@ -56,7 +56,10 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
       {/* Formulario para registrar una incidencia nueva.
           Solo lo ve el encargado (RNF-03); los demás ven un aviso. */}
       {puedeGestionarIncidencias(props.usuario.rol) && (
-        <FormularioIncidencia onIncidenciaRegistrada={alRegistrarIncidencia} />
+        <FormularioIncidencia
+          onIncidenciaRegistrada={alRegistrarIncidencia}
+          usuario={props.usuario}
+        />
       )}
       {!puedeGestionarIncidencias(props.usuario.rol) && (
         <p className="texto-secundario">

@@ -3,11 +3,13 @@
 // Campos: recurso afectado, docente presente, descripción y personas afectadas.
 // Valida que los campos obligatorios estén llenos antes de guardar.
 // RNF-02: el registro se completa en 5 pasos como máximo.
-// Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia)
+// Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia),
+// HU-10 (la incidencia guarda quién la registró)
 
 import { useState } from 'react';
 import { obtenerRecursos } from '../services/recursosService';
 import { agregarIncidencia } from '../services/incidenciasService';
+import type { Usuario } from '../types/Usuario';
 import './FormularioIncidencia.css';
 
 // Props que recibe el formulario desde la página.
@@ -15,10 +17,13 @@ import './FormularioIncidencia.css';
 // para que la página pueda mostrar un mensaje o actualizar la vista.
 interface PropsFormularioIncidencia {
   onIncidenciaRegistrada: () => void;
+  // Usuario conectado: su nombre queda como "registrada por" (HU-10)
+  usuario: Usuario;
 }
 
 // Componente FormularioIncidencia
-// Recibe: onIncidenciaRegistrada (función que avisa a la página que se registró).
+// Recibe: onIncidenciaRegistrada (función que avisa a la página que se registró)
+// y el usuario conectado.
 // Devuelve: el formulario con los campos de la incidencia.
 function FormularioIncidencia(props: PropsFormularioIncidencia) {
   // Obtenemos la lista de recursos para llenar el <select>.
@@ -79,7 +84,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       descripcion: descripcion.trim(),
       hayPersonasAfectadas,
       detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
-      registradaPor: 'Encargado (usuario actual)',
+      // Antes era un texto fijo; ahora es el nombre de quien inició sesión
+      registradaPor: props.usuario.nombre,
     });
 
     // Limpiamos todos los campos para que el formulario quede listo

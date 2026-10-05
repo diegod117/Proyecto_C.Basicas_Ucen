@@ -13,25 +13,22 @@ import type { EstadoRecurso } from '../types/Recurso';
 import { listaHistorialPrueba } from '../data/historialEstados';
 import { obtenerFechaActual } from '../utils/fechas';
 
-// Por ahora no hay inicio de sesión, así que todos los cambios quedan a
-// nombre del encargado. Es el mismo texto que usa incidenciasService.
-// Cuando exista el login con roles (pendiente, punto 3.4 de los
-// requerimientos), aquí irá el nombre de la persona conectada.
-const USUARIO_ACTUAL = 'Encargado (usuario actual)';
-
 // La lista del historial que usa toda la aplicación (vive en memoria)
 const listaHistorial: CambioEstado[] = listaHistorialPrueba;
 
 // registrarCambioEstado
-// Recibe: el id del recurso, los dos estados, la cantidad y el motivo.
+// Recibe: el id del recurso, los dos estados, la cantidad, el motivo y el
+//         nombre del usuario conectado que hizo el cambio.
 // Devuelve: el registro que se guardó (con id, fecha y usuario ya puestos).
-// La fecha y el usuario se ponen solos: el encargado no los escribe.
+// La fecha se pone sola. El nombre viene del login (antes era un texto fijo,
+// "Encargado (usuario actual)"): así el historial dice QUIÉN hizo cada cambio.
 export function registrarCambioEstado(
   recursoId: number,
   estadoAnterior: EstadoRecurso,
   estadoNuevo: EstadoRecurso,
   cantidad: number,
   motivo: string,
+  nombreUsuario: string,
 ): CambioEstado {
   // El id nuevo es uno más que la cantidad de registros. Como nunca se
   // borran registros, este número nunca se repite.
@@ -43,7 +40,7 @@ export function registrarCambioEstado(
     estadoNuevo: estadoNuevo,
     cantidad: cantidad,
     motivo: motivo.trim(), // trim() quita espacios sobrantes al inicio y al final
-    usuario: USUARIO_ACTUAL,
+    usuario: nombreUsuario,
   };
 
   // push() agrega el registro AL FINAL de la lista (no reemplaza nada)
