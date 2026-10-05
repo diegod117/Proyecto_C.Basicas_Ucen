@@ -10,6 +10,7 @@
 
 import { cargarRecursos } from './recursosService';
 import { cargarHistorial } from './historialService';
+import { cargarIncidencias } from './incidenciasService';
 
 // cargarTodosLosDatos
 // No recibe nada.
@@ -19,6 +20,7 @@ export async function cargarTodosLosDatos(): Promise<string> {
   try {
     await cargarRecursos();
     await cargarHistorial();
+    await cargarIncidencias();
   } catch (error) {
     // console.error muestra el error técnico en la consola del navegador
     // (F12), para poder revisarlo. Al usuario le mostramos un mensaje simple.

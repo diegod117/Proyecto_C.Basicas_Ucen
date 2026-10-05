@@ -55,11 +55,13 @@ function TablaIncidencias(props: PropsTablaIncidencias) {
 
   // Función que se llama al hacer clic en un botón para avanzar el estado.
   // Recibe el id de la incidencia y el nuevo estado al que pasa.
-  function manejarCambiarEstado(id: number, nuevoEstado: EstadoIncidencia) {
-    const exito = cambiarEstadoIncidencia(id, nuevoEstado);
+  async function manejarCambiarEstado(id: number, nuevoEstado: EstadoIncidencia) {
+    const exito = await cambiarEstadoIncidencia(id, nuevoEstado);
     if (exito) {
       // Le pedimos de nuevo la lista al servicio y actualizamos el estado de React
       setIncidencias(obtenerIncidencias());
+    } else {
+      alert('Hubo un error al guardar el nuevo estado. Revise su conexión.');
     }
   }
 
