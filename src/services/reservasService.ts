@@ -2,6 +2,7 @@
 // Servicio de reservas: es el ÚNICO lugar desde donde las páginas y componentes
 // leen y modifican las reservas de recursos del laboratorio.
 // Cubre: HU-03 (crear reserva), RF-03 (gestionar y cancelar reservas)
+// y RNF-03 (el docente solo ve sus propias reservas)
 
 // ¿Para qué sirve este servicio?
 // En lugar de que las pantallas importen directamente de src/data/reservas.ts,
@@ -9,7 +10,9 @@
 // cuando exista un backend, solo se modifica este archivo y las vistas quedan intactas.
 
 import type { Reserva } from '../types/Reserva';
+import type { Usuario } from '../types/Usuario';
 import { listaReservasPrueba } from '../data/reservas';
+import { puedeVerTodasLasReservas } from '../utils/permisos';
 
 // Copiamos la lista de prueba a un arreglo en memoria usando el operador spread (...)
 // para poder agregar o modificar elementos sin alterar el archivo original.
@@ -20,6 +23,30 @@ const listaReservas: Reserva[] = [...listaReservasPrueba];
 // Devuelve: la lista completa de reservas.
 export function obtenerReservas(): Reserva[] {
   return listaReservas;
+}
+
+// obtenerReservasVisibles (RNF-03)
+// Recibe: el usuario conectado.
+// Devuelve: las reservas que ese usuario puede ver.
+//   - Encargado y departamento: todas.
+//   - Docente: solo las que están a su nombre ("Mis reservas").
+// La usan la tabla y el contador de la página, así los dos muestran
+// siempre el mismo número.
+export function obtenerReservasVisibles(usuario: Usuario): Reserva[] {
+  if (puedeVerTodasLasReservas(usuario.rol)) {
+    return listaReservas;
+  }
+
+  // Recorremos todas las reservas y guardamos solo las del docente.
+  // Comparamos con su nombre porque así se guarda la reserva: desde J18
+  // el docente reserva siempre a su propio nombre (no lo puede cambiar).
+  const reservasDelDocente: Reserva[] = [];
+  for (const reserva of listaReservas) {
+    if (reserva.docente === usuario.nombre) {
+      reservasDelDocente.push(reserva);
+    }
+  }
+  return reservasDelDocente;
 }
 
 // agregarReserva

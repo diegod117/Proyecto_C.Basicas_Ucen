@@ -12,12 +12,16 @@ import type { Usuario } from '../types/Usuario';
 export const listaUsuarios: Usuario[] = [
   {
     correo: 'encargado@prueba.cl',
-    nombre: 'Encargado de prueba',
+    // Mismo nombre que aparece en los datos de prueba del historial y de
+    // las incidencias, así la demo se ve coherente.
+    nombre: 'Pedro Soto',
     rol: 'encargado',
   },
   {
     correo: 'docente@prueba.cl',
-    nombre: 'Docente de prueba',
+    // Igual que en src/data/reservas.ts: así, al entrar como docente,
+    // "Mis reservas" ya muestra sus 2 reservas de prueba (J21).
+    nombre: 'Prof. Ana Morales',
     rol: 'docente',
   },
   {

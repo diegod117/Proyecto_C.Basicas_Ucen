@@ -17,7 +17,7 @@ export const listaHistorialPrueba: CambioEstado[] = [
     estadoNuevo: 'disponible',
     cantidad: 1,
     motivo: 'Se cambió el fusible y quedó operativo',
-    usuario: 'Pedro Soto (encargado)',
+    usuario: 'Pedro Soto',
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ export const listaHistorialPrueba: CambioEstado[] = [
     estadoNuevo: 'danado',
     cantidad: 2,
     motivo: 'Pantalla sin lectura después del práctico',
-    usuario: 'Pedro Soto (encargado)',
+    usuario: 'Pedro Soto',
   },
   {
     id: 3,
@@ -37,6 +37,6 @@ export const listaHistorialPrueba: CambioEstado[] = [
     estadoNuevo: 'danado',
     cantidad: 1,
     motivo: 'Punta rota',
-    usuario: 'Pedro Soto (encargado)',
+    usuario: 'Pedro Soto',
   },
 ];

@@ -3,14 +3,14 @@
 // Permite al personal docente registrar nuevas reservas
 // y consultar o cancelar reservas existentes.
 // Cubre: HU-03 (formulario), HU-07, HU-08, RF-03 (tabla y cancelación)
-// y RNF-03 (el departamento solo consulta, no reserva)
+// y RNF-03 (el departamento solo consulta; el docente ve solo sus reservas)
 
 import { useState } from 'react';
 import FormularioReserva from '../components/FormularioReserva';
 import TablaReservas from '../components/TablaReservas';
-import { obtenerReservas } from '../services/reservasService';
+import { obtenerReservasVisibles } from '../services/reservasService';
 import type { Usuario } from '../types/Usuario';
-import { puedeReservar } from '../utils/permisos';
+import { puedeReservar, puedeVerTodasLasReservas } from '../utils/permisos';
 import './PaginaReservas.css';
 
 // Props que recibe la página desde App
@@ -25,7 +25,14 @@ interface PropsPaginaReservas {
 function PaginaReservas(props: PropsPaginaReservas) {
   const [actualizaciones, setActualizaciones] = useState(0);
 
-  const listaReservas = obtenerReservas();
+  // Mismas reservas que muestra la tabla: todas, o solo las del docente (RNF-03)
+  const listaReservas = obtenerReservasVisibles(props.usuario);
+
+  // Texto del contador según el rol
+  let textoContador = 'Reservas registradas';
+  if (!puedeVerTodasLasReservas(props.usuario.rol)) {
+    textoContador = 'Mis reservas';
+  }
 
   function refrescarDatos() {
     setActualizaciones(function (valorAnterior) {
@@ -42,7 +49,7 @@ function PaginaReservas(props: PropsPaginaReservas) {
           Módulo para solicitar recursos, instrumentos y espacios de trabajo.
         </p>
         <span className="contador-reservas-badge">
-          Reservas registradas: {listaReservas.length}
+          {textoContador}: {listaReservas.length}
         </span>
       </header>
 
@@ -61,7 +68,11 @@ function PaginaReservas(props: PropsPaginaReservas) {
         )}
 
         {/* Tabla con el historial de reservas y botón de cancelación */}
-        <TablaReservas version={actualizaciones} onReservaModificada={refrescarDatos} />
+        <TablaReservas
+          version={actualizaciones}
+          onReservaModificada={refrescarDatos}
+          usuario={props.usuario}
+        />
       </div>
     </section>
   );
