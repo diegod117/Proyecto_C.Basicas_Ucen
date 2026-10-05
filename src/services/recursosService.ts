@@ -49,7 +49,8 @@ export function obtenerRecursoPorId(id: number): Recurso | undefined {
 
 // cambiarEstadoRecurso
 // Recibe: el id del recurso, el estado de origen, el estado nuevo,
-//         cuántas unidades se mueven de uno a otro y el motivo del cambio.
+//         cuántas unidades se mueven de uno a otro, el motivo del cambio
+//         y el nombre del usuario conectado (para el historial, HU-06).
 // Devuelve: true si se pudo hacer el cambio, false si no.
 // Ejemplo: mover 1 multímetro de 'disponible' a 'danado' deja
 //          disponible: 12 -> 11 y danado: 1 -> 2. El total no cambia.
@@ -64,6 +65,7 @@ export function cambiarEstadoRecurso(
   estadoNuevo: EstadoRecurso,
   cantidad: number,
   motivo: string,
+  nombreUsuario: string,
 ): boolean {
   const recurso = obtenerRecursoPorId(idRecurso);
 
@@ -84,7 +86,7 @@ export function cambiarEstadoRecurso(
   // Dejamos constancia del cambio en el historial (HU-06).
   // Se hace AQUÍ, dentro del servicio, y no en el formulario: así es
   // imposible cambiar un estado sin que quede registrado.
-  registrarCambioEstado(idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo);
+  registrarCambioEstado(idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario);
 
   return true;
 }
