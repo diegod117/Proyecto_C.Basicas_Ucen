@@ -104,15 +104,6 @@
   box-shadow: none;
 }
 
-/* En escritorio el formulario se queda a la vista mientras se baja por
-   los datos y el historial de la columna izquierda */
-@media (min-width: 801px) {
-  .formulario-cambio-estado {
-    position: sticky;
-    top: var(--espacio-md);
-  }
-}
-
 /* D21: celular (375px). Menos relleno y campos con letra de 16px: así el
    navegador del celular no hace zoom solo al tocar un campo. */
 @media (max-width: 768px) {

@@ -8,10 +8,3 @@
   font-size: 0.85rem;
   color: var(--color-texto-secundario);
 }
-
-/* "Cambiar estado" queda fijo en pantalla en PC (position: sticky).
-   Este recuadro va debajo, así que no debe quedarse fijo. Se usan las dos
-   clases juntas para que esta regla gane sobre la de FormularioCambioEstado.css. */
-.formulario-cambio-estado.formulario-reponer-stock {
-  position: static;
-}

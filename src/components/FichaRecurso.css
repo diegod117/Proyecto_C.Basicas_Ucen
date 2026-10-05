@@ -138,6 +138,27 @@
   gap: var(--espacio-lg);
 }
 
+/* En escritorio la columna derecha COMPLETA se queda a la vista mientras se
+   baja por los datos y el historial. Se fija la columna y no cada formulario
+   por separado: así los dos se mueven juntos y uno no se mete debajo del otro.
+   - top: se queda justo debajo de la barra azul (que es fixed y la taparía).
+   - max-height + overflow-y: si la ventana es baja y los dos formularios no
+     caben, la columna se desliza por dentro en vez de quedar cortada.
+   - padding + margin negativo: overflow-y recorta lo que sale de la columna,
+     incluida la sombra de las tarjetas. Con 10px de relleno la sombra cabe,
+     y el margen de -10px deja la columna en el mismo lugar de antes.
+     Por ese relleno, top y max-height usan 6px (16px de separación - 10px). */
+@media (min-width: 801px) {
+  .ficha-columna-derecha {
+    position: sticky;
+    top: calc(var(--alto-header) + 6px);
+    max-height: calc(100vh - var(--alto-header) - 12px);
+    overflow-y: auto;
+    padding: 10px;
+    margin: -10px;
+  }
+}
+
 /* Aviso que ven el docente y el departamento en lugar del formulario
    de cambio de estado (RNF-03). Ocupa la columna derecha. */
 .ficha-aviso-permiso {
