@@ -76,9 +76,11 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif; /* M16 cambia esto por Inter */
+  /* M16: Inter es la fuente del mockup, cargada desde Google Fonts en index.html */
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto);
+  line-height: 1.5;
 }
 
 h1 {
@@ -100,6 +102,82 @@ h1 {
 
 .texto-secundario {
   color: var(--color-texto-secundario);
+}
+
+/* =====================================================
+   BOTONES BASE (M16 — RNF-01)
+   Tres estilos usados en TODAS las páginas.
+   Nunca agregar estilos de botón en archivos de página;
+   solo usar estas clases y sobreescribir lo mínimo.
+   ===================================================== */
+
+/* Base compartida: tamaño, cursor y transición */
+.boton-principal,
+.boton-secundario,
+.boton-peligro {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-xs);
+  padding: var(--espacio-sm) var(--espacio-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radio-borde-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease,
+              border-color 0.18s ease, box-shadow 0.18s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Principal: azul relleno (acción más importante de la pantalla) */
+.boton-principal {
+  background-color: var(--color-principal);
+  color: var(--color-blanco);
+  border-color: var(--color-principal);
+}
+.boton-principal:hover {
+  background-color: var(--color-principal-oscuro);
+  border-color: var(--color-principal-oscuro);
+  box-shadow: var(--sombra-tarjeta);
+}
+.boton-principal:active {
+  box-shadow: none;
+}
+
+/* Secundario: borde azul, fondo transparente (acciones secundarias) */
+.boton-secundario {
+  background-color: transparent;
+  color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+.boton-secundario:hover {
+  background-color: var(--color-principal-claro);
+}
+
+/* Peligro: rojo relleno (dar de baja, cancelar, eliminar) */
+.boton-peligro {
+  background-color: var(--color-danado);
+  color: var(--color-blanco);
+  border-color: var(--color-danado);
+}
+.boton-peligro:hover {
+  background-color: #991b1b; /* un tono más oscuro que --color-danado */
+  border-color: #991b1b;
+  box-shadow: var(--sombra-tarjeta);
+}
+.boton-peligro:active {
+  box-shadow: none;
+}
+
+/* Estado deshabilitado (aplica a los tres) */
+.boton-principal:disabled,
+.boton-secundario:disabled,
+.boton-peligro:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Estilo común de todas las etiquetas de estado */
