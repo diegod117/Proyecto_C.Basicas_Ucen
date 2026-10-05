@@ -62,6 +62,11 @@
 
   /* --- Alto de la barra superior --- */
   --alto-header: 56px;
+
+  /* --- Alto de la fila de pestañas en celular (RNF-01) ---
+     En celular el menú lateral se convierte en una fila fija debajo de la
+     barra azul. El contenido usa este valor para empezar justo debajo. */
+  --alto-menu-celular: 52px;
 }
 
 /* =====================================================

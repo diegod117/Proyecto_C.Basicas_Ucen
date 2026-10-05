@@ -102,6 +102,19 @@
   z-index: 90;
 }
 
+/* =====================================================
+   CONTENIDO DE LA PÁGINA (el <main> de App.tsx)
+   ===================================================== */
+
+/* La barra superior y el menú lateral son "fixed": quedan pegados a la
+   pantalla y NO ocupan espacio en la página. Por eso hay que correr el
+   contenido hacia abajo (alto de la barra) y hacia la derecha (ancho del
+   menú); si no, el título de cada página queda tapado. */
+.app-contenido {
+  margin-top: var(--alto-header);
+  margin-left: var(--ancho-menu);
+}
+
 /* Cada botón del menú lateral ocupa todo el ancho */
 .boton-menu {
   width: 100%;
@@ -160,22 +173,33 @@
    ===================================================== */
 
 @media (max-width: 768px) {
-  /* El sidebar se convierte en una fila horizontal debajo del header */
+  /* El sidebar se convierte en una fila horizontal FIJA justo debajo
+     de la barra azul. Antes era "static": empezaba arriba de todo
+     y la barra azul (que es fixed) la tapaba completa. */
   .app-sidebar {
-    position: static;
-    width: 100%;
-    height: auto;
+    position: fixed;
+    top: var(--alto-header);
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    height: var(--alto-menu-celular);
     flex-direction: row;
-    padding: var(--espacio-xs) 0;
+    align-items: center;
+    padding: 0 var(--espacio-xs);
     border-right: none;
     border-bottom: 1px solid var(--color-borde);
+    /* Si las pestañas no caben, la fila se desliza hacia el lado */
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: hidden;
   }
 
   /* Cada botón se ajusta al contenido (no ocupa todo el ancho) */
   .boton-menu {
     width: auto;
+    /* flex-shrink: 0 evita que los botones se aplasten si no caben:
+       en vez de achicarse, la fila se desliza hacia el lado */
+    flex-shrink: 0;
     border-left: none;
     border-bottom: 3px solid transparent;
     white-space: nowrap;
@@ -189,10 +213,10 @@
 
   /* En celular el contenido ocupa todo el ancho */
   .app-contenido {
-    /* sidebar ya no es fixed, así que no hace falta margin-left */
+    /* El menú ya no está a la izquierda, así que no hace falta margin-left */
     margin-left: 0;
-    /* header (56px) + sidebar (~44px) */
-    margin-top: calc(var(--alto-header) + 44px);
+    /* Barra azul + fila de pestañas: el contenido empieza debajo de ambas */
+    margin-top: calc(var(--alto-header) + var(--alto-menu-celular));
   }
 
   /* El header también se adapta */
