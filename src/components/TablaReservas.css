@@ -126,3 +126,26 @@
     font-size: 0.775rem;
   }
 }
+
+/* M21: en 375px la tabla tiene scroll horizontal.
+   La sombra derecha da un indicio visual de que hay más contenido. */
+@media (max-width: 420px) {
+  .tabla-reservas-contenedor {
+    padding: var(--espacio-sm);
+  }
+
+  /* Gradiente sutil a la derecha para indicar scroll horizontal */
+  .tabla-scroll {
+    background:
+      linear-gradient(to right, var(--color-blanco) 0%, transparent 8%),
+      linear-gradient(to left,  var(--color-blanco) 0%, transparent 8%)
+      right center / 100% 100%;
+    background-attachment: local, scroll;
+  }
+
+  /* Botón cancelar más fácil de pulsar con el pulgar */
+  .boton-cancelar-reserva {
+    min-height: 36px;
+    padding: var(--espacio-sm) var(--espacio-sm);
+  }
+}

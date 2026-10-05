@@ -178,3 +178,26 @@
     font-size: 1.15rem;
   }
 }
+
+/* M21: 375px (iPhone SE, Galaxy A series)
+   La tarjeta usa el 100% del ancho con margen mínimo. */
+@media (max-width: 400px) {
+  .login-fondo {
+    padding: var(--espacio-sm);
+    align-items: flex-start;
+    padding-top: var(--espacio-xl);
+  }
+
+  .login-tarjeta-cuerpo {
+    padding: var(--espacio-md) var(--espacio-sm);
+  }
+
+  .login-titulo {
+    font-size: 1rem;
+  }
+
+  /* El botón tiene altura mínima táctil de 44px */
+  .login-boton {
+    min-height: 44px;
+  }
+}
