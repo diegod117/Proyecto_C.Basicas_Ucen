@@ -5,10 +5,13 @@
 // Se abre al hacer clic en una tarjeta del inventario.
 // A la derecha muestra el formulario para cambiar el estado, y debajo
 // de los datos, el historial de cambios de estado.
+// El formulario solo lo ve el encargado; los demás roles ven un aviso.
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
-//        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10
+//        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03
 
 import type { Recurso } from '../types/Recurso';
+import type { Usuario } from '../types/Usuario';
+import { puedeCambiarEstado } from '../utils/permisos';
 import {
   textoCategoria,
   textoEstado,
@@ -31,10 +34,13 @@ interface PropsFichaRecurso {
   // usa: solo se la pasa al formulario. El aviso viaja así:
   // formulario -> ficha -> página -> App (que redibuja todo).
   onEstadoCambiado: () => void;
+  // Usuario conectado: decide si se muestra el formulario (RNF-03)
+  usuario: Usuario;
 }
 
 // Componente FichaRecurso
-// Recibe: el recurso, la función para volver y la de aviso de cambio de estado.
+// Recibe: el recurso, la función para volver, la de aviso de cambio de estado
+// y el usuario conectado.
 // Devuelve: la ficha completa del recurso.
 function FichaRecurso(props: PropsFichaRecurso) {
   const recurso = props.recurso;
@@ -136,7 +142,17 @@ function FichaRecurso(props: PropsFichaRecurso) {
           <TablaHistorial historial={historial} />
         </div>
 
-        <FormularioCambioEstado recurso={recurso} onEstadoCambiado={props.onEstadoCambiado} />
+        {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
+            Los demás roles ven los datos y el historial, pero en lugar
+            del formulario aparece un aviso. */}
+        {puedeCambiarEstado(props.usuario.rol) && (
+          <FormularioCambioEstado recurso={recurso} onEstadoCambiado={props.onEstadoCambiado} />
+        )}
+        {!puedeCambiarEstado(props.usuario.rol) && (
+          <p className="ficha-aviso-permiso">
+            Solo el encargado de laboratorio puede cambiar el estado de un recurso.
+          </p>
+        )}
       </div>
     </div>
   );
