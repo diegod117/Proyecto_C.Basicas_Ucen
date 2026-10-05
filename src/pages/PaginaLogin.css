@@ -1,92 +1,180 @@
 /* PaginaLogin.css
-   Estilos de la pantalla de inicio de sesión.
-   Usa los colores globales de src/styles/global.css.
-   Cubre: inicio de sesión (sección 3.4) y RNF-01 (se ve bien en celular) */
+   M18 — RNF-01: rediseño de la pantalla de inicio de sesión.
+   Inspirado en mockup-sgil.html:
+     - Fondo azul UCEN que ocupa toda la pantalla.
+     - Tarjeta blanca centrada con franja decorativa azul arriba.
+     - Título del sistema en dos líneas, centrado.
+   Solo se tocan estilos; PaginaLogin.tsx no cambia.
+   Todos los colores vienen de variables de global.css (nunca valores sueltos). */
 
-/* Ocupa toda la pantalla y centra la tarjeta */
+/* =====================================================
+   FONDO
+   ===================================================== */
+
+/* Fondo azul UCEN que ocupa toda la pantalla y centra la tarjeta.
+   Tiene un degradado sutil para que no se vea tan plano. */
 .login-fondo {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background-color: var(--color-principal);
+  padding: var(--espacio-md);
+  background: linear-gradient(
+    145deg,
+    var(--color-principal) 0%,
+    var(--color-principal-oscuro) 100%
+  );
 }
 
-/* flex-direction: column pone cada elemento debajo del anterior */
+/* =====================================================
+   TARJETA
+   ===================================================== */
+
+/* Tarjeta blanca con esquinas redondeadas y sombra.
+   overflow: hidden recorta la franja decorativa de arriba
+   para que respete el border-radius. */
 .login-tarjeta {
-  background-color: white;
-  border-radius: 8px;
-  padding: 32px 24px;
-  /* width: 100% + max-width: en celular ocupa todo el ancho,
-     en PC no pasa de 380px */
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--sombra-elevada);
+  overflow: hidden; /* necesario para que la franja respete el radio */
 }
 
+/* Franja decorativa azul en la parte superior de la tarjeta (M18).
+   Seis píxeles de altura, color principal. Da identidad institucional
+   sin sobrecargar la pantalla. */
+.login-tarjeta::before {
+  content: '';
+  display: block;
+  height: 6px;
+  background-color: var(--color-principal);
+  flex-shrink: 0;
+}
+
+/* Zona interior de la tarjeta (padding separado de la franja) */
+.login-tarjeta-cuerpo {
+  padding: var(--espacio-xl) var(--espacio-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   TÍTULO Y SUBTÍTULO
+   ===================================================== */
+
+/* Título en dos líneas: el <br> lo maneja el .tsx.
+   text-wrap: balance distribuye las palabras equitativamente. */
 .login-titulo {
-  margin: 0;
-  font-size: 22px;
+  margin: 0 0 var(--espacio-xs);
+  font-size: 1.35rem;
+  font-weight: 700;
   text-align: center;
+  color: var(--color-principal);
+  line-height: 1.3;
+  text-wrap: balance;
 }
 
 .login-subtitulo {
-  margin: 6px 0 24px;
-  font-size: 14px;
+  margin: 0 0 var(--espacio-xl);
+  font-size: 0.85rem;
   text-align: center;
+  color: var(--color-texto-secundario);
 }
 
+/* =====================================================
+   CAMPOS DEL FORMULARIO
+   ===================================================== */
+
 .login-etiqueta {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 6px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--color-texto);
+  margin-bottom: var(--espacio-xs);
+  display: block;
 }
 
 .login-input {
-  padding: 10px 12px;
-  border: 1px solid var(--color-borde);
-  border-radius: 4px;
-  font-size: 15px;
+  width: 100%;
+  padding: 10px var(--espacio-md);
+  border: 1.5px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  font-size: 0.9rem;
   font-family: inherit;
-  margin-bottom: 16px;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  margin-bottom: var(--espacio-md);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .login-input:focus {
   outline: none;
   border-color: var(--color-principal);
-  box-shadow: 0 0 0 2px rgba(26, 99, 187, 0.15);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.15);
 }
+
+/* =====================================================
+   MENSAJE DE ERROR
+   ===================================================== */
 
 .login-error {
   color: var(--color-danado);
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: 14px;
-  margin: 0 0 16px;
+  border-radius: var(--radio-borde-sm);
+  padding: var(--espacio-sm) var(--espacio-md);
+  font-size: 0.85rem;
+  margin: 0 0 var(--espacio-md);
 }
 
+/* =====================================================
+   BOTÓN
+   ===================================================== */
+
+/* Usamos la clase global .boton-principal de global.css,
+   pero el botón de login tiene un estilo propio: ancho completo
+   y tamaño de texto algo mayor para que destaque. */
 .login-boton {
+  width: 100%;
+  padding: 12px var(--espacio-md);
   background-color: var(--color-principal);
-  color: white;
+  color: var(--color-blanco);
   border: none;
-  border-radius: 4px;
-  padding: 12px;
-  font-size: 15px;
-  font-weight: bold;
+  border-radius: var(--radio-borde-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+  margin-top: var(--espacio-xs);
 }
 
 .login-boton:hover:not(:disabled) {
   background-color: var(--color-principal-oscuro);
+  box-shadow: var(--sombra-tarjeta);
 }
 
 /* Mientras espera a Firebase el botón se ve gris */
 .login-boton:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* =====================================================
+   RESPONSIVE (RNF-01)
+   ===================================================== */
+
+@media (max-width: 480px) {
+  .login-tarjeta-cuerpo {
+    padding: var(--espacio-lg) var(--espacio-md);
+  }
+
+  .login-titulo {
+    font-size: 1.15rem;
+  }
 }

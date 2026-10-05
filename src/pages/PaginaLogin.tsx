@@ -54,42 +54,47 @@ function PaginaLogin() {
 
   return (
     <div className="login-fondo">
+      {/* M18: overflow:hidden en .login-tarjeta + ::before = franja decorativa azul arriba.
+          .login-tarjeta-cuerpo tiene el padding para que el contenido quede
+          debajo de la franja y no pegado al borde. */}
       <form className="login-tarjeta" onSubmit={manejarEnvio}>
-        <h1 className="login-titulo">UCEN - Gestión de Inventario</h1>
-        <p className="texto-secundario login-subtitulo">
-          Laboratorios del Departamento de Ciencias Básicas
-        </p>
+        <div className="login-tarjeta-cuerpo">
+          <h1 className="login-titulo">UCEN — Gestión de Inventario</h1>
+          <p className="texto-secundario login-subtitulo">
+            Laboratorios del Departamento de Ciencias Básicas
+          </p>
 
-        <label className="login-etiqueta" htmlFor="login-correo">
-          Correo
-        </label>
-        <input
-          id="login-correo"
-          className="login-input"
-          type="email"
-          autoComplete="email"
-          value={correo}
-          onChange={(evento) => setCorreo(evento.target.value)}
-        />
+          <label className="login-etiqueta" htmlFor="login-correo">
+            Correo
+          </label>
+          <input
+            id="login-correo"
+            className="login-input"
+            type="email"
+            autoComplete="email"
+            value={correo}
+            onChange={(evento) => setCorreo(evento.target.value)}
+          />
 
-        <label className="login-etiqueta" htmlFor="login-contrasena">
-          Contraseña
-        </label>
-        <input
-          id="login-contrasena"
-          className="login-input"
-          type="password"
-          autoComplete="current-password"
-          value={contrasena}
-          onChange={(evento) => setContrasena(evento.target.value)}
-        />
+          <label className="login-etiqueta" htmlFor="login-contrasena">
+            Contraseña
+          </label>
+          <input
+            id="login-contrasena"
+            className="login-input"
+            type="password"
+            autoComplete="current-password"
+            value={contrasena}
+            onChange={(evento) => setContrasena(evento.target.value)}
+          />
 
-        {/* Solo se muestra si hay un mensaje de error */}
-        {mensajeError !== '' && <p className="login-error">{mensajeError}</p>}
+          {/* Solo se muestra si hay un mensaje de error */}
+          {mensajeError !== '' && <p className="login-error">{mensajeError}</p>}
 
-        <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
-          {textoBoton}
-        </button>
+          <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
+            {textoBoton}
+          </button>
+        </div>
       </form>
     </div>
   );
