@@ -54,7 +54,7 @@ export function obtenerReservasVisibles(usuario: Usuario): Reserva[] {
 // agregarReserva
 // Recibe: una reserva nueva sin su id.
 // Devuelve: nada.
-export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
+export async function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): Promise<void> {
   // Buscamos el ID más alto que exista actualmente
   let idMayor = 0;
   for (const reserva of listaReservas) {
@@ -71,6 +71,10 @@ export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
     id: idNuevo,
     ...reservaSinId,
   };
+
+  // Guardamos en Firestore primero
+  const docRef = doc(baseDatos, 'reservas', reservaCompleta.id.toString());
+  await setDoc(docRef, reservaCompleta);
 
   // La guardamos en el arreglo en memoria
   listaReservas.push(reservaCompleta);
