@@ -162,3 +162,37 @@
   font-size: 14px;
   color: var(--color-texto-secundario);
 }
+
+/* D21: celular (375px). Menos relleno en las tarjetas para aprovechar el
+   ancho, título más chico y datos en una sola columna si no caben. */
+@media (max-width: 768px) {
+  .ficha-tarjeta,
+  .ficha-aviso-permiso {
+    padding: var(--espacio-md);
+  }
+
+  .ficha-columnas,
+  .ficha-columna-izquierda {
+    gap: var(--espacio-md);
+  }
+
+  .ficha-nombre {
+    font-size: 1.25rem;
+  }
+
+  /* Dato arriba y valor abajo, para que textos largos (observación,
+     proveedor) no queden apretados en una columna angosta */
+  .ficha-datos {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .ficha-datos dd {
+    margin-bottom: var(--espacio-sm);
+  }
+
+  .ficha-tabla-estados {
+    width: 100%;
+    min-width: 0;
+  }
+}

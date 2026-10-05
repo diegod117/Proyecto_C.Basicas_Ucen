@@ -1,35 +1,35 @@
 /* EtiquetaEstadoIncidencia.css
    Estilos de la etiqueta que muestra el estado de una incidencia
    con un color diferente para cada estado (HU-10).
-   Es un componente pequeño y reutilizable. */
+   Es un componente pequeño y reutilizable.
+   D20: forma de píldora (--radio-pildora) y colores de global.css. */
 
-/* Base de la etiqueta: texto pequeño, redondeado, en línea */
+/* Base de la etiqueta: texto pequeño, en forma de píldora, en línea */
 .etiqueta-estado {
   display: inline-block;
   padding: 3px 10px;
   font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: var(--radio-pildora);
   border: 1px solid;
+  border-color: currentColor;
+  white-space: nowrap;
 }
 
-/* Pendiente: amarillo/naranja (la incidencia acaba de ser registrada) */
+/* Pendiente: amarillo (la incidencia acaba de ser registrada) */
 .etiqueta-estado-pendiente {
-  color: #92400e;
-  background-color: #fef3c7;
-  border-color: #fde68a;
+  color: var(--color-mantencion);
+  background-color: #fef9c3;
 }
 
 /* En revisión: azul (el encargado está investigando) */
 .etiqueta-estado-en-revision {
-  color: #1e40af;
+  color: var(--color-en-uso);
   background-color: #dbeafe;
-  border-color: #bfdbfe;
 }
 
 /* Resuelta: verde (ya se solucionó) */
 .etiqueta-estado-resuelta {
-  color: #166534;
+  color: var(--color-disponible);
   background-color: #dcfce7;
-  border-color: #bbf7d0;
 }
