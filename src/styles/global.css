@@ -188,15 +188,19 @@ h1 {
   box-shadow: none;
 }
 
-/* Estilo común de todas las etiquetas de estado */
+/* Estilo común de todas las etiquetas de estado.
+   D19: forma de "píldora" (bordes muy redondeados) con la variable
+   --radio-pildora. Los colores de cada estado se mantienen. */
 .etiqueta {
+  display: inline-block;
   font-size: 11px;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radio-pildora);
   border: 1px solid;
   /* "currentColor" usa el mismo color del texto para el borde */
   border-color: currentColor;
+  white-space: nowrap;
 }
 
 /* Un color por estado. Los nombres de clase terminan igual que los
