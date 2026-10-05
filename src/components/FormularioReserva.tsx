@@ -49,6 +49,7 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
   // Estados para avisos en pantalla
   const [mensajeError, setMensajeError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
+  const [guardando, setGuardando] = useState(false);
 
   // Obtenemos los recursos desde el servicio
   const recursos = obtenerRecursos();
@@ -89,7 +90,7 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
   }
 
   // Manejador del evento de envío del formulario
-  function manejarEnvio(evento: FormEvent) {
+  async function manejarEnvio(evento: FormEvent) {
     evento.preventDefault();
     setMensajeError('');
     setMensajeExito('');
@@ -130,23 +131,32 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
       return;
     }
 
-    // 3. Guardar en el servicio
-    agregarReserva({
-      recursoId: Number(recursoId),
-      docente: docente.trim(),
-      fecha,
-      horaInicio,
-      horaFin,
-      cantidad,
-      asignatura,
-      sala,
-    });
+    setGuardando(true);
 
-    setMensajeExito('¡Reserva registrada con éxito!');
-    limpiarFormulario();
+    try {
+      // 3. Guardar en el servicio
+      await agregarReserva({
+        recursoId: Number(recursoId),
+        docente: docente.trim(),
+        fecha,
+        horaInicio,
+        horaFin,
+        cantidad,
+        asignatura,
+        sala,
+      });
 
-    if (onReservaCreada) {
-      onReservaCreada();
+      setMensajeExito('¡Reserva registrada con éxito!');
+      limpiarFormulario();
+
+      if (onReservaCreada) {
+        onReservaCreada();
+      }
+    } catch (error) {
+      console.error('Error al guardar reserva:', error);
+      setMensajeError('Error al guardar la reserva. Revise su conexión.');
+    } finally {
+      setGuardando(false);
     }
   }
 
@@ -318,9 +328,11 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
       <button
         type="submit"
         className="boton-confirmar"
-        disabled={bloqueoPorDisponibilidad}
+        disabled={bloqueoPorDisponibilidad || guardando}
       >
-        {bloqueoPorDisponibilidad
+        {guardando
+          ? 'Guardando...'
+          : bloqueoPorDisponibilidad
           ? 'Sin disponibilidad suficiente'
           : 'Confirmar reserva'}
       </button>

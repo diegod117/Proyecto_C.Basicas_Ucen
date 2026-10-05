@@ -13,10 +13,12 @@ import type { Reserva } from '../types/Reserva';
 import type { Usuario } from '../types/Usuario';
 import { listaReservasPrueba } from '../data/reservas';
 import { puedeVerTodasLasReservas } from '../utils/permisos';
+import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { baseDatos } from './firebase';
 
-// Copiamos la lista de prueba a un arreglo en memoria usando el operador spread (...)
-// para poder agregar o modificar elementos sin alterar el archivo original.
-const listaReservas: Reserva[] = [...listaReservasPrueba];
+// Esta lista es la copia en memoria de la base de datos de Firestore.
+// Empieza vacía y se llena al llamar a cargarReservas() al iniciar sesión.
+let listaReservas: Reserva[] = [];
 
 // obtenerReservas
 // Recibe: nada.
@@ -52,7 +54,7 @@ export function obtenerReservasVisibles(usuario: Usuario): Reserva[] {
 // agregarReserva
 // Recibe: una reserva nueva sin su id.
 // Devuelve: nada.
-export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
+export async function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): Promise<void> {
   // Buscamos el ID más alto que exista actualmente
   let idMayor = 0;
   for (const reserva of listaReservas) {
@@ -70,6 +72,10 @@ export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
     ...reservaSinId,
   };
 
+  // Guardamos en Firestore primero
+  const docRef = doc(baseDatos, 'reservas', reservaCompleta.id.toString());
+  await setDoc(docRef, reservaCompleta);
+
   // La guardamos en el arreglo en memoria
   listaReservas.push(reservaCompleta);
 }
@@ -77,13 +83,44 @@ export function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): void {
 // cancelarReserva (RF-03)
 // Recibe: el ID de la reserva a cancelar.
 // Devuelve: true si se encontró y eliminó, o false si no existía.
-export function cancelarReserva(id: number): boolean {
+export async function cancelarReserva(id: number): Promise<boolean> {
+  // Primero intentamos borrar de Firestore
+  try {
+    const docRef = doc(baseDatos, 'reservas', id.toString());
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error('Error al cancelar reserva en Firestore:', error);
+    return false;
+  }
+
+  // Si Firestore funcionó, la borramos de la memoria
   for (let i = 0; i < listaReservas.length; i++) {
     if (listaReservas[i].id === id) {
-      // splice(posicion, cantidadAEliminar) elimina el elemento del arreglo in-place
       listaReservas.splice(i, 1);
       return true;
     }
   }
   return false;
+}
+
+// ------------------------------------------------------------------
+// cargarReservas (D25)
+// ------------------------------------------------------------------
+// Descarga las reservas desde Firestore y las guarda en memoria.
+// Si la colección está vacía, sube los datos de prueba automáticamente.
+export async function cargarReservas(): Promise<void> {
+  const coleccion = collection(baseDatos, 'reservas');
+  const snapshot = await getDocs(coleccion);
+
+  if (snapshot.empty) {
+    console.log('Colección reservas vacía, subiendo datos de prueba...');
+    for (const reserva of listaReservasPrueba) {
+      const docRef = doc(baseDatos, 'reservas', reserva.id.toString());
+      await setDoc(docRef, reserva);
+    }
+    const nuevoSnapshot = await getDocs(coleccion);
+    listaReservas = nuevoSnapshot.docs.map(d => d.data() as Reserva);
+  } else {
+    listaReservas = snapshot.docs.map(d => d.data() as Reserva);
+  }
 }

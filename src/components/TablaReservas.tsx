@@ -61,19 +61,24 @@ function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasP
   });
 
   // Cancela una reserva después de confirmar con el usuario.
-  function manejarCancelar(id: number, nombreRecurso: string, fecha: string, horario: string) {
+  async function manejarCancelar(id: number, nombreRecurso: string, fecha: string, horario: string) {
     const mensajeConfirmacion = `¿Estás seguro de que deseas cancelar la reserva de:\n${nombreRecurso}\nFecha: ${fecha} (${horario})?`;
 
     const usuarioConfirmo = window.confirm(mensajeConfirmacion);
 
     if (usuarioConfirmo) {
-      cancelarReserva(id);
-      setActualizacionInterna(function (prev) {
-        return prev + 1;
-      });
+      const exito = await cancelarReserva(id);
+      
+      if (exito) {
+        setActualizacionInterna(function (prev) {
+          return prev + 1;
+        });
 
-      if (onReservaModificada) {
-        onReservaModificada();
+        if (onReservaModificada) {
+          onReservaModificada();
+        }
+      } else {
+        alert('Hubo un error al cancelar la reserva. Revise su conexión.');
       }
     }
   }
