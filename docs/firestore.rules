@@ -1,0 +1,77 @@
+// firestore.rules
+// Reglas de seguridad de Firestore: las revisa el SERVIDOR de Firebase
+// antes de aceptar cualquier lectura o escritura. Aunque alguien modifique
+// el código de la app en su navegador, no puede saltarse estas reglas.
+// Cubre: RNF-06 (el historial no se pierde ni se sobrescribe) y J27 del
+// plan de la fase 3 (docs/plan-fase-3.md).
+//
+// CÓMO SE PUBLICAN: no usamos firebase-tools, así que se copian a mano.
+//   Consola de Firebase > Firestore Database > pestaña "Reglas" >
+//   pegar TODO este archivo > "Publicar".
+// Si se cambia algo aquí, hay que volver a pegarlo en la consola.
+//
+// Cada regla dice qué operaciones se permiten en una colección:
+//   read   = leer
+//   create = crear un documento nuevo
+//   update = modificar un documento que ya existe
+//   delete = borrar
+// Si una operación no aparece permitida, Firestore la RECHAZA.
+//
+// LÍMITE CONOCIDO: los roles (encargado, docente, departamento) están en
+// src/data/usuarios.ts, no en Firestore, así que estas reglas no pueden
+// distinguir roles: solo exigen que haya una sesión iniciada. Los permisos
+// por rol (RNF-03) los aplica la app.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // true si quien hace la petición inició sesión en la app
+    function conSesion() {
+      return request.auth != null;
+    }
+
+    // true si la modificación SOLO cambia los campos de la lista.
+    // diff() compara el documento nuevo con el que ya estaba guardado y
+    // affectedKeys() son los campos que cambiaron.
+    function soloCambia(campos) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+    }
+
+    // RECURSOS: se crean una vez (datos de prueba) y después solo cambian
+    // sus cantidades (cambiar estado y reponer stock). No se borran.
+    match /recursos/{id} {
+      allow read, create: if conSesion();
+      allow update: if conSesion() && soloCambia(['cantidades']);
+      allow delete: if false;
+    }
+
+    // HISTORIAL (HU-06, RNF-06): solo se agregan registros.
+    // Un registro NUNCA se modifica ni se borra: si hubo un error, se
+    // registra un cambio nuevo que lo corrija.
+    // Esto también evita que dos personas que guardan al mismo tiempo con
+    // el mismo id se pisen: el segundo "create" sería un "update" y se rechaza.
+    match /historial/{id} {
+      allow read, create: if conSesion();
+      allow update, delete: if false;
+    }
+
+    // INCIDENCIAS (HU-04, HU-10, RNF-06): se crean y después solo puede
+    // cambiar su estado (pendiente -> en revisión -> resuelta). No se borran.
+    match /incidencias/{id} {
+      allow read, create: if conSesion();
+      allow update: if conSesion() && soloCambia(['estado']);
+      allow delete: if false;
+    }
+
+    // RESERVAS (HU-03, RF-03): se crean y se borran (cancelar una reserva).
+    // No se modifican: para cambiar una reserva se cancela y se hace otra.
+    match /reservas/{id} {
+      allow read, create, delete: if conSesion();
+      allow update: if false;
+    }
+
+    // Cualquier otra colección que no esté arriba queda bloqueada,
+    // porque Firestore rechaza todo lo que no se permite explícitamente.
+  }
+}
