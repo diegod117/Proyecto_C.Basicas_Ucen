@@ -13,10 +13,12 @@ import type { Reserva } from '../types/Reserva';
 import type { Usuario } from '../types/Usuario';
 import { listaReservasPrueba } from '../data/reservas';
 import { puedeVerTodasLasReservas } from '../utils/permisos';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { baseDatos } from './firebase';
 
-// Copiamos la lista de prueba a un arreglo en memoria usando el operador spread (...)
-// para poder agregar o modificar elementos sin alterar el archivo original.
-const listaReservas: Reserva[] = [...listaReservasPrueba];
+// Esta lista es la copia en memoria de la base de datos de Firestore.
+// Empieza vacía y se llena al llamar a cargarReservas() al iniciar sesión.
+let listaReservas: Reserva[] = [];
 
 // obtenerReservas
 // Recibe: nada.
@@ -86,4 +88,26 @@ export function cancelarReserva(id: number): boolean {
     }
   }
   return false;
+}
+
+// ------------------------------------------------------------------
+// cargarReservas (D25)
+// ------------------------------------------------------------------
+// Descarga las reservas desde Firestore y las guarda en memoria.
+// Si la colección está vacía, sube los datos de prueba automáticamente.
+export async function cargarReservas(): Promise<void> {
+  const coleccion = collection(baseDatos, 'reservas');
+  const snapshot = await getDocs(coleccion);
+
+  if (snapshot.empty) {
+    console.log('Colección reservas vacía, subiendo datos de prueba...');
+    for (const reserva of listaReservasPrueba) {
+      const docRef = doc(baseDatos, 'reservas', reserva.id.toString());
+      await setDoc(docRef, reserva);
+    }
+    const nuevoSnapshot = await getDocs(coleccion);
+    listaReservas = nuevoSnapshot.docs.map(d => d.data() as Reserva);
+  } else {
+    listaReservas = snapshot.docs.map(d => d.data() as Reserva);
+  }
 }
