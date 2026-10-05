@@ -1,23 +1,25 @@
 /* TablaIncidencias.css
    Estilos de la tabla que muestra el historial de incidencias (HU-10).
-   Los colores vienen de styles/global.css. */
+   D20: tarjeta blanca con sombra, cabeceras discretas y botones de acción
+   con los colores de las variables de global.css. */
 
-/* Contenedor de la tabla con borde y esquinas redondeadas */
+/* Contenedor de la tabla: tarjeta con esquinas redondeadas.
+   overflow-x: auto permite deslizar la tabla hacia el lado en celular. */
 .tabla-incidencias-contenedor {
-  border: 1px solid var(--color-borde);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 24px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  overflow-x: auto;
+  margin-top: var(--espacio-lg);
 }
 
 /* Encabezado de la sección */
 .tabla-incidencias-titulo {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--color-texto);
-  padding: 14px 16px;
+  padding: var(--espacio-md) var(--espacio-lg);
   margin: 0;
-  background-color: #f9fafb;
   border-bottom: 1px solid var(--color-borde);
 }
 
@@ -31,65 +33,72 @@
 /* Encabezados de columna */
 .tabla-incidencias th {
   text-align: left;
-  padding: 10px 14px;
+  padding: 10px var(--espacio-md);
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-texto-secundario);
-  background-color: #f3f4f6;
-  border-bottom: 1px solid var(--color-borde);
+  background-color: var(--color-fondo-menu);
 }
 
 /* Celdas de datos */
 .tabla-incidencias td {
-  padding: 10px 14px;
+  padding: 12px var(--espacio-md);
   color: var(--color-texto);
-  border-bottom: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-borde);
+  vertical-align: middle;
 }
 
-/* Última fila sin borde inferior */
-.tabla-incidencias tr:last-child td {
-  border-bottom: none;
+/* Efecto hover en las filas: azul claro de la paleta */
+.tabla-incidencias tbody tr {
+  transition: background-color 0.15s ease;
 }
 
-/* Efecto hover en las filas */
 .tabla-incidencias tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-principal-claro);
 }
 
 /* Mensaje cuando no hay incidencias */
 .tabla-incidencias-vacia {
-  padding: 24px 16px;
+  padding: var(--espacio-lg) var(--espacio-md);
+  margin: 0;
   text-align: center;
   color: var(--color-texto-secundario);
   font-size: 0.875rem;
 }
 
-/* Botones de acción para cambiar de estado (HU-10) */
+/* Botones de acción para cambiar de estado (HU-10).
+   Usan el estilo secundario de la app: borde de color y fondo suave. */
 .boton-accion-incidencia {
-  padding: 5px 10px;
+  padding: 6px 12px;
+  font-family: inherit;
   font-size: 0.78rem;
-  font-weight: 600;
-  border-radius: 6px;
-  border: 1px solid transparent;
+  font-weight: 500;
+  border-radius: var(--radio-borde-sm);
+  border: 2px solid transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, color 0.18s ease,
+    border-color 0.18s ease;
 }
 
-/* Botón para pasar a 'en_revision' */
+/* Botón para pasar a 'en_revision': secundario azul */
 .boton-accion-revision {
-  color: #1e40af;
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
+  color: var(--color-principal);
+  background-color: transparent;
+  border-color: var(--color-principal);
 }
 
 .boton-accion-revision:hover {
-  background-color: #dbeafe;
+  background-color: var(--color-principal-claro);
 }
 
-/* Botón para marcar como 'resuelta' */
+/* Botón para marcar como 'resuelta': verde de "disponible" */
 .boton-accion-resuelta {
-  color: #166534;
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
+  color: var(--color-disponible);
+  background-color: transparent;
+  border-color: var(--color-disponible);
 }
 
 .boton-accion-resuelta:hover {
@@ -100,5 +109,5 @@
 .texto-accion-finalizada {
   color: var(--color-texto-secundario);
   font-weight: 600;
-  padding-left: 8px;
+  padding-left: var(--espacio-sm);
 }

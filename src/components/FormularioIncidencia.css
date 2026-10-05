@@ -1,13 +1,14 @@
 /* FormularioIncidencia.css
    Estilos del formulario para registrar una incidencia (HU-04).
-   Los colores y variables vienen de styles/global.css. */
+   D20: tarjeta blanca con sombra y botón principal; todo con las
+   variables y estilos de styles/global.css. */
 
 /* Contenedor principal del formulario */
 .formulario-incidencia {
-  background-color: #ffffff;
-  border: 1px solid var(--color-borde);
-  border-radius: 8px;
-  padding: 24px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espacio-lg);
   max-width: 640px;
 }
 
@@ -16,28 +17,30 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-texto);
-  margin: 0 0 4px 0;
+  margin: 0 0 var(--espacio-xs) 0;
 }
 
 /* Subtítulo / descripción breve */
 .formulario-incidencia-subtitulo {
   font-size: 0.875rem;
   color: var(--color-texto-secundario);
-  margin: 0 0 20px 0;
+  margin: 0 0 var(--espacio-lg) 0;
 }
 
 /* Cada grupo de campo: label + input/select/textarea */
 .campo-formulario {
-  margin-bottom: 16px;
+  margin-bottom: var(--espacio-md);
 }
 
 /* Etiqueta (label) de cada campo */
 .campo-formulario label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-texto);
-  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-secundario);
+  margin-bottom: 6px;
 }
 
 /* Estilos comunes para input, select y textarea */
@@ -45,20 +48,32 @@
 .campo-formulario select,
 .campo-formulario textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 12px;
+  font-family: inherit;
   font-size: 0.875rem;
   color: var(--color-texto);
   border: 1px solid var(--color-borde);
-  border-radius: 6px;
+  border-radius: var(--radio-borde-sm);
   outline: none;
-  background-color: #ffffff;
+  background-color: var(--color-fondo);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease;
 }
 
-/* Borde azul al enfocar un campo */
+/* Al pasar el mouse el borde se marca un poco */
+.campo-formulario input:hover,
+.campo-formulario select:hover,
+.campo-formulario textarea:hover {
+  border-color: var(--color-principal);
+}
+
+/* Borde azul y aro claro al enfocar un campo */
 .campo-formulario input:focus,
 .campo-formulario select:focus,
 .campo-formulario textarea:focus {
   border-color: var(--color-principal);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
 /* El textarea no debe poder cambiar de ancho, solo de alto */
@@ -67,13 +82,17 @@
   min-height: 80px;
 }
 
-/* Campo con checkbox: el label contiene el input y el texto en línea */
+/* Campo con checkbox: el label contiene el input y el texto en línea.
+   Aquí el texto va normal (sin mayúsculas) porque es una pregunta. */
 .campo-checkbox label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--espacio-sm);
+  margin-bottom: 0;
   font-size: 0.875rem;
   font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--color-texto);
   cursor: pointer;
 }
@@ -82,7 +101,9 @@
 .campo-checkbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
+  padding: 0;
   cursor: pointer;
+  accent-color: var(--color-principal);
 }
 
 /* Mensaje de error cuando falta un campo obligatorio */
@@ -90,27 +111,38 @@
   color: var(--color-danado);
   font-size: 0.875rem;
   font-weight: 500;
-  margin: 0 0 12px 0;
-  padding: 8px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
+  margin: 0 0 var(--espacio-md) 0;
+  padding: var(--espacio-sm) var(--espacio-md);
+  background-color: #fee2e2;
+  border-left: 4px solid var(--color-danado);
+  border-radius: var(--radio-borde-sm);
 }
 
-/* Botón para registrar la incidencia */
+/* Botón para registrar la incidencia: mismo aspecto que .boton-principal */
 .boton-registrar {
   width: 100%;
-  padding: 10px 16px;
+  padding: 11px var(--espacio-md);
+  font-family: inherit;
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 500;
+  color: var(--color-blanco);
   background-color: var(--color-principal);
-  border: none;
-  border-radius: 6px;
+  border: 2px solid var(--color-principal);
+  border-radius: var(--radio-borde-sm);
   cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 /* Efecto al pasar el mouse por encima del botón */
 .boton-registrar:hover {
   background-color: var(--color-principal-oscuro);
+  border-color: var(--color-principal-oscuro);
+  box-shadow: var(--sombra-tarjeta);
+}
+
+.boton-registrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
