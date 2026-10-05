@@ -27,7 +27,8 @@ function PaginaReservas() {
     <section className="contenido-pagina">
       <header className="pagina-reservas-header">
         <h2>Reservas de Laboratorio</h2>
-        <p className="texto-secundario">
+        {/* M19: clase pagina-reservas-descripcion para el estilo del encabezado */}
+        <p className="pagina-reservas-descripcion">
           Módulo para solicitar recursos, instrumentos y espacios de trabajo.
         </p>
         <span className="contador-reservas-badge">
