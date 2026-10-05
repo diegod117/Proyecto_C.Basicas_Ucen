@@ -3,23 +3,70 @@
    Los estilos de cada componente o página irán en su propio archivo .css.
    Los colores vienen del mockup (docs/mockup-sgil.html). */
 
-/* Variables de CSS: guardamos los colores en un solo lugar.
-   Si queremos cambiar el azul de toda la app, se cambia solo aquí. */
+/* =====================================================
+   VARIABLES DE DISEÑO (M15 — RNF-01)
+   Todas las reglas de color, tamaño y sombra están
+   aquí. Nunca escribir valores sueltos en otros .css;
+   siempre usar var(--nombre-variable).
+   ===================================================== */
 :root {
-  --color-principal: #1a63bb; /* azul de la universidad (del mockup) */
-  --color-principal-oscuro: #144f96;
-  --color-fondo: #f8fafc;
+  /* --- Colores principales --- */
+  --color-principal: #1a63bb;        /* azul UCEN (del mockup) */
+  --color-principal-oscuro: #144f96; /* hover de botones y links activos */
+  --color-principal-claro: #e8f0fe;  /* fondo de ítem activo en el menú */
+
+  /* --- Fondos generales --- */
+  --color-fondo: #f8fafc;            /* fondo de toda la app */
+  --color-fondo-menu: #f1f5f9;       /* fondo del menú lateral */
+  --color-blanco: #ffffff;           /* tarjetas y paneles */
+
+  /* --- Texto --- */
   --color-texto: #1f2937;
   --color-texto-secundario: #6b7280;
+
+  /* --- Bordes --- */
   --color-borde: #e5e7eb;
 
-  /* Colores de los estados del recurso */
-  --color-disponible: #15803d; /* verde */
-  --color-en-uso: #1d4ed8; /* azul */
-  --color-danado: #b91c1c; /* rojo */
-  --color-mantencion: #a16207; /* amarillo oscuro */
-  --color-baja: #4b5563; /* gris */
+  /* --- Colores de estado del recurso --- */
+  --color-disponible: #15803d;  /* verde */
+  --color-en-uso: #1d4ed8;      /* azul */
+  --color-danado: #b91c1c;      /* rojo */
+  --color-mantencion: #a16207;  /* amarillo oscuro */
+  --color-baja: #4b5563;        /* gris */
+
+  /* --- Colores de alertas e incidencias --- */
+  --color-alerta-critica: #b91c1c;    /* rojo — prioridad alta */
+  --color-alerta-advertencia: #a16207; /* amarillo — prioridad media */
+  --color-alerta-info: #1a63bb;       /* azul — prioridad baja */
+
+  /* --- Sombras --- */
+  /* Sombra suave para tarjetas y paneles */
+  --sombra-tarjeta: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* Sombra más notoria para elementos elevados (hover, modales) */
+  --sombra-elevada: 0 4px 16px rgba(0, 0, 0, 0.14);
+
+  /* --- Bordes redondeados --- */
+  --radio-borde: 10px;   /* tarjetas y contenedores grandes */
+  --radio-borde-sm: 6px; /* botones, campos e inputs */
+  --radio-pildora: 20px; /* etiquetas de estado (píldoras) */
+
+  /* --- Espaciado --- */
+  --espacio-xs: 4px;
+  --espacio-sm: 8px;
+  --espacio-md: 16px;
+  --espacio-lg: 24px;
+  --espacio-xl: 32px;
+
+  /* --- Ancho del menú lateral --- */
+  --ancho-menu: 220px;
+
+  /* --- Alto de la barra superior --- */
+  --alto-header: 56px;
 }
+
+/* =====================================================
+   RESET BASE
+   ===================================================== */
 
 /* box-sizing: border-box hace que el ancho de un elemento incluya
    su padding y borde. Así es más fácil calcular tamaños. */
@@ -29,7 +76,7 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif; /* M16 cambia esto por Inter */
   background-color: var(--color-fondo);
   color: var(--color-texto);
 }
@@ -38,13 +85,17 @@ h1 {
   color: var(--color-principal);
 }
 
+/* =====================================================
+   UTILIDADES COMUNES
+   ===================================================== */
+
 /* Contenedor común de todas las páginas (Inventario, Reservas, Incidencias).
    Va aquí porque lo usan todas; los estilos propios de cada página
    irán en su propio archivo .css. */
 .contenido-pagina {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px; /* margen lateral para que se vea bien en celular (RNF-01) */
+  padding: var(--espacio-lg) var(--espacio-md);
 }
 
 .texto-secundario {
