@@ -134,3 +134,15 @@
   font-weight: bold;
   border-bottom: none;
 }
+
+/* Aviso que ven el docente y el departamento en lugar del formulario
+   de cambio de estado (RNF-03). Ocupa la columna derecha. */
+.ficha-aviso-permiso {
+  margin: 0;
+  background-color: #f9fafb;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 14px;
+  color: var(--color-texto-secundario);
+}
