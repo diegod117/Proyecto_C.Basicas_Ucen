@@ -51,6 +51,19 @@ export function puedeReservar(rol: RolUsuario): boolean {
   }
 }
 
+// puedeReservarAOtroDocente
+// Recibe: el rol del usuario.
+// Devuelve: true si puede escribir el nombre de OTRO docente al reservar.
+// El encargado puede reservar a nombre de un profesor. El docente reserva
+// siempre a su propio nombre, así nadie reserva haciéndose pasar por otro.
+export function puedeReservarAOtroDocente(rol: RolUsuario): boolean {
+  if (rol === 'encargado') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // puedeVerTodasLasReservas
 // Recibe: el rol del usuario.
 // Devuelve: true si ve las reservas de todos los docentes.

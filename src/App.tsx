@@ -95,7 +95,7 @@ function App() {
     if (paginaActual === 'inventario') {
       return <PaginaInventario onInventarioCambiado={registrarCambioInventario} />;
     } else if (paginaActual === 'reservas') {
-      return <PaginaReservas />;
+      return <PaginaReservas usuario={usuario} />;
     } else if (paginaActual === 'incidencias') {
       return <PaginaIncidencias />;
     } else {
