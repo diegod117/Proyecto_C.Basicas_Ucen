@@ -8,7 +8,7 @@
 import type { Incidencia, EstadoIncidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
 import { obtenerFechaActual } from '../utils/fechas';
-import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, updateDoc } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
 // ------------------------------------------------------------------
@@ -89,10 +89,20 @@ async function agregarIncidencia(
 // Busca la incidencia en la lista y le actualiza el estado.
 // Devuelve true si la encontró y la actualizó, o false si no existía.
 // Cubre: HU-10 (avanzar incidencia de pendiente -> en_revision -> resuelta)
-function cambiarEstadoIncidencia(
+async function cambiarEstadoIncidencia(
   id: number,
   nuevoEstado: EstadoIncidencia
-): boolean {
+): Promise<boolean> {
+  // Primero actualizamos en Firestore
+  try {
+    const docRef = doc(baseDatos, 'incidencias', id.toString());
+    await updateDoc(docRef, { estado: nuevoEstado });
+  } catch (error) {
+    console.error('Error al actualizar estado en Firestore:', error);
+    return false;
+  }
+
+  // Si Firestore funcionó, actualizamos en memoria
   for (const incidencia of incidencias) {
     if (incidencia.id === id) {
       incidencia.estado = nuevoEstado;
