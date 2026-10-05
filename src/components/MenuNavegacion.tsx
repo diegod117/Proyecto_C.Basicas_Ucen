@@ -1,9 +1,9 @@
 // MenuNavegacion.tsx
-// Barra superior azul con el nombre del sistema y los botones
-// para cambiar de página (Inventario, Reservas, Incidencias).
-// También muestra quién inició sesión y el botón para cerrar sesión.
-// Solo muestra los botones de las páginas que el rol puede ver.
-// Cubre: navegación base, inicio de sesión con roles (sección 3.4 de requerimientos) y RNF-03
+// M17 — RNF-01: rediseño del menú a barra superior + menú lateral.
+// La barra superior (header) muestra el título y el usuario conectado.
+// El menú lateral (aside) muestra solo las páginas que el rol puede ver.
+// En celular el aside pasa a ser una fila horizontal (ver MenuNavegacion.css).
+// Cubre: navegación base, inicio de sesión con roles (sección 3.4 de requerimientos) y RNF-03.
 
 import type { Pagina } from '../types/Pagina';
 import type { Usuario, RolUsuario } from '../types/Usuario';
@@ -44,7 +44,9 @@ function nombreDelRol(rol: RolUsuario): string {
 // Componente MenuNavegacion
 // Recibe: paginaActual, onCambiarPagina, cantidadAlertas opcional,
 // usuario y onCerrarSesion.
-// Devuelve: la barra de navegación.
+// Devuelve: la barra superior (header) y el menú lateral (nav/aside).
+// NOTA: el <main> que envuelve el contenido sigue en App.tsx con la clase
+// "app-contenido" para que se desplace a la derecha del sidebar.
 function MenuNavegacion(props: PropsMenuNavegacion) {
   // Devuelve la clase CSS de un botón: si es la página actual,
   // le agrega "boton-menu-activo" para que se vea resaltado.
@@ -57,10 +59,25 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
   }
 
   return (
-    <header className="menu-navegacion">
-      <h1 className="menu-titulo">UCEN - Gestión de Inventario</h1>
+    <>
+      {/* ── Barra superior azul (fija en la parte de arriba) ── */}
+      <header className="app-header">
+        <h1 className="app-header-titulo">UCEN — Gestión de Inventario</h1>
 
-      <nav className="menu-botones">
+        <div className="app-header-usuario">
+          <div className="app-header-usuario-datos">
+            <span className="app-header-usuario-nombre">{props.usuario.nombre}</span>
+            <span className="app-header-usuario-rol">{nombreDelRol(props.usuario.rol)}</span>
+          </div>
+          <button className="boton-cerrar-sesion" onClick={props.onCerrarSesion}>
+            Cerrar sesión
+          </button>
+        </div>
+      </header>
+
+      {/* ── Menú lateral gris (fijo a la izquierda, debajo del header) ── */}
+      {/* En celular se convierte en fila horizontal (ver .css @media) */}
+      <nav className="app-sidebar">
         {/* Cada botón se dibuja SOLO si el rol del usuario puede ver esa
             página (RNF-03). "condición && (...)" significa: si la condición
             es true, dibuja lo de la derecha; si es false, no dibuja nada.
@@ -103,17 +120,7 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
           </button>
         )}
       </nav>
-
-      <div className="menu-usuario">
-        <div className="menu-usuario-datos">
-          <span className="menu-usuario-nombre">{props.usuario.nombre}</span>
-          <span className="menu-usuario-rol">{nombreDelRol(props.usuario.rol)}</span>
-        </div>
-        <button className="boton-menu" onClick={props.onCerrarSesion}>
-          Cerrar sesión
-        </button>
-      </div>
-    </header>
+    </>
   );
 }
 

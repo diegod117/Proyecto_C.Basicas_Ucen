@@ -114,7 +114,12 @@ function App() {
   }
 
   return (
-    <div>
+    // M17: div raíz para el nuevo layout de pantalla completa.
+    // MenuNavegacion ahora devuelve el header (fijo arriba) y el
+    // sidebar (fijo a la izquierda). El <main> tiene la clase
+    // "app-contenido" para que se desplace a la derecha del sidebar
+    // y debajo del header (ver MenuNavegacion.css).
+    <div className="app-layout">
       {/* Le pasamos al menú la página actual, la función para cambiarla,
           el contador de alertas (HU-05) y el usuario conectado. */}
       <MenuNavegacion
@@ -125,7 +130,7 @@ function App() {
         onCerrarSesion={manejarCerrarSesion}
       />
 
-      <main>{mostrarPaginaActual(usuarioActual)}</main>
+      <main className="app-contenido">{mostrarPaginaActual(usuarioActual)}</main>
     </div>
   );
 }

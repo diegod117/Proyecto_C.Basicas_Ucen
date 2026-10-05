@@ -1,101 +1,202 @@
 /* MenuNavegacion.css
-   Estilos de la barra superior de navegación. */
+   M17 — RNF-01: rediseño del menú.
+   Layout de pantalla completa:
+     - Barra superior azul (header) con el título y el usuario conectado.
+     - Menú lateral gris a la izquierda (aside) con los botones de navegación.
+   En celular (max-width 768px): el menú lateral pasa a fila horizontal arriba. */
 
-.menu-navegacion {
+/* =====================================================
+   BARRA SUPERIOR (header)
+   ===================================================== */
+
+/* Franja azul fija en la parte superior de la pantalla.
+   Muestra el título del sistema a la izquierda y los datos
+   del usuario + botón de cerrar sesión a la derecha. */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--alto-header);
   background-color: var(--color-principal);
   color: white;
-  padding: 12px 16px;
-  /* flex pone el título y los botones uno al lado del otro */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* flex-wrap: si no caben (celular), los botones bajan a otra línea (RNF-01) */
-  flex-wrap: wrap;
-  gap: 12px;
+  padding: 0 var(--espacio-lg);
+  z-index: 100;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-.menu-titulo {
+/* Título del sistema en la barra superior */
+.app-header-titulo {
   margin: 0;
-  font-size: 18px;
-  color: white;
-}
-
-.menu-botones {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.boton-menu {
-  background-color: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.boton-menu:hover {
-  background-color: var(--color-principal-oscuro);
-}
-
-/* Botón de la página que se está mostrando */
-.boton-menu-activo {
-  background-color: white;
-  color: var(--color-principal);
-  font-weight: bold;
-}
-
-.boton-menu-activo:hover {
-  background-color: white;
-}
-
-/* Badge numérico para el contador de alertas (HU-05) */
-.badge-alertas-menu {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ef4444;
-  color: white;
-  font-size: 0.72rem;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 10px;
-  min-width: 18px;
-  line-height: 1;
-}
-
-/* En el botón activo (blanco) el badge mantiene su color rojo destacado */
-.boton-menu-activo .badge-alertas-menu {
-  background-color: #dc2626;
   color: white;
+  white-space: nowrap;
 }
 
-/* Zona del usuario conectado: nombre, rol y botón "Cerrar sesión" */
-.menu-usuario {
+/* Zona del usuario: nombre, rol y botón cerrar sesión */
+.app-header-usuario {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--espacio-md);
 }
 
-/* El nombre arriba y el rol debajo */
-.menu-usuario-datos {
+.app-header-usuario-datos {
   display: flex;
   flex-direction: column;
   text-align: right;
   line-height: 1.2;
 }
 
-.menu-usuario-nombre {
-  font-size: 14px;
-  font-weight: bold;
+.app-header-usuario-nombre {
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
-.menu-usuario-rol {
-  font-size: 12px;
-  opacity: 0.85;
+.app-header-usuario-rol {
+  font-size: 0.75rem;
+  opacity: 0.82;
+}
+
+/* Botón "Cerrar sesión" en la barra superior */
+.boton-cerrar-sesion {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radio-borde-sm);
+  padding: 6px var(--espacio-md);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.boton-cerrar-sesion:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+/* =====================================================
+   MENÚ LATERAL (aside)
+   ===================================================== */
+
+/* Panel gris fijo a la izquierda, debajo de la barra superior.
+   Solo contiene los botones de las páginas que el rol puede ver. */
+.app-sidebar {
+  position: fixed;
+  top: var(--alto-header);
+  left: 0;
+  bottom: 0;
+  width: var(--ancho-menu);
+  background-color: var(--color-fondo-menu);
+  border-right: 1px solid var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-lg) 0;
+  gap: var(--espacio-xs);
+  overflow-y: auto;
+  z-index: 90;
+}
+
+/* Cada botón del menú lateral ocupa todo el ancho */
+.boton-menu {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-sm);
+  padding: var(--espacio-sm) var(--espacio-lg);
+  background-color: transparent;
+  color: var(--color-texto);
+  border: none;
+  border-left: 3px solid transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease;
+}
+
+.boton-menu:hover {
+  background-color: var(--color-principal-claro);
+  color: var(--color-principal);
+}
+
+/* Página activa: resaltada en azul claro con línea lateral */
+.boton-menu-activo {
+  background-color: var(--color-principal-claro);
+  color: var(--color-principal);
+  border-left-color: var(--color-principal);
+  font-weight: 600;
+}
+
+.boton-menu-activo:hover {
+  background-color: var(--color-principal-claro);
+}
+
+/* Badge rojo del contador de alertas (HU-05) */
+.badge-alertas-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radio-pildora);
+  min-width: 18px;
+  line-height: 1;
+  margin-left: auto;
+}
+
+/* =====================================================
+   RESPONSIVE — celular (RNF-01, max 768px)
+   ===================================================== */
+
+@media (max-width: 768px) {
+  /* El sidebar se convierte en una fila horizontal debajo del header */
+  .app-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    padding: var(--espacio-xs) 0;
+    border-right: none;
+    border-bottom: 1px solid var(--color-borde);
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  /* Cada botón se ajusta al contenido (no ocupa todo el ancho) */
+  .boton-menu {
+    width: auto;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    padding: var(--espacio-sm) var(--espacio-md);
+  }
+
+  .boton-menu-activo {
+    border-left-color: transparent;
+    border-bottom-color: var(--color-principal);
+  }
+
+  /* En celular el contenido ocupa todo el ancho */
+  .app-contenido {
+    /* sidebar ya no es fixed, así que no hace falta margin-left */
+    margin-left: 0;
+    /* header (56px) + sidebar (~44px) */
+    margin-top: calc(var(--alto-header) + 44px);
+  }
+
+  /* El header también se adapta */
+  .app-header-titulo {
+    font-size: 0.875rem;
+  }
 }
