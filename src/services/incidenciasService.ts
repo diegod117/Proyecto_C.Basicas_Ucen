@@ -53,9 +53,9 @@ function obtenerIncidenciaPorId(id: number): Incidencia | undefined {
 // Omit<Incidencia, 'id' | 'fecha' | 'estado'> significa:
 // "una Incidencia pero sin los campos id, fecha ni estado".
 // HU-10 pide que la fecha sea automática y el estado empiece en 'pendiente'.
-function agregarIncidencia(
+async function agregarIncidencia(
   datos: Omit<Incidencia, 'id' | 'fecha' | 'estado'>
-): Incidencia {
+): Promise<Incidencia> {
   // Generamos un id nuevo: tomamos el mayor id que exista y le sumamos 1.
   // Si la lista está vacía, el id será 1.
   let mayorId = 0;
@@ -72,6 +72,11 @@ function agregarIncidencia(
     ...datos,
   };
 
+  // Guardamos en Firestore primero
+  const docRef = doc(baseDatos, 'incidencias', nuevaIncidencia.id.toString());
+  await setDoc(docRef, nuevaIncidencia);
+
+  // Si Firestore no falló, actualizamos la copia local en memoria
   incidencias.push(nuevaIncidencia);
   return nuevaIncidencia;
 }
