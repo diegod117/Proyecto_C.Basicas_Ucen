@@ -36,7 +36,7 @@ data/incidencias.ts ► services/incidenciasService.ts ◄── usa: Incidencia
 3. **Una rama por HU**, que siempre parte de `main` actualizado (**Pull** antes de crearla).
 4. **Antes de cada commit:** `npm run build` sin errores. Antes del Pull Request, también `npm run lint`.
 5. **Revisión cruzada de Pull Requests:** el PR de Johann lo revisa Martín, el de Martín lo revisa Diego y el de Diego lo revisa Johann.
-6. **`docs/avance.md`:** cada uno agrega su entrada al final. Si GitHub muestra un conflicto en ese archivo, se dejan **ambas** entradas.
+6. **Bitácora:** cada tarea crea su propio archivo en `docs/avance/` (ver `docs/avance.md`). Antes se agregaba todo al final de `docs/avance.md` y eso causaba conflictos.
 
 ---
 
@@ -71,7 +71,7 @@ data/incidencias.ts ► services/incidenciasService.ts ◄── usa: Incidencia
 | J11 | `feature/hu-06-historial-estados` | `feat(HU-06): registra cada cambio de estado en un historial` | `types/CambioEstado.ts`, `services/historialService.ts` | Nuevo tipo; nunca se borra un registro (RNF-06) |
 | J12 | `feature/hu-06-historial-estados` | `feat(HU-06): muestra el historial de estados en la ficha` | `components/TablaHistorial.tsx/.css` | Tabla con `.map()`, igual a la del mockup |
 | J13 | `feature/hu-11-ubicacion` | `feat(HU-11): agrega funciones para generar y validar el código de ubicación` | `utils/ubicacion.ts` | `generarCodigo()` → "B307-B1-M2"; validar campos vacíos |
-| J14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance.md` | — |
+| J14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance/` (archivo nuevo) | — |
 
 **Demo en la exposición:** filtrar "termómetros" de la torre C, abrir la ficha, pasar 1 unidad a "dañado" y mostrar que aparece en el historial.
 
@@ -94,7 +94,7 @@ data/incidencias.ts ► services/incidenciasService.ts ◄── usa: Incidencia
 | M11 | `feature/mis-reservas` | `feat(RF-03): crea tabla con las reservas ordenadas por fecha` | `components/TablaReservas.tsx/.css` | Ordenar una lista con `.sort()` explicado paso a paso |
 | M12 | `feature/mis-reservas` | `feat(RF-03): permite cancelar una reserva` | `reservasService.ts`, `TablaReservas.tsx` | Confirmar con `window.confirm()` y actualizar la lista |
 | M13 | `feature/mis-reservas` | `style(RF-03): adapta formulario y tabla a celular` | `.css` | RNF-01: el docente reserva desde el celular |
-| M14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance.md` | — |
+| M14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance/` (archivo nuevo) | — |
 
 **Demo en la exposición:** intentar reservar termómetros el 09/10 a las 08:30 y mostrar que el sistema lo impide (el caso real que contó el profesor Torres). Luego elegir otro horario y reservar con éxito.
 
@@ -117,7 +117,7 @@ data/incidencias.ts ► services/incidenciasService.ts ◄── usa: Incidencia
 | D11 | `feature/hu-05-panel-alertas` | `feat(HU-05): agrega página de alertas al menú` | `types/Pagina.ts`, `App.tsx`, `MenuNavegacion.tsx` | Archivos compartidos: **avisar al grupo antes** |
 | D12 | `feature/hu-05-panel-alertas` | `feat(HU-05): muestra las alertas pendientes en tarjetas` | `pages/PaginaAlertas.tsx/.css`, `components/TarjetaAlerta.tsx/.css` | Colores por tipo de alerta |
 | D13 | `feature/hu-05-panel-alertas` | `feat(HU-05): muestra contador de alertas en el menú` | `MenuNavegacion.tsx/.css` | Nueva prop numérica, como la campana del mockup |
-| D14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance.md` | — |
+| D14+ | cada rama | `docs: actualiza avance con HU-0X` | `docs/avance/` (archivo nuevo) | — |
 
 **Demo en la exposición:** registrar una incidencia en menos de 5 pasos (RNF-02), mostrar que nace "pendiente" con fecha automática y avanzarla a "resuelta". Luego abrir el panel de alertas y mostrar la de los guantes bajo el stock mínimo.
 

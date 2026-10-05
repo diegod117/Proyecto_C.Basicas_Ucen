@@ -36,7 +36,7 @@ Propuesta basada en la tabla 1.2 de requerimientos y en RNF-03 ("el encargado ed
 1. **Johann toca los `.tsx`** (lógica de quién puede hacer qué). **Martín y Diego tocan sobre todo los `.css`.** Así casi no hay conflictos aunque trabajen en los mismos componentes.
 2. Si Martín o Diego necesitan cambiar el JSX de un componente (agregar un `div` o una clase), lo hacen en un commit pequeño aparte y **avisan en el grupo**, porque Johann puede estar editando ese mismo archivo.
 3. **Archivos compartidos** (avisar antes de tocarlos): `App.tsx`, `MenuNavegacion.tsx/.css`, `styles/global.css`, `index.html` y `types/`.
-4. Todo lo demás sigue igual que en la fase 1: **una rama por tarea** que parte de `main` actualizado, `npm run build` y `npm run lint` antes del PR, revisión cruzada (a Johann lo revisa Martín, a Martín lo revisa Diego y a Diego lo revisa Johann) y la entrada en `docs/avance.md` al final de cada tarea.
+4. Todo lo demás sigue igual que en la fase 1: **una rama por tarea** que parte de `main` actualizado, `npm run build` y `npm run lint` antes del PR, revisión cruzada (a Johann lo revisa Martín, a Martín lo revisa Diego y a Diego lo revisa Johann) y un archivo nuevo en `docs/avance/` al final de cada tarea (ver `docs/avance.md`).
 5. **Sin librerías nuevas.** El diseño se hace con CSS simple. Si alguien quiere íconos (por ejemplo, Font Awesome como en el mockup), se pregunta antes.
 
 ---
@@ -68,7 +68,7 @@ Propuesta basada en la tabla 1.2 de requerimientos y en RNF-03 ("el encargado ed
 | J20 | `feature/usuario-real` | `feat(HU-06): registra el nombre del usuario conectado en historial e incidencias` | `historialService.ts`, `recursosService.ts`, `FormularioIncidencia.tsx` | Cambiar el texto fijo "Encargado (usuario actual)" por un parámetro con el nombre real |
 | J21 | `feature/mis-reservas-docente` | `feat(RF-03): el docente ve y cancela solo sus propias reservas` | `TablaReservas.tsx`, `reservasService.ts` | Filtrar con `if` dentro de un `for`, comparando `reserva.docente` con el nombre del usuario |
 | J22 | `feature/mis-reservas-docente` | `chore(RNF-03): ajusta usuarios de prueba para la demo` | `data/usuarios.ts` | Que el docente de prueba se llame "Prof. Ana Morales" y el encargado "Pedro Soto", como en los datos de prueba. Así "Mis reservas" muestra algo |
-| J23+ | cada rama | `docs: actualiza avance con RNF-03` | `docs/avance.md` | — |
+| J23+ | cada rama | `docs: actualiza avance con RNF-03` | `docs/avance/` (archivo nuevo) | — |
 
 **Demo en la exposición:** entrar como docente (no aparecen Incidencias ni Alertas, y la ficha no tiene el formulario de estado), reservar y ver solo sus propias reservas. Cerrar sesión, entrar como encargado y mostrar que ve todo, y que el historial guarda su nombre.
 
@@ -102,7 +102,7 @@ Para que la app deje de verse genérica, los dos siguen **la misma línea**, bas
 | M19 | `feature/diseno-reservas` | `style(HU-03): rediseña el formulario y la tabla de reservas` | `FormularioReserva.css`, `TablaReservas.css`, `PaginaReservas.css` | Usar las variables de M15; tabla con filas alternadas |
 | M20 | `feature/diseno-alertas` | `style(HU-05): rediseña las tarjetas y filtros de alertas` | `TarjetaAlerta.css`, `PaginaAlertas.css` | Franja de color a la izquierda según el tipo de alerta |
 | M21 | `feature/diseno-reservas` | `style: revisa menú, login, reservas y alertas en celular` | `.css` de M17 a M20 | `@media (max-width: 768px)`: probar a 375px |
-| M22+ | cada rama | `docs: actualiza avance con el diseño` | `docs/avance.md` | — |
+| M22+ | cada rama | `docs: actualiza avance con el diseño` | `docs/avance/` (archivo nuevo) | — |
 
 ---
 
@@ -117,7 +117,7 @@ Para que la app deje de verse genérica, los dos siguen **la misma línea**, bas
 | D19 | `feature/diseno-ficha` | `style(HU-06): rediseña la tabla del historial de estados` | `TablaHistorial.css`, `global.css` (etiquetas) | Etiquetas de estado en forma de píldora. `global.css` es compartido: **avisar** |
 | D20 | `feature/diseno-incidencias` | `style(HU-04): rediseña el formulario y la tabla de incidencias` | `FormularioIncidencia.css`, `TablaIncidencias.css`, `EtiquetaEstadoIncidencia.css`, `PaginaIncidencias.css` | Usar las mismas variables y botones de M15 y M16 |
 | D21 | `feature/diseno-incidencias` | `style: revisa inventario, ficha e incidencias en celular` | `.css` de D15 a D20 | `@media (max-width: 768px)`: probar a 375px |
-| D22+ | cada rama | `docs: actualiza avance con el diseño` | `docs/avance.md` | — |
+| D22+ | cada rama | `docs: actualiza avance con el diseño` | `docs/avance/` (archivo nuevo) | — |
 
 ---
 
