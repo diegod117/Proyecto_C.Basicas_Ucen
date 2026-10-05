@@ -1,18 +1,26 @@
 /* PaginaInventario.css
-   Estilos propios de la página de inventario. */
+   Estilos propios de la página de inventario.
+   D17: encabezado de página con título grande y descripción en gris.
+   Las clases .encabezado-pagina-* están pensadas para que las demás
+   páginas (Reservas, Incidencias, Alertas) usen el mismo encabezado. */
 
-.inventario-encabezado {
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-borde);
+/* Encabezado de página: título arriba y una línea de descripción debajo */
+.encabezado-pagina {
+  margin-bottom: var(--espacio-lg);
 }
 
-.inventario-encabezado h2 {
-  margin: 0 0 4px 0;
+.encabezado-pagina-titulo {
+  margin: 0 0 var(--espacio-xs) 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-texto);
 }
 
-.inventario-encabezado p {
+.encabezado-pagina-descripcion {
   margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-texto-secundario);
 }
 
 /* Fila con el contador "Mostrando X de 10" y el botón para limpiar filtros */
@@ -20,7 +28,13 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-sm);
+}
+
+.inventario-contador p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 /* Botón "Limpiar filtros" al lado del contador.
@@ -29,14 +43,23 @@
   background-color: transparent;
   color: var(--color-principal);
   border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
+  border-radius: var(--radio-borde-sm);
+  padding: var(--espacio-xs) var(--espacio-sm);
+  font-family: inherit;
   font-size: 13px;
-  font-weight: bold;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
+  transition: background-color 0.18s ease;
 }
 
 .boton-limpiar-pequeno:hover {
-  background-color: #e8f0fe;
+  background-color: var(--color-principal-claro);
+}
+
+/* En celular el título baja de tamaño para que no ocupe tantas líneas */
+@media (max-width: 700px) {
+  .encabezado-pagina-titulo {
+    font-size: 1.4rem;
+  }
 }
