@@ -14,7 +14,7 @@ export const listaIncidenciasPrueba: Incidencia[] = [
     descripcion: 'Un estudiante dejó caer el multímetro y se rompió la punta de prueba.',
     hayPersonasAfectadas: false,
     // No hay "detalleAfectacion" porque nadie resultó afectado (es opcional)
-    registradaPor: 'Pedro Soto (encargado)',
+    registradaPor: 'Pedro Soto',
     estado: 'pendiente',
   },
   {
@@ -25,7 +25,7 @@ export const listaIncidenciasPrueba: Incidencia[] = [
     descripcion: 'Derrame de sulfato de cobre sobre el mesón durante el práctico.',
     hayPersonasAfectadas: true,
     detalleAfectacion: 'Un estudiante con irritación leve en la mano. Se lavó con agua y fue a enfermería.',
-    registradaPor: 'Pedro Soto (encargado)',
+    registradaPor: 'Pedro Soto',
     estado: 'en_revision',
   },
   {
@@ -35,7 +35,7 @@ export const listaIncidenciasPrueba: Incidencia[] = [
     docentePresente: 'Prof. Carlos Fuentes',
     descripcion: 'El osciloscopio no encendía. Se envió a mantención y se cambió el fusible.',
     hayPersonasAfectadas: false,
-    registradaPor: 'Pedro Soto (encargado)',
+    registradaPor: 'Pedro Soto',
     estado: 'resuelta',
   },
 ];
