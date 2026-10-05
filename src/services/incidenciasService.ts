@@ -8,14 +8,15 @@
 import type { Incidencia, EstadoIncidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
 import { obtenerFechaActual } from '../utils/fechas';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { baseDatos } from './firebase';
 
 // ------------------------------------------------------------------
 // Lista en memoria
 // ------------------------------------------------------------------
-// Copiamos los datos de prueba a una lista que se puede modificar.
-// Al recargar el navegador, los datos vuelven a los originales
-// (para el MVP está bien, ver nota en plan-implementacion.md).
-const incidencias: Incidencia[] = [...listaIncidenciasPrueba];
+// Esta es la copia local de los datos. Empieza vacía y se llena al
+// llamar a cargarIncidencias() al iniciar sesión.
+let incidencias: Incidencia[] = [];
 
 // ------------------------------------------------------------------
 // obtenerIncidencias
@@ -94,6 +95,28 @@ function cambiarEstadoIncidencia(
     }
   }
   return false;
+}
+
+// ------------------------------------------------------------------
+// cargarIncidencias (D22)
+// ------------------------------------------------------------------
+// Descarga las incidencias desde Firestore y las guarda en memoria.
+// Si la colección está vacía, sube los datos de prueba automáticamente.
+export async function cargarIncidencias(): Promise<void> {
+  const coleccion = collection(baseDatos, 'incidencias');
+  const snapshot = await getDocs(coleccion);
+
+  if (snapshot.empty) {
+    console.log('Colección incidencias vacía, subiendo datos de prueba...');
+    for (const incidencia of listaIncidenciasPrueba) {
+      const docRef = doc(baseDatos, 'incidencias', incidencia.id.toString());
+      await setDoc(docRef, incidencia);
+    }
+    const nuevoSnapshot = await getDocs(coleccion);
+    incidencias = nuevoSnapshot.docs.map(d => d.data() as Incidencia);
+  } else {
+    incidencias = snapshot.docs.map(d => d.data() as Incidencia);
+  }
 }
 
 // ------------------------------------------------------------------
