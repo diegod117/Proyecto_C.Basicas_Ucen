@@ -1,54 +1,68 @@
 /* TarjetaRecurso.css
-   Estilos de la tarjeta de un recurso (basada en el mockup). */
+   Estilos de la tarjeta de un recurso (basada en el mockup).
+   D15: sombra suave y efecto :hover que eleva la tarjeta.
+   Todos los colores, sombras y radios vienen de las variables de global.css. */
 
 .tarjeta-recurso {
-  background-color: white;
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
+  background-color: var(--color-blanco);
+  /* Sin bordes grises duros: el borde es casi invisible y la sombra
+     es la que separa la tarjeta del fondo. */
+  border: 1px solid transparent;
+  border-radius: var(--radio-borde);
   /* overflow: hidden hace que la cabecera respete las esquinas redondeadas */
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sombra-tarjeta);
   /* La manito del mouse indica que la tarjeta se puede cliquear */
   cursor: pointer;
-  /* transition hace que el cambio de sombra y borde sea suave */
-  transition: box-shadow 0.2s, border-color 0.2s;
+  /* transition hace que el movimiento y el cambio de sombra sean suaves */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Al pasar el mouse por encima, la tarjeta se resalta */
+/* Al pasar el mouse por encima, la tarjeta se eleva un poco:
+   translateY(-4px) la sube 4px y la sombra más grande refuerza el efecto. */
 .tarjeta-recurso:hover {
-  border-color: var(--color-principal);
-  box-shadow: 0 4px 14px rgba(26, 99, 187, 0.15);
+  transform: translateY(-4px);
+  border-color: var(--color-principal-claro);
+  box-shadow: var(--sombra-elevada);
 }
 
-/* Franja superior gris con la categoría y el código de ubicación */
+/* Al navegar con teclado también se ve cuál tarjeta está activa */
+.tarjeta-recurso:focus-visible {
+  outline: 2px solid var(--color-principal);
+  outline-offset: 2px;
+}
+
+/* Franja superior con la categoría y el código de ubicación */
 .tarjeta-cabecera {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background-color: #f1f5f9;
-  border-bottom: 1px solid var(--color-borde);
+  gap: var(--espacio-sm);
+  padding: 10px var(--espacio-md);
+  background-color: var(--color-fondo-menu);
   font-size: 12px;
 }
 
 .tarjeta-categoria {
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: var(--color-principal);
   text-transform: uppercase;
 }
 
 .tarjeta-codigo {
   color: var(--color-texto-secundario);
+  font-weight: 500;
 }
 
 .tarjeta-cuerpo {
-  padding: 14px;
+  padding: var(--espacio-md);
 }
 
 .tarjeta-nombre {
-  margin: 0 0 4px 0;
+  margin: 0 0 var(--espacio-xs) 0;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .tarjeta-laboratorio,
