@@ -1,48 +1,55 @@
 /* FichaRecurso.css
-   Estilos de la ficha completa de un recurso. */
+   Estilos de la ficha completa de un recurso.
+   D18: dos columnas (datos e historial a la izquierda, acciones a la derecha)
+   con tarjetas blancas, sombra suave y variables de global.css. */
 
 /* Ruta "← Inventario / Nombre del recurso" */
 .ficha-ruta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 16px;
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-md);
+  font-size: 0.95rem;
 }
 
 .ficha-boton-volver {
   background: none;
   border: none;
-  padding: 4px 0;
-  font-size: 16px;
-  color: var(--color-texto-secundario);
+  padding: var(--espacio-xs) var(--espacio-sm);
+  margin-left: calc(var(--espacio-sm) * -1);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-principal);
+  border-radius: var(--radio-borde-sm);
   cursor: pointer;
+  transition: background-color 0.18s ease;
 }
 
 .ficha-boton-volver:hover {
-  color: var(--color-principal);
+  background-color: var(--color-principal-claro);
 }
 
 .ficha-ruta-separador {
-  color: #9ca3af;
+  color: var(--color-texto-secundario);
 }
 
 .ficha-ruta-actual {
-  font-weight: bold;
+  font-weight: 600;
 }
 
-/* Dos columnas: la ficha ocupa 2 partes del ancho y el formulario 1.
+/* Dos columnas: la ficha ocupa 2 partes del ancho y las acciones 1.
    "align-items: start" evita que el formulario se estire hasta el alto
    de la ficha. */
 .ficha-columnas {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 20px;
+  gap: var(--espacio-lg);
   align-items: start;
 }
 
-/* En pantallas angostas (celular), el formulario baja debajo de la ficha */
+/* En pantallas angostas (celular), las acciones bajan debajo de la ficha */
 @media (max-width: 800px) {
   .ficha-columnas {
     grid-template-columns: 1fr;
@@ -53,7 +60,7 @@
 .ficha-columna-izquierda {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--espacio-lg);
   /* min-width: 0 permite que la tabla del historial se deslice hacia el lado
      en celular, en vez de estirar toda la grilla */
   min-width: 0;
@@ -61,30 +68,38 @@
 
 /* Recuadro blanco con todos los datos */
 .ficha-tarjeta {
-  background-color: white;
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
-  padding: 20px;
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espacio-lg);
 }
 
 .ficha-encabezado {
-  margin-bottom: 8px;
+  margin-bottom: var(--espacio-sm);
 }
 
 .ficha-categoria {
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: var(--color-principal);
   text-transform: uppercase;
 }
 
 .ficha-nombre {
-  margin: 4px 0 0 0;
+  margin: var(--espacio-xs) 0 0 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--color-texto);
 }
 
 .ficha-subtitulo {
-  font-size: 15px;
-  margin: 20px 0 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-secundario);
+  margin: var(--espacio-lg) 0 var(--espacio-sm) 0;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--color-borde);
 }
@@ -95,7 +110,7 @@
 .ficha-datos {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 6px 16px;
+  gap: 6px var(--espacio-md);
   margin: 0;
   font-size: 14px;
 }
@@ -106,11 +121,13 @@
 
 .ficha-datos dd {
   margin: 0; /* el navegador le pone margen a <dd> por defecto */
+  font-weight: 500;
 }
 
 .ficha-codigo {
   font-family: monospace;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--color-principal);
 }
 
 /* Tabla de unidades por estado */
@@ -121,17 +138,17 @@
 }
 
 .ficha-tabla-estados td {
-  padding: 6px 8px;
+  padding: 6px var(--espacio-sm);
   border-bottom: 1px solid var(--color-borde);
 }
 
 .ficha-tabla-numero {
   text-align: right;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .ficha-tabla-total td {
-  font-weight: bold;
+  font-weight: 700;
   border-bottom: none;
 }
 
@@ -139,10 +156,9 @@
    de cambio de estado (RNF-03). Ocupa la columna derecha. */
 .ficha-aviso-permiso {
   margin: 0;
-  background-color: #f9fafb;
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
-  padding: 20px;
+  background-color: var(--color-fondo-menu);
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-lg);
   font-size: 14px;
   color: var(--color-texto-secundario);
 }
