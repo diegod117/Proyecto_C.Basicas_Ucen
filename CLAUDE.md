@@ -57,7 +57,8 @@ inventario-cs-basicas/
 ├── README.md
 ├── docs/
 │   ├── requerimientos.md      # Requerimientos del proyecto (no modificar)
-│   └── avance.md              # Bitácora: qué se hizo en cada sesión
+│   ├── avance.md              # Portada de la bitácora: explica cómo registrar (no se modifica)
+│   └── avance/                # Bitácora: un archivo por tarea (AAAA-MM-DD-ID-descripcion.md)
 ├── public/
 └── src/
     ├── main.tsx               # Punto de entrada
@@ -82,12 +83,12 @@ Reglas:
 
 Trabaja **una historia de usuario a la vez**. Para cada tarea sigue estos pasos y **no te saltes ninguno**:
 
-1. **Leer**: revisa `docs/requerimientos.md` y `docs/avance.md` para saber qué hay hecho.
+1. **Leer**: revisa `docs/requerimientos.md` y los archivos de `docs/avance/` para saber qué hay hecho.
 2. **Planificar**: antes de escribir código, explícame en pocas líneas qué archivos vas a crear o modificar y por qué. **Espera mi confirmación.**
 3. **Implementar**: haz cambios pequeños, solo lo necesario para la historia de usuario. No refactorices otras partes sin preguntar.
 4. **Verificar**: ejecuta `npm run build` (y `npm run lint` si existe) y corrige los errores antes de decir que terminaste.
 5. **Explicar**: resume qué hiciste, en lenguaje simple, como si se lo explicaras a un compañero. Indica cómo probarlo en el navegador.
-6. **Registrar**: agrega una entrada en `docs/avance.md` con la fecha, la HU trabajada y los archivos tocados.
+6. **Registrar**: crea un archivo nuevo en `docs/avance/` (nombre y plantilla en `docs/avance.md`) con la fecha, la HU trabajada y los archivos tocados. Nunca agregues entradas al final de `docs/avance.md`: eso causaba conflictos.
 7. **Commit**: propón el mensaje de commit, pero **no hagas commit ni push sin que te lo pida**.
 
 Si algo de los requerimientos no está claro o está marcado como "pendiente de confirmar", **pregunta** en vez de inventar.
