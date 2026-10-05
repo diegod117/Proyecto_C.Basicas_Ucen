@@ -324,15 +324,35 @@
 
 **Archivos tocados:** `src/utils/permisos.ts`, `docs/avance.md`.
 
-## 2026-10-04 — J17: solo el encargado cambia el estado de un recurso (Johann)
+## 2026-10-04 — J16: menú según el rol (Johann)
 
-**Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-inventario`.
+**Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-permisos-rol` (PR #19).
 
 **Qué se hizo:**
-- `FichaRecurso.tsx`: usa `puedeCambiarEstado(rol)`. El encargado ve el formulario de cambio de estado como antes. El docente y el departamento ven los datos, la ubicación y el historial, y en la columna derecha un aviso: "Solo el encargado de laboratorio puede cambiar el estado de un recurso."
-- `FichaRecurso.css`: clase `.ficha-aviso-permiso`, una tarjeta gris del mismo estilo que el formulario.
-- `PaginaInventario.tsx` recibe el usuario y se lo pasa a la ficha; `App.tsx` se lo pasa a la página.
-- Se probó en el navegador con los tres roles en la ficha del multímetro: el encargado puede guardar un cambio; el docente y el departamento ven el aviso.
-- Nota: `FichaRecurso.tsx` quedó en 161 líneas. Más adelante se puede separar la tabla "Unidades por estado" en su propio componente.
+- `MenuNavegacion.tsx`: cada botón del menú se dibuja solo si `puedeVerPagina(rol, pagina)` lo permite. Se aplicó a los cuatro botones, así un cambio de permisos se hace solo en `utils/permisos.ts`.
+- `App.tsx`: protección extra. Si la página actual no está permitida para el rol, se muestra el inventario.
+- Se probó en el navegador: el docente ve solo Inventario y Reservas; el encargado y el departamento ven las cuatro páginas.
+- Nota: al principio el docente seguía viendo Incidencias y Alertas porque el `main` local estaba atrasado. Después de cada PR integrado hay que hacer **Pull** en GitHub Desktop.
 
-**Archivos tocados:** `src/components/FichaRecurso.tsx`, `src/components/FichaRecurso.css`, `src/pages/PaginaInventario.tsx`, `src/App.tsx`, `docs/avance.md`.
+**Archivos tocados:** `src/App.tsx`, `src/components/MenuNavegacion.tsx`, `docs/avance.md`.
+
+## 2026-10-04 — J18: reservas según el rol (Johann)
+
+**Trabajado:** RNF-03 (fase 2). Rama: `feature/rnf-03-reservas`.
+
+**Qué se hizo:**
+- `utils/permisos.ts`: permiso nuevo `puedeReservarAOtroDocente(rol)`, que solo devuelve true para el encargado.
+- `FormularioReserva.tsx` (archivo de Martín, avisado):
+  - El campo "Docente" ya no tiene "Prof. Martín Zepeda" fijo.
+  - El docente reserva siempre a su nombre: el campo sale bloqueado con el nombre del usuario conectado.
+  - El encargado puede escribir el nombre del profesor; el campo parte vacío y es obligatorio.
+- `PaginaReservas.tsx`: recibe el usuario. Si el rol no puede reservar (departamento), muestra un aviso en vez del formulario.
+- `App.tsx`: le pasa el usuario a `PaginaReservas`.
+- Se probó en el navegador:
+  - el docente reserva con su nombre bloqueado;
+  - el encargado recibe un error si deja el docente vacío, y la reserva se guarda al escribirlo;
+  - el departamento ve el aviso y la tabla, sin formulario.
+
+**Pendiente (J21):** el botón "Cancelar" de la tabla todavía lo ven todos los roles.
+
+**Archivos tocados:** `src/utils/permisos.ts`, `src/components/FormularioReserva.tsx`, `src/pages/PaginaReservas.tsx`, `src/App.tsx`, `docs/avance.md`.

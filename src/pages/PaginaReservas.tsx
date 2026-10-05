@@ -2,17 +2,27 @@
 // Página de reservas del laboratorio.
 // Permite al personal docente registrar nuevas reservas
 // y consultar o cancelar reservas existentes.
-// Cubre: HU-03 (formulario), HU-07, HU-08 y RF-03 (tabla y cancelación)
+// Cubre: HU-03 (formulario), HU-07, HU-08, RF-03 (tabla y cancelación)
+// y RNF-03 (el departamento solo consulta, no reserva)
 
 import { useState } from 'react';
 import FormularioReserva from '../components/FormularioReserva';
 import TablaReservas from '../components/TablaReservas';
 import { obtenerReservas } from '../services/reservasService';
+import type { Usuario } from '../types/Usuario';
+import { puedeReservar } from '../utils/permisos';
 import './PaginaReservas.css';
+
+// Props que recibe la página desde App
+interface PropsPaginaReservas {
+  // Usuario conectado: decide si se muestra el formulario (RNF-03)
+  usuario: Usuario;
+}
 
 // Componente PaginaReservas
 // Renderiza el encabezado del módulo, el formulario y la tabla de reservas.
-function PaginaReservas() {
+// Recibe el usuario conectado. El formulario solo aparece si su rol puede reservar.
+function PaginaReservas(props: PropsPaginaReservas) {
   const [actualizaciones, setActualizaciones] = useState(0);
 
   const listaReservas = obtenerReservas();
@@ -36,8 +46,18 @@ function PaginaReservas() {
       </header>
 
       <div className="pagina-reservas-contenedor">
-        {/* Formulario para registrar una nueva reserva */}
-        <FormularioReserva onReservaCreada={refrescarDatos} />
+        {/* Formulario para registrar una nueva reserva.
+            Solo se dibuja si el rol puede reservar (RNF-03);
+            si no, se muestra un aviso en su lugar. */}
+        {puedeReservar(props.usuario.rol) && (
+          <FormularioReserva onReservaCreada={refrescarDatos} usuario={props.usuario} />
+        )}
+        {!puedeReservar(props.usuario.rol) && (
+          <p className="texto-secundario">
+            Tu rol solo permite consultar las reservas. Para reservar, inicia sesión como
+            docente o encargado.
+          </p>
+        )}
 
         {/* Tabla con el historial de reservas y botón de cancelación */}
         <TablaReservas version={actualizaciones} onReservaModificada={refrescarDatos} />
