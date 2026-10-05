@@ -105,3 +105,25 @@ export interface Recurso {
 // Nota: no guardamos la "cantidad total" porque se puede calcular
 // sumando las cantidades de cada estado. Si la guardáramos aparte,
 // podría quedar desactualizada. Ese cálculo irá en src/utils/.
+
+// ------------------------------------------------------------------
+// Datos del formulario "Agregar recurso"
+// ------------------------------------------------------------------
+// Es lo que escribe el encargado en el formulario. Todo es texto porque
+// así lo entregan los <input>; se convierte a Recurso al guardar
+// (ver utils/nuevoRecurso.ts). La categoría puede quedar '' mientras
+// el encargado todavía no la elige.
+export interface DatosNuevoRecurso {
+  nombre: string;
+  categoria: CategoriaRecurso | '';
+  cantidadTexto: string; // unidades iniciales (entran como "disponible")
+  stockMinimoTexto: string; // solo se usa en insumos y reactivos
+  torre: Torre;
+  sala: string;
+  bodega: string;
+  mueble: string;
+  marca: string;
+  numeroSerie: string;
+  proveedor: string;
+  observacion: string;
+}

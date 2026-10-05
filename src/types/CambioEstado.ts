@@ -10,7 +10,8 @@ import type { EstadoRecurso } from './Recurso';
 // Tipo de movimiento que se registra en el historial:
 //   - 'cambio_estado': unidades que pasan de un estado a otro (el total no cambia).
 //   - 'reposicion': llegan unidades NUEVAS y se suman a "disponible" (el total sube).
-export type TipoMovimiento = 'cambio_estado' | 'reposicion';
+//   - 'alta': el recurso se agregó al inventario con sus unidades iniciales.
+export type TipoMovimiento = 'cambio_estado' | 'reposicion' | 'alta';
 
 // CambioEstado
 // Ejemplo: "El 01/10 a las 11:20, el encargado pasó 1 multímetro de

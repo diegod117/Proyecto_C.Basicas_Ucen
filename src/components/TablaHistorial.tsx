@@ -1,7 +1,8 @@
 // TablaHistorial.tsx
 // Tabla "Historial de estados" que va debajo de la ficha de un recurso.
 // Muestra cada cambio de estado: cuándo, qué cambió, por qué y quién.
-// También muestra las reposiciones de stock (unidades nuevas que llegaron).
+// También muestra las reposiciones de stock (unidades nuevas que llegaron)
+// y el alta del recurso (cuando se agregó al inventario).
 // Cubre: HU-06 (ver el historial de cambios de estado), RF-04, RNF-06
 
 import type { CambioEstado } from '../types/CambioEstado';
@@ -47,6 +48,16 @@ function TablaHistorial(props: PropsTablaHistorial) {
                 <tr key={cambio.id}>
                   <td className="tabla-historial-fecha">{cambio.fecha}</td>
                   <td className="tabla-historial-cambio">
+                    {/* Alta del recurso. Ej: Alta 10 → [Disponible] */}
+                    {cambio.tipo === 'alta' && (
+                      <>
+                        <span className="tabla-historial-reposicion">Alta {cambio.cantidad}</span>
+                        {' → '}
+                        <span className="etiqueta etiqueta-disponible">
+                          {textoEstado('disponible')}
+                        </span>
+                      </>
+                    )}
                     {/* Reposición. Ej: Reposición +10 → [Disponible] */}
                     {cambio.tipo === 'reposicion' && (
                       <>

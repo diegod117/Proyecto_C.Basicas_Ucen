@@ -121,6 +121,30 @@ export function crearRegistroReposicion(
   };
 }
 
+// crearRegistroAlta
+// Recibe: el id del recurso nuevo, sus unidades iniciales y el nombre del
+//         usuario conectado.
+// Devuelve: el registro listo para guardar, con tipo 'alta'. Así el
+// historial de cada recurso empieza el día en que se agregó (RNF-06).
+export function crearRegistroAlta(
+  recursoId: number,
+  cantidad: number,
+  nombreUsuario: string,
+): CambioEstado {
+  return {
+    id: obtenerSiguienteId(),
+    tipo: 'alta',
+    recursoId: recursoId,
+    fecha: obtenerFechaActual(),
+    // Las unidades iniciales entran como "disponible"
+    estadoAnterior: 'disponible',
+    estadoNuevo: 'disponible',
+    cantidad: cantidad,
+    motivo: 'Alta del recurso en el inventario',
+    usuario: nombreUsuario,
+  };
+}
+
 // agregarRegistroAlLote
 // Recibe: un lote de escrituras (writeBatch) y un registro.
 // No devuelve nada: agrega "guardar este registro" al lote. El lote se

@@ -23,6 +23,16 @@
   color: var(--color-texto-secundario);
 }
 
+/* En inventario, el encargado ve el botón "+ Agregar recurso" a la derecha
+   del título. flex-wrap: en celular, si no cabe, el botón baja. */
+.encabezado-inventario {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--espacio-md);
+}
+
 /* Fila con el contador "Mostrando X de 10" y el botón para limpiar filtros */
 .inventario-contador {
   display: flex;
