@@ -35,11 +35,16 @@
   margin-bottom: var(--espacio-md);
 }
 
-/* Contenedor vertical de etiqueta + input/select */
+/* Contenedor vertical de etiqueta + input/select.
+   min-width: 0 permite que el campo se achique para caber en la fila.
+   Sin esto, flex no lo deja ser más angosto que su contenido (el <select>
+   mide lo que mide el nombre de recurso más largo) y los campos de la
+   derecha se salían de la tarjeta. */
 .campo {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
 }
 
 .campo label {
@@ -49,8 +54,11 @@
   color: var(--color-texto);
 }
 
+/* width: 100% hace que cada campo ocupe todo el ancho de su columna, así
+   quedan alineados con los de las otras filas */
 .campo input,
 .campo select {
+  width: 100%;
   padding: 9px var(--espacio-md);
   border: 1.5px solid var(--color-borde);
   border-radius: var(--radio-borde-sm);
