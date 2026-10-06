@@ -41,16 +41,20 @@ export function generarAlertas(recursos: Recurso[] = obtenerRecursos()): Alerta[
   for (const recurso of recursos) {
     // Caso 1: Unidades dañadas -> alerta de reparación
     if (recurso.cantidades.danado > 0) {
-      const unidadesTexto =
-        recurso.cantidades.danado === 1
-          ? '1 unidad dañada'
-          : recurso.cantidades.danado + ' unidades dañadas';
+      // El verbo también cambia: "1 unidad dañada requiere" pero
+      // "2 unidades dañadas requieren"
+      let unidadesTexto = '';
+      if (recurso.cantidades.danado === 1) {
+        unidadesTexto = '1 unidad dañada requiere';
+      } else {
+        unidadesTexto = recurso.cantidades.danado + ' unidades dañadas requieren';
+      }
 
       alertas.push({
         id: 'alerta-' + recurso.id + '-reparacion',
         recursoId: recurso.id,
         tipo: 'reparacion',
-        mensaje: recurso.nombre + ': ' + unidadesTexto + ' requiere reparación.',
+        mensaje: recurso.nombre + ': ' + unidadesTexto + ' reparación.',
         fecha: fechaHoy,
       });
     }
@@ -78,6 +82,14 @@ export function generarAlertas(recursos: Recurso[] = obtenerRecursos()): Alerta[
       recurso.stockMinimo !== undefined &&
       recurso.cantidades.disponible <= recurso.stockMinimo
     ) {
+      // "1 disponible" en singular y "0 disponibles" o "3 disponibles" en plural
+      let disponiblesTexto = '';
+      if (recurso.cantidades.disponible === 1) {
+        disponiblesTexto = '1 disponible';
+      } else {
+        disponiblesTexto = recurso.cantidades.disponible + ' disponibles';
+      }
+
       alertas.push({
         id: 'alerta-' + recurso.id + '-reposicion',
         recursoId: recurso.id,
@@ -85,8 +97,8 @@ export function generarAlertas(recursos: Recurso[] = obtenerRecursos()): Alerta[
         mensaje:
           recurso.nombre +
           ': stock bajo (' +
-          recurso.cantidades.disponible +
-          ' disponibles, mínimo requerido: ' +
+          disponiblesTexto +
+          ', mínimo requerido: ' +
           recurso.stockMinimo +
           ').',
         fecha: fechaHoy,

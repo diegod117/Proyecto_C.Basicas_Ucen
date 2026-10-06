@@ -38,6 +38,10 @@ function App() {
   // también redibuja la página de inventario con los números nuevos.
   const [cambiosInventario, setCambiosInventario] = useState(0);
 
+  // Cuántas veces se apretó "Inventario" en el menú. Se usa como "key" de
+  // PaginaInventario (ver cambiarPagina más abajo).
+  const [vecesMenuInventario, setVecesMenuInventario] = useState(0);
+
   // Usuario que inició sesión, o null si no hay nadie conectado.
   const [usuarioActual, setUsuarioActual] = useState<Usuario | null>(null);
 
@@ -74,6 +78,19 @@ function App() {
   // cambia cambiosInventario (por ejemplo, si un recurso pasa a "dañado").
   const totalAlertas = generarAlertas().length;
 
+  // cambiarPagina
+  // Recibe la página que se eligió en el menú. No devuelve nada.
+  // Si ya estábamos en el inventario (por ejemplo, mirando la ficha de un
+  // recurso), cambiar paginaActual a 'inventario' no cambia nada. Por eso
+  // también sumamos 1 a vecesMenuInventario: al cambiar la "key", React crea
+  // la página de inventario de nuevo y se vuelve a ver el listado.
+  function cambiarPagina(pagina: Pagina) {
+    if (pagina === 'inventario') {
+      setVecesMenuInventario(vecesMenuInventario + 1);
+    }
+    setPaginaActual(pagina);
+  }
+
   // manejarCerrarSesion
   // No recibe ni devuelve nada. La llama el botón "Cerrar sesión" del menú.
   // Volvemos a la página de inventario para que el próximo usuario
@@ -96,7 +113,13 @@ function App() {
     }
 
     if (paginaActual === 'inventario') {
-      return <PaginaInventario onInventarioCambiado={registrarCambioInventario} usuario={usuario} />;
+      return (
+        <PaginaInventario
+          key={vecesMenuInventario}
+          onInventarioCambiado={registrarCambioInventario}
+          usuario={usuario}
+        />
+      );
     } else if (paginaActual === 'reservas') {
       return <PaginaReservas usuario={usuario} />;
     } else if (paginaActual === 'incidencias') {
@@ -129,7 +152,7 @@ function App() {
             el contador de alertas (HU-05) y el usuario conectado. */}
         <MenuNavegacion
           paginaActual={paginaActual}
-          onCambiarPagina={setPaginaActual}
+          onCambiarPagina={cambiarPagina}
           cantidadAlertas={totalAlertas}
           usuario={usuarioActual}
           onCerrarSesion={manejarCerrarSesion}
