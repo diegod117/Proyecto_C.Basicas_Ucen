@@ -5,6 +5,7 @@
 
 import { obtenerRecursoPorId } from '../services/recursosService';
 import { obtenerReservas } from '../services/reservasService';
+import { obtenerFechaHoy } from './fechas';
 
 // ------------------------------------------------------------------
 // validarCamposReserva
@@ -26,6 +27,11 @@ export function validarCamposReserva(
   }
   if (fecha === '') {
     return 'Debe ingresar la fecha de la reserva.';
+  }
+  // No se puede reservar en un día que ya pasó. Las fechas "AAAA-MM-DD"
+  // se pueden comparar como texto porque van de año a día.
+  if (fecha < obtenerFechaHoy()) {
+    return 'La fecha de la reserva no puede ser anterior a hoy.';
   }
   if (horaInicio === '') {
     return 'Debe ingresar la hora de inicio.';

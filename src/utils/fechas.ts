@@ -34,3 +34,16 @@ export function obtenerFechaActual(): string {
 
   return anio + '-' + mes + '-' + dia + ' ' + hora + ':' + minutos;
 }
+
+// obtenerFechaHoy
+// No recibe nada.
+// Devuelve la fecha de hoy como texto "AAAA-MM-DD" (sin la hora).
+// Ejemplo: "2026-10-12"
+// Es el mismo formato que entrega un <input type="date">, así se pueden
+// comparar como texto: "2026-10-11" < "2026-10-12" es true.
+// Cubre: HU-03 (no reservar en fechas que ya pasaron)
+export function obtenerFechaHoy(): string {
+  // obtenerFechaActual devuelve "AAAA-MM-DD HH:MM"; los primeros 10
+  // caracteres son justo la fecha. slice(0, 10) corta el texto ahí.
+  return obtenerFechaActual().slice(0, 10);
+}
