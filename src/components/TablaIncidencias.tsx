@@ -15,7 +15,7 @@ import {
 } from '../services/incidenciasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
 import type { EstadoIncidencia } from '../types/Incidencia';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeGestionarIncidencias } from '../utils/permisos';
 import EtiquetaEstadoIncidencia from './EtiquetaEstadoIncidencia';
 import './TablaIncidencias.css';
@@ -34,19 +34,16 @@ function nombreDelRecurso(recursoId: number): string {
   return 'Recurso desconocido';
 }
 
-// Props que recibe la tabla desde PaginaIncidencias
-interface PropsTablaIncidencias {
-  // Usuario conectado: decide si se muestran los botones de acción (RNF-03)
-  usuario: Usuario;
-}
-
 // Componente TablaIncidencias
-// Recibe el usuario conectado. Devuelve la tabla con todas las incidencias
-// y, si el rol lo permite, los botones para avanzar su estado.
-function TablaIncidencias(props: PropsTablaIncidencias) {
+// No recibe props: el usuario conectado lo lee con useUsuario().
+// Devuelve la tabla con todas las incidencias y, si el rol lo permite,
+// los botones para avanzar su estado.
+function TablaIncidencias() {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // true si el usuario puede avanzar el estado de las incidencias.
   // Lo calculamos una vez y lo usamos en el encabezado y en cada fila.
-  const mostrarAcciones = puedeGestionarIncidencias(props.usuario.rol);
+  const mostrarAcciones = puedeGestionarIncidencias(usuario.rol);
 
   // Guardamos las incidencias en el estado local de React.
   // Así, cuando cambiemos el estado de una incidencia, React volverá a dibujar

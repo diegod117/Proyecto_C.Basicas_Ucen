@@ -11,7 +11,7 @@
 //        RF-04 (reponer stock)
 
 import type { Recurso } from '../types/Recurso';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeCambiarEstado, puedeReponerStock } from '../utils/permisos';
 import { textoCategoria, textoCampoOpcional } from '../utils/inventario';
 import { obtenerHistorialDeRecurso } from '../services/historialService';
@@ -31,15 +31,15 @@ interface PropsFichaRecurso {
   // usa: solo se la pasa al formulario. El aviso viaja así:
   // formulario -> ficha -> página -> App (que redibuja todo).
   onEstadoCambiado: () => void;
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
-  usuario: Usuario;
 }
 
 // Componente FichaRecurso
 // Recibe: el recurso, la función para volver, la de aviso de cambio de estado
-// y el usuario conectado.
+// El usuario conectado (decide si se ven los formularios, RNF-03) lo lee con useUsuario().
 // Devuelve: la ficha completa del recurso.
 function FichaRecurso(props: PropsFichaRecurso) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   const recurso = props.recurso;
   const ubicacion = recurso.ubicacion;
 
@@ -124,26 +124,24 @@ function FichaRecurso(props: PropsFichaRecurso) {
         {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
             Los demás roles ven los datos y el historial, pero en lugar
             de los formularios aparece un aviso. */}
-        {puedeCambiarEstado(props.usuario.rol) && (
+        {puedeCambiarEstado(usuario.rol) && (
           <div className="ficha-columna-derecha">
             <FormularioCambioEstado
               recurso={recurso}
               onEstadoCambiado={props.onEstadoCambiado}
-              usuario={props.usuario}
             />
             {/* Reponer stock: suma unidades nuevas (resuelve las alertas
                 de reposición). Usa el mismo aviso hacia App que el cambio
                 de estado, porque también cambia los números. */}
-            {puedeReponerStock(props.usuario.rol) && (
+            {puedeReponerStock(usuario.rol) && (
               <FormularioReponerStock
                 recurso={recurso}
                 onStockRepuesto={props.onEstadoCambiado}
-                usuario={props.usuario}
               />
             )}
           </div>
         )}
-        {!puedeCambiarEstado(props.usuario.rol) && (
+        {!puedeCambiarEstado(usuario.rol) && (
           <p className="ficha-aviso-permiso">
             Solo el encargado de laboratorio puede cambiar el estado o reponer el stock
             de un recurso.

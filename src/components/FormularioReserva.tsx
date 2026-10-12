@@ -13,21 +13,23 @@ import {
   calcularUnidadesDisponibles,
   validarDisponibilidadReserva,
 } from '../utils/disponibilidad';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeReservarAOtroDocente } from '../utils/permisos';
 import './FormularioReserva.css';
 
 // Props que recibe el formulario
 interface FormularioReservaProps {
   onReservaCreada?: () => void;
-  // Usuario conectado: decide qué nombre va en el campo "Docente" (RNF-03)
-  usuario: Usuario;
 }
 
 // Componente FormularioReserva
 // Permite al docente seleccionar el recurso, fecha y horario.
 // Desactiva el botón de confirmación si no hay disponibilidad suficiente en ese tramo.
-function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps) {
+// El usuario conectado (decide qué nombre va en el campo "Docente", RNF-03)
+// lo lee con useUsuario().
+function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // --- Estados controlados del formulario ---
   const [recursoId, setRecursoId] = useState('');
   // Campo "Docente" (RNF-03):

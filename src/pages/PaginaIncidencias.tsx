@@ -7,19 +7,16 @@
 import { useState } from 'react';
 import FormularioIncidencia from '../components/FormularioIncidencia';
 import TablaIncidencias from '../components/TablaIncidencias';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeGestionarIncidencias } from '../utils/permisos';
 import './PaginaIncidencias.css';
 
-// Props que recibe la página desde App
-interface PropsPaginaIncidencias {
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
-  usuario: Usuario;
-}
-
 // Componente PaginaIncidencias
-// Recibe el usuario conectado. Devuelve la página completa de incidencias.
-function PaginaIncidencias(props: PropsPaginaIncidencias) {
+// No recibe props: el usuario conectado lo lee con useUsuario().
+// Devuelve la página completa de incidencias.
+function PaginaIncidencias() {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // Controla si se muestra el mensaje de confirmación.
   // Parte en false: al principio solo se ve el formulario.
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
@@ -55,13 +52,12 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
 
       {/* Formulario para registrar una incidencia nueva.
           Solo lo ve el encargado (RNF-03); los demás ven un aviso. */}
-      {puedeGestionarIncidencias(props.usuario.rol) && (
+      {puedeGestionarIncidencias(usuario.rol) && (
         <FormularioIncidencia
           onIncidenciaRegistrada={alRegistrarIncidencia}
-          usuario={props.usuario}
         />
       )}
-      {!puedeGestionarIncidencias(props.usuario.rol) && (
+      {!puedeGestionarIncidencias(usuario.rol) && (
         <p className="texto-secundario">
           Tu rol solo permite consultar las incidencias. Para registrar una, avisa al
           encargado de laboratorio.
@@ -71,7 +67,7 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
       {/* Historial de incidencias (HU-10) */}
       {/* La key={contador} hace que React vuelva a crear la tabla
           cada vez que se registra una incidencia, mostrando la nueva. */}
-      <TablaIncidencias key={contador} usuario={props.usuario} />
+      <TablaIncidencias key={contador} />
     </section>
   );
 }

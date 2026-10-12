@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Recurso } from '../types/Recurso';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { reponerStock } from '../services/recursosService';
 import { validarReposicion, textoResumenReposicion } from '../utils/reposicion';
 import './FormularioReponerStock.css';
@@ -20,14 +20,15 @@ interface PropsFormularioReponerStock {
   // Se llama después de guardar, para que App redibuje todo
   // (así la alerta de reposición desaparece si ya se llegó al mínimo)
   onStockRepuesto: () => void;
-  // Usuario conectado: su nombre queda en el historial
-  usuario: Usuario;
 }
 
 // Componente FormularioReponerStock
-// Recibe: el recurso, la función para avisar que se guardó y el usuario.
+// Recibe: el recurso y la función para avisar que se guardó.
+// El usuario conectado (su nombre queda en el historial) lo lee con useUsuario().
 // Devuelve: el formulario "Reponer stock".
 function FormularioReponerStock(props: PropsFormularioReponerStock) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   const recurso = props.recurso;
 
   const [cantidadTexto, setCantidadTexto] = useState('1');
@@ -52,7 +53,7 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
 
     const cantidad = Number(cantidadTexto);
     setGuardando(true);
-    const seGuardo = await reponerStock(recurso.id, cantidad, motivo, props.usuario.nombre);
+    const seGuardo = await reponerStock(recurso.id, cantidad, motivo, usuario.nombre);
     setGuardando(false);
 
     if (seGuardo) {
