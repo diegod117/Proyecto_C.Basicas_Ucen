@@ -1,24 +1,32 @@
 /* PaginaLogin.css
-   M18 — RNF-01: rediseño de la pantalla de inicio de sesión.
-   Inspirado en mockup-sgil.html:
-     - Fondo azul UCEN que ocupa toda la pantalla.
-     - Tarjeta blanca centrada con franja decorativa azul arriba.
-     - Título del sistema en dos líneas, centrado.
-   Solo se tocan estilos; PaginaLogin.tsx no cambia.
-   Todos los colores vienen de variables de global.css (nunca valores sueltos). */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la pantalla de LOGIN (M18 — RNF-01):
+     - un fondo azul que llena toda la pantalla,
+     - una tarjeta blanca al centro, con una franja azul arriba,
+     - el título y el subtítulo centrados.
+   Los colores vienen de las variables de global.css (nunca colores sueltos).
+   *** Para cambiar el color del fondo del login, busca .login-fondo. ***
+   En la guía: paso 7 (CSS: flex para centrar, degradados y ::before). */
 
 /* =====================================================
-   FONDO
+   EL FONDO
    ===================================================== */
 
-/* Fondo azul UCEN que ocupa toda la pantalla y centra la tarjeta.
-   Tiene un degradado sutil para que no se vea tan plano. */
+/* El fondo azul que llena toda la pantalla y pone la tarjeta al centro. */
 .login-fondo {
+  /* vh = "alto de la ventana". 100vh = toda la altura de la pantalla.
+     min-height = "por lo menos" ese alto. */
   min-height: 100vh;
+  /* El truco clásico para CENTRAR algo en la pantalla:
+     display: flex + align-items: center (centro de arriba a abajo)
+                   + justify-content: center (centro de izquierda a derecha). */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--espacio-md);
+  /* Un degradado: un color que se va transformando en otro.
+     linear-gradient(dirección, color1 dónde-empieza, color2 dónde-termina)
+     145deg = en diagonal. Del azul normal (0%) al azul oscuro (100%). */
   background: linear-gradient(
     145deg,
     var(--color-principal) 0%,
@@ -27,57 +35,60 @@
 }
 
 /* =====================================================
-   TARJETA
+   LA TARJETA BLANCA
    ===================================================== */
 
-/* Tarjeta blanca con esquinas redondeadas y sombra.
-   overflow: hidden recorta la franja decorativa de arriba
-   para que respete el border-radius. */
+/* La tarjeta blanca con esquinas redondeadas y sombra. */
 .login-tarjeta {
   background-color: var(--color-blanco);
   border-radius: var(--radio-borde);
-  width: 100%;
-  max-width: 400px;
+  width: 100%;      /* todo el ancho que pueda... */
+  max-width: 400px; /* ...pero nunca más de 400px */
   display: flex;
   flex-direction: column;
   box-shadow: var(--sombra-elevada);
-  overflow: hidden; /* necesario para que la franja respete el radio */
+  /* overflow: hidden = "lo que se salga de mis bordes, no se ve".
+     Sin esto, la franja azul de arriba tendría las esquinas cuadradas
+     y se saldría de las esquinas redondeadas de la tarjeta. */
+  overflow: hidden;
 }
 
-/* Franja decorativa azul en la parte superior de la tarjeta (M18).
-   Seis píxeles de altura, color principal. Da identidad institucional
-   sin sobrecargar la pantalla. */
+/* La franja azul decorativa de arriba (M18).
+   ::before = un elemento "fantasma" que el CSS crea ANTES del contenido
+   de la tarjeta, sin tocar el .tsx. Necesita content: '' para existir. */
 .login-tarjeta::before {
   content: '';
   display: block;
-  height: 6px;
+  height: 6px; /* una franja de 6 pixeles de alto */
   background-color: var(--color-principal);
-  flex-shrink: 0;
+  flex-shrink: 0; /* que no se aplaste */
 }
 
-/* Zona interior de la tarjeta (padding separado de la franja) */
+/* El interior de la tarjeta: el relleno para que nada quede pegado a los bordes. */
 .login-tarjeta-cuerpo {
   padding: var(--espacio-xl) var(--espacio-lg);
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* todo uno debajo del otro */
 }
 
 /* =====================================================
    TÍTULO Y SUBTÍTULO
    ===================================================== */
 
-/* Título en dos líneas: el <br> lo maneja el .tsx.
-   text-wrap: balance distribuye las palabras equitativamente. */
+/* El título "UCEN — Gestión de Inventario". */
 .login-titulo {
+  /* margin con 3 valores: arriba (0), los lados (0) y abajo (xs). */
   margin: 0 0 var(--espacio-xs);
   font-size: 1.35rem;
   font-weight: 700;
-  text-align: center;
+  text-align: center; /* centrado */
   color: var(--color-principal);
   line-height: 1.3;
+  /* Si el título ocupa dos líneas, reparte las palabras parejito entre las dos. */
   text-wrap: balance;
 }
 
+/* El subtítulo "Laboratorios del Departamento...". */
 .login-subtitulo {
   margin: 0 0 var(--espacio-xl);
   font-size: 0.85rem;
@@ -86,24 +97,26 @@
 }
 
 /* =====================================================
-   CAMPOS DEL FORMULARIO
+   LAS CAJITAS DEL FORMULARIO
    ===================================================== */
 
+/* Las etiquetas "Correo" y "Contraseña". */
 .login-etiqueta {
   font-size: 0.825rem;
   font-weight: 600;
   color: var(--color-texto);
   margin-bottom: var(--espacio-xs);
-  display: block;
+  display: block; /* block = ocupa su propia línea completa */
 }
 
+/* Las cajitas para escribir. */
 .login-input {
   width: 100%;
   padding: 10px var(--espacio-md);
   border: 1.5px solid var(--color-borde);
   border-radius: var(--radio-borde-sm);
-  /* 16px (1rem) como mínimo: en iPhone, si un campo tiene letra más chica,
-     Safari hace zoom al tocarlo y NO lo deshace al entrar a la app (RNF-01) */
+  /* La letra tiene que ser de 16px (1rem) o más. Si es más chica, el iPhone
+     hace zoom al tocar la cajita y después NO lo quita al entrar a la app (RNF-01). */
   font-size: 1rem;
   font-family: inherit;
   color: var(--color-texto);
@@ -112,20 +125,23 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+/* :focus = "cuando la cajita está ACTIVA" (el cursor está adentro, escribiendo).
+   Le ponemos un borde azul y un "halo" azul clarito alrededor. */
 .login-input:focus {
-  outline: none;
+  outline: none; /* quitamos el borde feo que pone el navegador */
   border-color: var(--color-principal);
   background-color: var(--color-blanco);
+  /* Una sombra sin borrosidad (0 0 0) de 3px = un anillo alrededor. */
   box-shadow: 0 0 0 3px rgba(26, 99, 187, 0.15);
 }
 
 /* =====================================================
-   MENSAJE DE ERROR
+   EL MENSAJE DE ERROR (rojo)
    ===================================================== */
 
 .login-error {
   color: var(--color-danado);
-  background-color: #fef2f2;
+  background-color: #fef2f2; /* rojo muy clarito */
   border: 1px solid #fecaca;
   border-radius: var(--radio-borde-sm);
   padding: var(--espacio-sm) var(--espacio-md);
@@ -134,12 +150,11 @@
 }
 
 /* =====================================================
-   BOTÓN
+   EL BOTÓN "INICIAR SESIÓN"
    ===================================================== */
 
-/* Usamos la clase global .boton-principal de global.css,
-   pero el botón de login tiene un estilo propio: ancho completo
-   y tamaño de texto algo mayor para que destaque. */
+/* No usa .boton-principal de global.css porque este botón es especial:
+   ocupa todo el ancho y tiene la letra un poco más grande para que destaque. */
 .login-boton {
   width: 100%;
   padding: 12px var(--espacio-md);
@@ -155,12 +170,13 @@
   margin-top: var(--espacio-xs);
 }
 
+/* :hover:not(:disabled) = "mouse encima, PERO solo si NO está apagado". */
 .login-boton:hover:not(:disabled) {
   background-color: var(--color-principal-oscuro);
   box-shadow: var(--sombra-tarjeta);
 }
 
-/* Mientras espera a Firebase el botón se ve gris */
+/* Mientras espera a Firebase, el botón se ve gris. */
 .login-boton:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
@@ -168,14 +184,14 @@
 }
 
 /* =====================================================
-   ENLACE "¿OLVIDASTE TU CONTRASEÑA?"
+   EL ENLACE "¿OLVIDASTE TU CONTRASEÑA?"
    ===================================================== */
 
-/* Es un <button> pero se ve como un enlace de texto azul.
-   También lo usa FormularioRecuperarContrasena para "Volver". */
+/* Es un <button>, pero lo disfrazamos de enlace: sin fondo, sin borde,
+   letra azul. También lo usa el formulario de recuperar para "Volver". */
 .login-enlace {
   display: block;
-  margin: var(--espacio-md) auto 0;
+  margin: var(--espacio-md) auto 0; /* "auto" a los lados = centrado */
   padding: var(--espacio-xs);
   background: none;
   border: none;
@@ -185,14 +201,16 @@
   cursor: pointer;
 }
 
+/* Con el mouse encima, se subraya (como un enlace de verdad). */
 .login-enlace:hover {
   text-decoration: underline;
 }
 
 /* =====================================================
-   RESPONSIVE (RNF-01)
+   EN PANTALLAS CHICAS (RNF-01)
    ===================================================== */
 
+/* Celulares (480px o menos): menos relleno y título más chico. */
 @media (max-width: 480px) {
   .login-tarjeta-cuerpo {
     padding: var(--espacio-lg) var(--espacio-md);
@@ -203,11 +221,13 @@
   }
 }
 
-/* M21: 375px (iPhone SE, Galaxy A series)
-   La tarjeta usa el 100% del ancho con margen mínimo. */
+/* M21: celulares muy chicos (375px, como un iPhone SE).
+   La tarjeta usa casi todo el ancho. */
 @media (max-width: 400px) {
   .login-fondo {
     padding: var(--espacio-sm);
+    /* flex-start = la tarjeta va ARRIBA, no al centro (así se ve entera
+       aunque aparezca el teclado). */
     align-items: flex-start;
     padding-top: var(--espacio-xl);
   }
@@ -220,7 +240,7 @@
     font-size: 1rem;
   }
 
-  /* El botón tiene altura mínima táctil de 44px */
+  /* El botón de al menos 44px de alto: cómodo para el dedo. */
   .login-boton {
     min-height: 44px;
   }

@@ -1,10 +1,12 @@
 // FormularioReponerStock.tsx
-// Recuadro "Reponer stock" de la ficha, debajo de "Cambiar estado".
-// Sirve para sumar unidades NUEVAS que llegan al laboratorio (por ejemplo,
-// una compra de guantes). Las unidades entran como "disponible".
-// Así se resuelven las alertas de reposición: antes solo se podían mover
-// unidades entre estados, pero no agregar unidades nuevas.
-// Usa el mismo estilo que FormularioCambioEstado (sus clases CSS).
+// ¿QUÉ ES ESTE ARCHIVO?
+// El recuadro "Reponer stock" de la ficha, debajo de "Cambiar estado".
+// Sirve para sumar unidades NUEVAS que llegan al laboratorio (ej: se
+// compraron 10 cajas de guantes). Entran como "disponible".
+// Así se apagan las alertas de reposición ("quedan pocas, hay que comprar").
+// Usa las mismas clases CSS que FormularioCambioEstado para verse igual.
+// Funciona igual que FormularioCambioEstado (revisar -> guardar -> avisar),
+// pero más corto. (ver guía, paso 4)
 // Cubre: RF-04 y HU-09 (reposición), HU-06 (queda en el historial), RNF-03
 
 import { useState } from 'react';
@@ -18,63 +20,72 @@ import './FormularioReponerStock.css';
 interface PropsFormularioReponerStock {
   recurso: Recurso;
   // Se llama después de guardar, para que App redibuje todo
-  // (así la alerta de reposición desaparece si ya se llegó al mínimo)
+  // (así la alerta de reposición desaparece si ya hay suficientes).
   onStockRepuesto: () => void;
-  // Usuario conectado: su nombre queda en el historial
+  // La persona conectada: su nombre queda en el historial.
   usuario: Usuario;
 }
 
 // Componente FormularioReponerStock
-// Recibe: el recurso, la función para avisar que se guardó y el usuario.
+// Recibe: el recurso, la función para avisar y la persona conectada.
 // Devuelve: el formulario "Reponer stock".
 function FormularioReponerStock(props: PropsFormularioReponerStock) {
   const recurso = props.recurso;
 
+  // La memoria del formulario: una por cajita, más los mensajes.
   const [cantidadTexto, setCantidadTexto] = useState('1');
   const [motivo, setMotivo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
-  // true mientras se espera a Firestore: desactiva el botón para no guardar dos veces
+  // true mientras esperamos a Firestore: apaga el botón para no guardar dos veces.
   const [guardando, setGuardando] = useState(false);
 
   // guardarReposicion
+  // Se ejecuta al apretar "Agregar unidades".
   // Recibe: el evento del formulario. No devuelve nada.
-  // Es "async" porque el servicio guarda en Firestore y hay que esperarlo.
   async function guardarReposicion(evento: FormEvent) {
-    evento.preventDefault();
+    evento.preventDefault(); // que no se recargue la página
     setMensajeExito('');
 
+    // 1. Revisar.
     const error = validarReposicion(cantidadTexto, motivo);
     if (error !== '') {
       setMensajeError(error);
       return;
     }
 
+    // 2. Guardar (y esperar a Firestore).
     const cantidad = Number(cantidadTexto);
     setGuardando(true);
     const seGuardo = await reponerStock(recurso.id, cantidad, motivo, props.usuario.nombre);
     setGuardando(false);
 
+    // 3. Contar cómo nos fue.
     if (seGuardo) {
       setMensajeError('');
-      // recurso.cantidades.disponible ya tiene el número nuevo, porque el
-      // servicio modificó este mismo objeto
+      // recurso.cantidades.disponible YA tiene el número nuevo, porque el
+      // servicio cambió este mismo objeto (no una copia).
       setMensajeExito(textoResumenReposicion(cantidad, recurso.cantidades.disponible));
+      // Dejamos las cajitas como al principio para la próxima vez.
       setCantidadTexto('1');
       setMotivo('');
-      props.onStockRepuesto();
+      props.onStockRepuesto(); // avisamos hacia arriba
     } else {
       setMensajeError('No se pudo reponer el stock. Revisa tu conexión e inténtalo de nuevo.');
     }
   }
 
-  // Texto de ayuda: cuántas hay disponibles y, si tiene, el stock mínimo
+  // Un texto de ayuda: cuántas hay y, si tiene, el mínimo.
+  // Ej: "Disponibles: 2 · Mínimo: 5".
   let textoStockActual = 'Disponibles: ' + recurso.cantidades.disponible;
   if (recurso.stockMinimo !== undefined) {
     textoStockActual = textoStockActual + ' · Mínimo: ' + recurso.stockMinimo;
   }
 
   return (
+    // Tiene DOS clases: "formulario-cambio-estado" (para verse igual al otro
+    // recuadro) y "formulario-reponer-stock" (para lo propio de este).
+    // En CSS, un elemento puede tener varias clases separadas por espacio.
     <form
       className="formulario-cambio-estado formulario-reponer-stock"
       onSubmit={guardarReposicion}

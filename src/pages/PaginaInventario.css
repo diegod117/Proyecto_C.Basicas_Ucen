@@ -1,39 +1,49 @@
 /* PaginaInventario.css
-   Estilos propios de la página de inventario.
-   D17: encabezado de página con título grande y descripción en gris.
-   Las clases .encabezado-pagina-* están pensadas para que las demás
-   páginas (Reservas, Incidencias, Alertas) usen el mismo encabezado. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la página de inventario:
+     - el encabezado (título grande + frase gris + botón "+ Agregar recurso"),
+     - la línea "Mostrando X de Y recursos" con el botón "Limpiar filtros".
+   D17: las clases .encabezado-pagina-* están pensadas para que otras
+   páginas puedan usar el mismo encabezado.
+   En la guía: paso 7 (CSS: flex y flex-wrap). */
 
-/* Encabezado de página: título arriba y una línea de descripción debajo */
+/* El encabezado: un poco de espacio abajo para separarlo de los filtros. */
 .encabezado-pagina {
   margin-bottom: var(--espacio-lg);
 }
 
+/* El título grande "Inventario". */
 .encabezado-pagina-titulo {
+  /* margin con 4 valores va en el sentido del reloj:
+     arriba, derecha, abajo, izquierda. Aquí solo hay espacio abajo. */
   margin: 0 0 var(--espacio-xs) 0;
-  font-size: 1.75rem;
+  font-size: 1.75rem; /* 1.75 veces la letra normal = 28px */
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-texto);
 }
 
+/* La frase gris debajo del título. */
 .encabezado-pagina-descripcion {
   margin: 0;
   font-size: 0.95rem;
   color: var(--color-texto-secundario);
 }
 
-/* En inventario, el encargado ve el botón "+ Agregar recurso" a la derecha
-   del título. flex-wrap: en celular, si no cabe, el botón baja. */
+/* En inventario, el encargado ve el botón "+ Agregar recurso" a la DERECHA
+   del título. Con flex en fila y space-between: título a la izquierda,
+   botón a la derecha.
+   flex-wrap: wrap = "si no caben en una línea, baja el que sobre a la
+   siguiente" (en el celular, el botón baja debajo del título). */
 .encabezado-inventario {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-start; /* alineados por ARRIBA */
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--espacio-md);
 }
 
-/* Fila con el contador "Mostrando X de 10" y el botón para limpiar filtros */
+/* La fila con "Mostrando X de 10 recursos" y el botón "Limpiar filtros". */
 .inventario-contador {
   display: flex;
   align-items: center;
@@ -42,13 +52,15 @@
   margin-bottom: var(--espacio-sm);
 }
 
+/* ".inventario-contador p" (con espacio) = "los <p> que están DENTRO de
+   .inventario-contador". Solo esos, no todos los <p> de la app. */
 .inventario-contador p {
   margin: 0;
   font-size: 0.875rem;
 }
 
-/* Botón "Limpiar filtros" al lado del contador.
-   Se ve como un enlace para que no compita con el resto de la página. */
+/* El botón "Limpiar filtros": disfrazado de enlace (azul y subrayado)
+   para que no llame tanto la atención. */
 .boton-limpiar-pequeno {
   background-color: transparent;
   color: var(--color-principal);
@@ -58,7 +70,7 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  text-decoration: underline;
+  text-decoration: underline; /* subrayado */
   cursor: pointer;
   transition: background-color 0.18s ease;
 }
@@ -67,7 +79,7 @@
   background-color: var(--color-principal-claro);
 }
 
-/* En celular el título baja de tamaño para que no ocupe tantas líneas */
+/* En pantallas de 700px o menos, el título se achica un poco. */
 @media (max-width: 700px) {
   .encabezado-pagina-titulo {
     font-size: 1.4rem;

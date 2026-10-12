@@ -1,33 +1,62 @@
 /* global.css
-   Estilos que se aplican a TODA la aplicación.
-   Los estilos de cada componente o página irán en su propio archivo .css.
-   Los colores vienen del mockup (docs/mockup-sgil.html). */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos que se aplican a TODA la app (se importa una sola vez en main.tsx).
+   Aquí están:
+     1. Las VARIABLES: los colores, tamaños y sombras de toda la app.
+     2. Reglas para toda la página (letra, fondo).
+     3. Los BOTONES que se usan en todas partes (.boton-principal, etc.).
+     4. Las ETIQUETAS de colores de los estados (Disponible, Dañado...).
+   Los estilos de cada componente van en su propio .css, al lado de su .tsx.
+   Los colores salieron del dibujo del diseño (docs/mockup-sgil.html).
+
+   ¿CÓMO SE LEE UN ARCHIVO CSS? (ver guía, paso 7)
+   Cada bloque es una "regla" y se escribe así:
+       selector {
+         propiedad: valor;
+       }
+   - El SELECTOR dice A QUIÉN se le aplica:
+       .boton-principal -> a todo lo que tenga className="boton-principal"
+                           (el punto . significa "clase")
+       body             -> a la etiqueta <body> (sin punto = etiqueta HTML)
+       *                -> a TODO
+   - Cada PROPIEDAD dice QUÉ cambiar (color, tamaño...), y el VALOR, cuánto.
+   - Lo que va entre barra-asterisco y asterisco-barra son comentarios, como este. */
 
 /* =====================================================
-   VARIABLES DE DISEÑO (M15 — RNF-01)
-   Todas las reglas de color, tamaño y sombra están
-   aquí. Nunca escribir valores sueltos en otros .css;
-   siempre usar var(--nombre-variable).
+   1. VARIABLES DE DISEÑO (M15 — RNF-01)
+   ¡AQUÍ SE CAMBIAN LOS COLORES DE TODA LA APP! (ver guía, paso 9)
+   Una variable es una cajita con nombre que guarda un valor.
+   Se crea con dos guiones:   --color-principal: #1a63bb;
+   y se usa en otros lados así: color: var(--color-principal);
+   Si cambias el valor aquí, cambia en TODOS los lugares que la usan.
+   Regla del grupo: en los otros .css no se escriben colores sueltos,
+   siempre se usa var(--nombre).
    ===================================================== */
-:root {
-  /* --- Colores principales --- */
-  --color-principal: #1a63bb;        /* azul UCEN (del mockup) */
-  --color-principal-oscuro: #144f96; /* hover de botones y links activos */
-  --color-principal-claro: #e8f0fe;  /* fondo de ítem activo en el menú */
 
-  /* --- Fondos generales --- */
-  --color-fondo: #f8fafc;            /* fondo de toda la app */
-  --color-fondo-menu: #f1f5f9;       /* fondo del menú lateral */
-  --color-blanco: #ffffff;           /* tarjetas y paneles */
+/* :root = "la raíz", o sea, toda la página. Las variables definidas aquí
+   se pueden usar en cualquier parte. */
+:root {
+  /* --- Colores principales ---
+     Los colores se escriben en "hexadecimal": # y 6 letras/números.
+     Los 2 primeros son el rojo, los 2 del medio el verde y los 2 últimos el azul.
+     #ffffff = blanco, #000000 = negro, #1a63bb = azul. */
+  --color-principal: #1a63bb;        /* el azul UCEN (barra de arriba, botones) */
+  --color-principal-oscuro: #144f96; /* azul más oscuro: botones con el mouse encima */
+  --color-principal-claro: #e8f0fe;  /* azul clarito: fondo del botón elegido en el menú */
+
+  /* --- Fondos --- */
+  --color-fondo: #f8fafc;            /* el fondo gris muy clarito de toda la app */
+  --color-fondo-menu: #f1f5f9;       /* el fondo del menú de la izquierda */
+  --color-blanco: #ffffff;           /* las tarjetas y recuadros */
 
   /* --- Texto --- */
-  --color-texto: #1f2937;
-  --color-texto-secundario: #6b7280;
+  --color-texto: #1f2937;            /* texto normal (casi negro) */
+  --color-texto-secundario: #6b7280; /* texto menos importante (gris) */
 
   /* --- Bordes --- */
-  --color-borde: #e5e7eb;
+  --color-borde: #e5e7eb;            /* las líneas grises finitas */
 
-  /* --- Colores de estado del recurso --- */
+  /* --- Un color por cada estado de un recurso --- */
   --color-disponible: #15803d;  /* verde */
   --color-en-uso: #1d4ed8;      /* azul */
   --color-danado: #b91c1c;      /* rojo */
@@ -35,82 +64,102 @@
   --color-baja: #4b5563;        /* gris */
 
   /* --- Colores de alertas e incidencias --- */
-  --color-alerta-critica: #b91c1c;    /* rojo — prioridad alta */
-  --color-alerta-advertencia: #a16207; /* amarillo — prioridad media */
-  --color-alerta-info: #1a63bb;       /* azul — prioridad baja */
+  --color-alerta-critica: #b91c1c;     /* rojo: muy importante */
+  --color-alerta-advertencia: #a16207; /* amarillo: importante */
+  --color-alerta-info: #1a63bb;        /* azul: para saber */
 
-  /* --- Sombras --- */
-  /* Sombra suave para tarjetas y paneles */
+  /* --- Sombras ---
+     Se leen así: "0 2px 8px rgba(0, 0, 0, 0.08)" =
+       0   -> la sombra no se corre hacia el lado
+       2px -> se corre 2 pixeles hacia abajo
+       8px -> qué tan borrosa es
+       rgba(0, 0, 0, 0.08) -> negro con 8% de opacidad (casi transparente)
+     (rgba = rojo, verde, azul y "alfa", que es la transparencia de 0 a 1) */
+  /* Sombra suave para tarjetas y recuadros. */
   --sombra-tarjeta: 0 2px 8px rgba(0, 0, 0, 0.08);
-  /* Sombra más notoria para elementos elevados (hover, modales) */
+  /* Sombra más fuerte para cosas "levantadas" (ej: mouse encima). */
   --sombra-elevada: 0 4px 16px rgba(0, 0, 0, 0.14);
 
-  /* --- Bordes redondeados --- */
-  --radio-borde: 10px;   /* tarjetas y contenedores grandes */
-  --radio-borde-sm: 6px; /* botones, campos e inputs */
-  --radio-pildora: 20px; /* etiquetas de estado (píldoras) */
+  /* --- Esquinas redondeadas (cuánto se redondean) ---
+     px = pixeles, los puntitos de la pantalla. */
+  --radio-borde: 10px;   /* tarjetas y recuadros grandes */
+  --radio-borde-sm: 6px; /* botones y cajitas de texto */
+  --radio-pildora: 20px; /* las etiquetas de estado (forma de pastilla) */
 
-  /* --- Espaciado --- */
+  /* --- Espacios (de más chico a más grande) ---
+     xs = extra chico, sm = chico, md = mediano, lg = grande, xl = extra grande.
+     Usar siempre estos hace que todo quede parejito. */
   --espacio-xs: 4px;
   --espacio-sm: 8px;
   --espacio-md: 16px;
   --espacio-lg: 24px;
   --espacio-xl: 32px;
 
-  /* --- Ancho del menú lateral --- */
+  /* --- Qué tan ancho es el menú de la izquierda --- */
   --ancho-menu: 220px;
 
-  /* --- Alto de la barra superior --- */
+  /* --- Qué tan alta es la barra azul de arriba --- */
   --alto-header: 56px;
 
-  /* --- Alto de la fila de pestañas en celular (RNF-01) ---
-     En celular el menú lateral se convierte en una fila fija debajo de la
-     barra azul. El contenido usa este valor para empezar justo debajo. */
+  /* --- Qué tan alta es la fila de botones del menú en el celular (RNF-01) ---
+     En el celular, el menú de la izquierda se convierte en una fila fija
+     debajo de la barra azul. El contenido usa este número para empezar
+     justo debajo y no quedar tapado. */
   --alto-menu-celular: 52px;
 }
 
 /* =====================================================
-   RESET BASE
+   2. REGLAS PARA TODA LA PÁGINA
    ===================================================== */
 
-/* box-sizing: border-box hace que el ancho de un elemento incluya
-   su padding y borde. Así es más fácil calcular tamaños. */
+/* * = a TODOS los elementos.
+   box-sizing: border-box = "el ancho que te doy INCLUYE el relleno y el borde".
+   Sin esto, si dices "mide 100px" y le pones 10px de relleno, termina
+   midiendo 120px. Con esto, mide 100px y punto. Mucho más fácil. */
 * {
   box-sizing: border-box;
 }
 
+/* body = el cuerpo de la página (todo lo que se ve). */
 body {
-  margin: 0;
-  /* M16: Inter es la fuente del mockup, cargada desde Google Fonts en index.html */
+  margin: 0; /* el navegador pone un margen blanco alrededor; lo quitamos */
+  /* M16: el tipo de letra. Se prueba en orden: si no hay 'Inter', usa Arial,
+     y así. Inter se descarga de Google Fonts (ver index.html). */
   font-family: 'Inter', Arial, Helvetica, sans-serif;
-  background-color: var(--color-fondo);
-  color: var(--color-texto);
-  line-height: 1.5;
+  background-color: var(--color-fondo); /* color de fondo */
+  color: var(--color-texto);            /* color de la letra */
+  line-height: 1.5; /* el alto de cada línea: 1.5 veces el tamaño de la letra (más aire) */
 }
 
+/* h1 = los títulos más grandes. Los pintamos azul UCEN. */
 h1 {
   color: var(--color-principal);
 }
 
 /* =====================================================
-   UTILIDADES COMUNES
+   CLASES QUE SE USAN EN VARIAS PÁGINAS
    ===================================================== */
 
-/* Contenedor común de todas las páginas (Inventario, Reservas, Incidencias).
-   Va aquí porque lo usan todas; los estilos propios de cada página
-   irán en su propio archivo .css. */
+/* El "contenedor" de todas las páginas (Inventario, Reservas, etc.).
+   Está aquí porque lo usan todas. */
 .contenido-pagina {
-  max-width: 1100px;
-  margin: 0 auto;
+  max-width: 1100px; /* nunca más ancho que 1100px, aunque la pantalla sea enorme */
+  margin: 0 auto;    /* 0 arriba/abajo, "auto" a los lados = queda CENTRADO */
+  /* padding = el relleno de ADENTRO (el espacio entre el borde y el contenido).
+     Con dos valores: el primero es arriba/abajo y el segundo izquierda/derecha. */
   padding: var(--espacio-lg) var(--espacio-md);
 }
 
+/* Texto gris, para cosas menos importantes. */
 .texto-secundario {
   color: var(--color-texto-secundario);
 }
 
-/* M21: reduce el padding lateral en pantallas muy pequeñas (375px).
-   Sin esto, las tarjetas y tablas quedan demasiado apretadas. */
+/* @media = "solo cuando la pantalla cumpla esta condición".
+   (max-width: 420px) = "solo si la pantalla mide 420px de ancho o menos"
+   (un celular chico). Es como decir: "si es un celular, haz esto".
+   M21: en pantallas muy chicas, menos relleno a los lados para que las
+   tarjetas y tablas no queden apretadas. */
 @media (max-width: 420px) {
   .contenido-pagina {
     padding: var(--espacio-md) var(--espacio-sm);
@@ -118,48 +167,57 @@ h1 {
 }
 
 /* =====================================================
-   BOTONES BASE (M16 — RNF-01)
-   Tres estilos usados en TODAS las páginas.
-   Nunca agregar estilos de botón en archivos de página;
-   solo usar estas clases y sobreescribir lo mínimo.
+   3. BOTONES (M16 — RNF-01)
+   Tres estilos de botón para TODAS las páginas:
+     .boton-principal  -> azul relleno (la acción más importante)
+     .boton-secundario -> solo borde azul (acciones de segunda importancia)
+     .boton-peligro    -> rojo (acciones peligrosas)
+   Regla del grupo: no inventar botones nuevos en cada página; usar estos.
    ===================================================== */
 
-/* Base compartida: tamaño, cursor y transición */
+/* Lo que comparten los tres. Separar selectores con comas = "a todos estos". */
 .boton-principal,
 .boton-secundario,
 .boton-peligro {
+  /* display = cómo se acomoda el elemento.
+     inline-flex = va en la misma línea que el texto, pero sus hijos
+     (ej: un dibujito y el texto) se pueden alinear entre sí. */
   display: inline-flex;
-  align-items: center;
-  gap: var(--espacio-xs);
-  padding: var(--espacio-sm) var(--espacio-md);
-  font-family: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: var(--radio-borde-sm);
-  border: 2px solid transparent;
-  cursor: pointer;
+  align-items: center; /* centra los hijos de arriba a abajo */
+  gap: var(--espacio-xs); /* espacio entre los hijos */
+  padding: var(--espacio-sm) var(--espacio-md); /* relleno de adentro */
+  font-family: inherit; /* inherit = "usa la misma letra que tu papá" (los botones no la heredan solos) */
+  font-size: 0.875rem;  /* tamaño de letra. 1rem = el tamaño normal (16px); 0.875rem = 14px */
+  font-weight: 500;     /* grosor de la letra: 400 normal, 700 negrita */
+  border-radius: var(--radio-borde-sm); /* esquinas redondeadas */
+  border: 2px solid transparent; /* borde de 2px, línea continua, invisible (transparente) */
+  cursor: pointer; /* la flechita del mouse se vuelve una manito */
+  /* transition = los cambios de color no son de golpe: tardan 0.18 segundos.
+     Así se ve suave cuando pasas el mouse encima. */
   transition: background-color 0.18s ease, color 0.18s ease,
               border-color 0.18s ease, box-shadow 0.18s ease;
-  text-decoration: none;
-  white-space: nowrap;
+  text-decoration: none; /* sin subrayado */
+  white-space: nowrap;   /* el texto del botón no se parte en dos líneas */
 }
 
-/* Principal: azul relleno (acción más importante de la pantalla) */
+/* Principal: azul relleno. */
 .boton-principal {
   background-color: var(--color-principal);
   color: var(--color-blanco);
   border-color: var(--color-principal);
 }
+/* :hover = "cuando el mouse está ENCIMA". Se pone más oscuro y con sombra. */
 .boton-principal:hover {
   background-color: var(--color-principal-oscuro);
   border-color: var(--color-principal-oscuro);
   box-shadow: var(--sombra-tarjeta);
 }
+/* :active = "mientras lo estás apretando". Sin sombra = parece hundido. */
 .boton-principal:active {
   box-shadow: none;
 }
 
-/* Secundario: borde azul, fondo transparente (acciones secundarias) */
+/* Secundario: fondo transparente con borde azul. */
 .boton-secundario {
   background-color: transparent;
   color: var(--color-principal);
@@ -169,14 +227,14 @@ h1 {
   background-color: var(--color-principal-claro);
 }
 
-/* Peligro: rojo relleno (dar de baja, cancelar, eliminar) */
+/* Peligro: rojo relleno (dar de baja, eliminar...). */
 .boton-peligro {
   background-color: var(--color-danado);
   color: var(--color-blanco);
   border-color: var(--color-danado);
 }
 .boton-peligro:hover {
-  background-color: #991b1b; /* un tono más oscuro que --color-danado */
+  background-color: #991b1b; /* un rojo un poco más oscuro */
   border-color: #991b1b;
   box-shadow: var(--sombra-tarjeta);
 }
@@ -184,55 +242,62 @@ h1 {
   box-shadow: none;
 }
 
-/* Estado deshabilitado (aplica a los tres) */
+/* :disabled = "cuando el botón está APAGADO" (disabled en el .tsx).
+   Se ve medio transparente y el mouse muestra un "prohibido". */
 .boton-principal:disabled,
 .boton-secundario:disabled,
 .boton-peligro:disabled {
-  opacity: 0.5;
+  opacity: 0.5; /* 50% transparente (1 = normal, 0 = invisible) */
   cursor: not-allowed;
   box-shadow: none;
 }
 
-/* Estilo común de todas las etiquetas de estado.
-   D19: forma de "píldora" (bordes muy redondeados) con la variable
-   --radio-pildora. Los colores de cada estado se mantienen. */
+/* =====================================================
+   4. ETIQUETAS DE ESTADO (las "pastillas" de colores)
+   ===================================================== */
+
+/* Lo común a todas las etiquetas: la forma de pastilla.
+   D19: bordes MUY redondeados con --radio-pildora. */
 .etiqueta {
-  display: inline-block;
+  display: inline-block; /* va en la línea del texto, pero se le puede dar relleno */
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 10px;
+  padding: 2px 10px; /* 2px arriba/abajo, 10px a los lados */
   border-radius: var(--radio-pildora);
   border: 1px solid;
-  /* "currentColor" usa el mismo color del texto para el borde */
+  /* currentColor = "el mismo color que la letra". Así el borde siempre
+     combina con el texto, sin escribir el color dos veces. */
   border-color: currentColor;
   white-space: nowrap;
 }
 
-/* Un color por estado. Los nombres de clase terminan igual que los
-   estados (etiqueta-disponible, etiqueta-en_uso...), así en el .tsx
-   basta con escribir 'etiqueta-' + estado.
-   Están aquí (global) porque las usan TarjetaRecurso y FichaRecurso. */
+/* Un color por estado. El truco: las clases terminan IGUAL que los estados
+   (etiqueta-disponible, etiqueta-en_uso...). Así, en el .tsx basta con
+   escribir 'etiqueta etiqueta-' + estado y sale el color correcto.
+   Están aquí (y no en un componente) porque las usan varios: la tarjeta,
+   la ficha y el historial.
+   Cada una tiene un color de letra fuerte y un fondo clarito del mismo tono. */
 .etiqueta-disponible {
   color: var(--color-disponible);
-  background-color: #dcfce7;
+  background-color: #dcfce7; /* verde clarito */
 }
 
 .etiqueta-en_uso {
   color: var(--color-en-uso);
-  background-color: #dbeafe;
+  background-color: #dbeafe; /* azul clarito */
 }
 
 .etiqueta-danado {
   color: var(--color-danado);
-  background-color: #fee2e2;
+  background-color: #fee2e2; /* rojo clarito */
 }
 
 .etiqueta-en_mantencion {
   color: var(--color-mantencion);
-  background-color: #fef9c3;
+  background-color: #fef9c3; /* amarillo clarito */
 }
 
 .etiqueta-dado_de_baja {
   color: var(--color-baja);
-  background-color: #f3f4f6;
+  background-color: #f3f4f6; /* gris clarito */
 }

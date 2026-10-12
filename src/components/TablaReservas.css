@@ -1,10 +1,13 @@
 /* TablaReservas.css
-   M19 — RF-03: rediseño de la tabla de reservas.
-   Agrega filas alternadas (zebra striping) con --color-fondo-menu.
-   Usa variables de global.css (nunca valores sueltos). */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la tabla de reservas (M19 — RF-03).
+   Tiene "filas de cebra": una fila blanca, una gris, una blanca... así los
+   ojos no se pierden al leer una fila larga.
+   Usa variables de global.css.
+   En la guía: paso 7 (CSS de tablas, :nth-child y @media). */
 
 /* =====================================================
-   CONTENEDOR DE LA TABLA
+   LA TARJETA QUE CONTIENE LA TABLA
    ===================================================== */
 
 .tabla-reservas-contenedor {
@@ -16,6 +19,7 @@
   box-shadow: var(--sombra-tarjeta);
 }
 
+/* El título ("Reservas programadas" o "Mis reservas"). */
 .tabla-reservas-contenedor h3 {
   margin: 0 0 var(--espacio-md) 0;
   font-size: 1.1rem;
@@ -24,18 +28,19 @@
 }
 
 /* =====================================================
-   TABLA
+   LA TABLA
    ===================================================== */
 
-/* Wrapper con scroll horizontal para que en celular
-   la tabla no rompa el layout. */
+/* Una caja alrededor de la tabla que deja deslizarla hacia el lado en el
+   celular, para que la tabla no rompa la página. */
 .tabla-scroll {
   width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: auto; /* barrita para deslizar, solo si hace falta */
+  -webkit-overflow-scrolling: touch; /* en iPhone, que el deslizar sea suave */
   border-radius: var(--radio-borde-sm);
 }
 
+/* La tabla: nunca más angosta que 620px (si no cabe, se desliza). */
 .tabla-reservas {
   width: 100%;
   border-collapse: collapse;
@@ -44,7 +49,7 @@
   min-width: 620px;
 }
 
-/* Encabezados de columna */
+/* Los títulos de las columnas: fondo gris, en mayúsculas, con una línea gruesa abajo. */
 .tabla-reservas th {
   background-color: var(--color-fondo-menu);
   color: var(--color-texto);
@@ -57,7 +62,7 @@
   white-space: nowrap;
 }
 
-/* Celdas de datos */
+/* Las celdas normales. */
 .tabla-reservas td {
   padding: var(--espacio-sm) var(--espacio-md);
   border-bottom: 1px solid var(--color-borde);
@@ -65,30 +70,32 @@
   vertical-align: middle;
 }
 
-/* Zebra striping: filas pares con fondo levemente gris.
-   Mejora la legibilidad sin necesitar bordes entre filas. */
+/* FILAS DE CEBRA.
+   :nth-child(even) = "los hijos que están en posición PAR" (2ª, 4ª, 6ª...).
+   Esas filas se pintan gris clarito. (even = par, odd = impar) */
 .tabla-reservas tbody tr:nth-child(even) {
   background-color: var(--color-fondo-menu);
 }
 
+/* Con el mouse encima, la fila se pinta azul clarito. */
 .tabla-reservas tbody tr:hover {
   background-color: var(--color-principal-claro);
 }
 
-/* Mensaje cuando no hay reservas */
+/* El texto "No hay reservas registradas...", gris y en cursiva. */
 .sin-reservas-texto {
   color: var(--color-texto-secundario);
-  font-style: italic;
+  font-style: italic; /* letra inclinada */
   padding: var(--espacio-md) 0;
 }
 
 /* =====================================================
-   BOTÓN CANCELAR RESERVA
-   Estilo "peligro" compacto para usar dentro de la tabla.
+   EL BOTÓN "CANCELAR" DE CADA FILA
+   Rojo clarito; con el mouse encima, rojo fuerte.
    ===================================================== */
 
 .boton-cancelar-reserva {
-  background-color: #fef2f2;
+  background-color: #fef2f2; /* rojo muy clarito */
   color: var(--color-danado);
   border: 1px solid #fecaca;
   border-radius: var(--radio-borde-sm);
@@ -102,12 +109,12 @@
 }
 
 .boton-cancelar-reserva:hover {
-  background-color: var(--color-danado);
-  color: var(--color-blanco);
+  background-color: var(--color-danado); /* fondo rojo fuerte */
+  color: var(--color-blanco);            /* letra blanca */
 }
 
 /* =====================================================
-   RESPONSIVE — celular (RNF-01)
+   EN EL CELULAR (RNF-01)
    ===================================================== */
 
 @media (max-width: 768px) {
@@ -115,6 +122,7 @@
     padding: var(--espacio-md);
   }
 
+  /* Menos relleno y letra un poco más chica en las celdas. */
   .tabla-reservas th,
   .tabla-reservas td {
     padding: var(--espacio-sm) var(--espacio-sm);
@@ -127,14 +135,15 @@
   }
 }
 
-/* M21: en 375px la tabla tiene scroll horizontal.
-   La sombra derecha da un indicio visual de que hay más contenido. */
+/* M21: celulares muy chicos (375px). Aquí la tabla se desliza hacia el lado. */
 @media (max-width: 420px) {
   .tabla-reservas-contenedor {
     padding: var(--espacio-sm);
   }
 
-  /* Gradiente sutil a la derecha para indicar scroll horizontal */
+  /* Un degradado blanco suave en los bordes de la caja, como pista de que
+     hay más tabla escondida hacia el lado. (Truco avanzado: dos degradados
+     encimados; no hace falta entenderlo en detalle.) */
   .tabla-scroll {
     background:
       linear-gradient(to right, var(--color-blanco) 0%, transparent 8%),
@@ -143,7 +152,7 @@
     background-attachment: local, scroll;
   }
 
-  /* Botón cancelar más fácil de pulsar con el pulgar */
+  /* El botón "Cancelar" más alto, fácil de tocar con el pulgar. */
   .boton-cancelar-reserva {
     min-height: 36px;
     padding: var(--espacio-sm) var(--espacio-sm);

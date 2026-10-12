@@ -1,7 +1,13 @@
 // PaginaIncidencias.tsx
-// Página de incidencias: muestra el formulario para registrar una incidencia,
-// un mensaje de confirmación y el historial de incidencias en una tabla.
-// Solo el encargado ve el formulario; el departamento solo consulta la tabla.
+// ¿QUÉ ES ESTE ARCHIVO?
+// La página de INCIDENCIAS (accidentes o problemas en el laboratorio).
+// Tiene, de arriba a abajo:
+//   1. El título "Incidencias".
+//   2. Un mensaje verde de "¡listo!" (solo unos segundos, después de registrar).
+//   3. El formulario para registrar una incidencia (solo el encargado).
+//   4. La tabla con todas las incidencias.
+// El docente no puede entrar a esta página (lo decide permisos.ts).
+// En la guía: paso 3 (componentes y key) y paso 8 (incidencias).
 // Cubre: HU-04 (formulario), HU-10 (historial), RF-05, RNF-03
 
 import { useState } from 'react';
@@ -11,32 +17,34 @@ import type { Usuario } from '../types/Usuario';
 import { puedeGestionarIncidencias } from '../utils/permisos';
 import './PaginaIncidencias.css';
 
-// Props que recibe la página desde App
+// Las props que le pasa App.
 interface PropsPaginaIncidencias {
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
+  // La persona conectada: decide si se ve el formulario (RNF-03).
   usuario: Usuario;
 }
 
 // Componente PaginaIncidencias
-// Recibe el usuario conectado. Devuelve la página completa de incidencias.
+// Recibe: la persona conectada. Devuelve: la página completa.
 function PaginaIncidencias(props: PropsPaginaIncidencias) {
-  // Controla si se muestra el mensaje de confirmación.
-  // Parte en false: al principio solo se ve el formulario.
+  // ¿Se muestra el mensaje verde? Parte en false (no se ve).
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
-  // Contador que se incrementa cada vez que se registra una incidencia.
-  // Al cambiar, React vuelve a dibujar la tabla con los datos actualizados.
-  // Es un truco simple: la tabla lee los datos del servicio cada vez que
-  // se dibuja, y cambiar su "key" la obliga a dibujarse de nuevo.
+  // Un contador que sube cada vez que se registra una incidencia.
+  // Se usa como "key" de la tabla: cuando cambia, React tira la tabla vieja
+  // y crea una nueva, que vuelve a leer las incidencias (¡incluida la nueva!).
+  // Es el mismo truco de la "camiseta con número" que se usa en App.tsx.
   const [contador, setContador] = useState(0);
 
-  // Se ejecuta cuando el formulario avisa que se registró una incidencia.
+  // alRegistrarIncidencia
+  // La llama el formulario cuando guardó una incidencia.
   // No recibe nada. No devuelve nada.
   function alRegistrarIncidencia() {
-    setMostrarConfirmacion(true);
-    setContador(contador + 1);
+    setMostrarConfirmacion(true); // aparece el mensaje verde
+    setContador(contador + 1); // la tabla se vuelve a crear
 
-    // Después de 3 segundos, ocultamos el mensaje automáticamente.
+    // setTimeout = "ejecuta esto DESPUÉS de un rato". El rato va en
+    // milisegundos: 3000 ms = 3 segundos. Como una alarma de cocina.
+    // Pasados 3 segundos, el mensaje verde desaparece solo.
     setTimeout(() => {
       setMostrarConfirmacion(false);
     }, 3000);
@@ -46,15 +54,15 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
     <section className="contenido-pagina">
       <h2>Incidencias</h2>
 
-      {/* Mensaje de confirmación: aparece tras registrar con éxito */}
+      {/* El mensaje verde, solo si mostrarConfirmacion es true. */}
       {mostrarConfirmacion && (
         <div className="mensaje-confirmacion">
           ✓ Incidencia registrada con éxito. Estado inicial: pendiente.
         </div>
       )}
 
-      {/* Formulario para registrar una incidencia nueva.
-          Solo lo ve el encargado (RNF-03); los demás ven un aviso. */}
+      {/* El formulario: solo lo ve el encargado (RNF-03).
+          Los demás (departamento) ven un aviso en su lugar. */}
       {puedeGestionarIncidencias(props.usuario.rol) && (
         <FormularioIncidencia
           onIncidenciaRegistrada={alRegistrarIncidencia}
@@ -68,9 +76,9 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
         </p>
       )}
 
-      {/* Historial de incidencias (HU-10) */}
-      {/* La key={contador} hace que React vuelva a crear la tabla
-          cada vez que se registra una incidencia, mostrando la nueva. */}
+      {/* La tabla con todas las incidencias (HU-10).
+          key={contador}: cada vez que se registra una, la tabla se crea de nuevo
+          y muestra la incidencia recién agregada. */}
       <TablaIncidencias key={contador} usuario={props.usuario} />
     </section>
   );

@@ -1,9 +1,15 @@
 /* FichaRecurso.css
-   Estilos de la ficha completa de un recurso.
-   D18: dos columnas (datos e historial a la izquierda, acciones a la derecha)
-   con tarjetas blancas, sombra suave y variables de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la FICHA de un recurso (D18): dos columnas.
+     - Izquierda (más ancha): los datos y el historial.
+     - Derecha (más angosta): "Cambiar estado" y "Reponer stock", que se
+       quedan quietos en la pantalla mientras bajas.
+   Usa tarjetas blancas con sombra suave y las variables de global.css.
+   *** Para cambiar el ANCHO de las columnas, busca .ficha-columnas.
+       Para el tamaño del nombre del recurso, busca .ficha-nombre. (ver guía, paso 9) ***
+   En la guía: paso 7 (CSS: grid, position sticky y @media). */
 
-/* Ruta "← Inventario / Nombre del recurso" */
+/* La "ruta" de arriba: "← Inventario / Nombre del recurso", en fila. */
 .ficha-ruta {
   display: flex;
   align-items: center;
@@ -13,10 +19,14 @@
   font-size: 0.95rem;
 }
 
+/* El botón "← Inventario": parece un enlace azul. */
 .ficha-boton-volver {
   background: none;
   border: none;
   padding: var(--espacio-xs) var(--espacio-sm);
+  /* Un margen NEGATIVO lo corre hacia la izquierda, para que el texto quede
+     alineado con el borde aunque el botón tenga relleno.
+     calc(8px * -1) = -8px. */
   margin-left: calc(var(--espacio-sm) * -1);
   font-family: inherit;
   font-size: 0.95rem;
@@ -31,17 +41,21 @@
   background-color: var(--color-principal-claro);
 }
 
+/* La barrita "/" en gris. */
 .ficha-ruta-separador {
   color: var(--color-texto-secundario);
 }
 
+/* El nombre del recurso en la ruta, en negrita. */
 .ficha-ruta-actual {
   font-weight: 600;
 }
 
-/* Dos columnas: la ficha ocupa 2 partes del ancho y las acciones 1.
-   "align-items: start" evita que el formulario se estire hasta el alto
-   de la ficha. */
+/* LAS DOS COLUMNAS, con grid.
+   grid-template-columns: 2fr 1fr = la izquierda recibe 2 partes del ancho y
+   la derecha 1 parte (la izquierda es el doble de ancha).
+   align-items: start = cada columna mide lo que mide su contenido (si no,
+   la columna derecha se estiraría hasta el alto de la izquierda). */
 .ficha-columnas {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -49,24 +63,25 @@
   align-items: start;
 }
 
-/* En pantallas angostas (celular), las acciones bajan debajo de la ficha */
+/* En pantallas de 800px o menos (celular): UNA columna, así la de la
+   derecha baja debajo de los datos. */
 @media (max-width: 800px) {
   .ficha-columnas {
     grid-template-columns: 1fr;
   }
 }
 
-/* Columna izquierda: la tarjeta de datos y el historial, uno bajo el otro */
+/* La columna izquierda: la tarjeta de datos y el historial, uno bajo el otro. */
 .ficha-columna-izquierda {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-lg);
-  /* min-width: 0 permite que la tabla del historial se deslice hacia el lado
-     en celular, en vez de estirar toda la grilla */
+  /* min-width: 0 deja que la tabla del historial se deslice hacia el lado
+     en el celular, en vez de estirar toda la página. */
   min-width: 0;
 }
 
-/* Recuadro blanco con todos los datos */
+/* El recuadro blanco con todos los datos. */
 .ficha-tarjeta {
   background-color: var(--color-blanco);
   border-radius: var(--radio-borde);
@@ -78,6 +93,7 @@
   margin-bottom: var(--espacio-sm);
 }
 
+/* La categoría (ej: "INSTRUMENTO"): azul, chiquita y en mayúsculas. */
 .ficha-categoria {
   font-size: 12px;
   font-weight: 700;
@@ -86,6 +102,7 @@
   text-transform: uppercase;
 }
 
+/* El nombre grande del recurso. */
 .ficha-nombre {
   margin: var(--espacio-xs) 0 0 0;
   font-size: 1.5rem;
@@ -93,6 +110,7 @@
   color: var(--color-texto);
 }
 
+/* Los subtítulos ("UBICACIÓN", "DATOS DEL RECURSO"...), con una línea abajo. */
 .ficha-subtitulo {
   font-size: 12px;
   font-weight: 600;
@@ -101,52 +119,59 @@
   color: var(--color-texto-secundario);
   margin: var(--espacio-lg) 0 var(--espacio-sm) 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--color-borde);
+  border-bottom: 1px solid var(--color-borde); /* la línea de abajo */
 }
 
-/* Lista "Dato: valor" en dos columnas: nombre del dato | valor.
-   "max-content" hace que la primera columna mida lo justo para el texto
-   más largo ("N° de serie"), y la segunda ocupa el resto (1fr). */
+/* La lista "Dato: valor" en dos columnas: nombre del dato | valor.
+   max-content = la primera columna mide JUSTO lo que mide su texto más largo
+   ("N° de serie"), y la segunda (1fr) ocupa todo el resto. */
 .ficha-datos {
   display: grid;
   grid-template-columns: max-content 1fr;
+  /* gap con dos valores: 6px entre filas y md entre columnas. */
   gap: 6px var(--espacio-md);
   margin: 0;
   font-size: 14px;
 }
 
+/* El nombre del dato (<dt>), en gris. */
 .ficha-datos dt {
   color: var(--color-texto-secundario);
 }
 
+/* El valor (<dd>). */
 .ficha-datos dd {
-  margin: 0; /* el navegador le pone margen a <dd> por defecto */
+  margin: 0; /* el navegador le pone un margen a <dd> por su cuenta; lo quitamos */
   font-weight: 500;
 }
 
+/* El código de ubicación: letra de "máquina de escribir" (monospace), azul. */
 .ficha-codigo {
   font-family: monospace;
   font-weight: 700;
   color: var(--color-principal);
 }
 
-/* Columna derecha (solo encargado): "Cambiar estado" y, debajo,
-   "Reponer stock", uno bajo el otro */
+/* La columna derecha (solo encargado): "Cambiar estado" y, debajo,
+   "Reponer stock". */
 .ficha-columna-derecha {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-lg);
 }
 
-/* En escritorio la columna derecha COMPLETA se queda a la vista mientras se
-   baja por los datos y el historial. Se fija la columna y no cada formulario
-   por separado: así los dos se mueven juntos y uno no se mete debajo del otro.
-   - top: se queda justo debajo de la barra azul (que es fixed y la taparía).
-   - max-height + overflow-y: si la ventana es baja y los dos formularios no
-     caben, la columna se desliza por dentro en vez de quedar cortada.
-   - padding + margin negativo: overflow-y recorta lo que sale de la columna,
-     incluida la sombra de las tarjetas. Con 10px de relleno la sombra cabe,
-     y el margen de -10px deja la columna en el mismo lugar de antes.
+/* En el COMPUTADOR (801px o más), la columna derecha se queda QUIETA en la
+   pantalla mientras bajas por los datos y el historial.
+   position: sticky = "pegajoso": se mueve normal con la página hasta que
+   llega a cierta altura (top), y ahí se queda pegado. Como un imán.
+   Se pega la columna COMPLETA (no cada formulario), así los dos recuadros
+   se mueven juntos y uno no se mete debajo del otro.
+   - top: se pega justo debajo de la barra azul (si no, la barra lo taparía).
+   - max-height + overflow-y: si la ventana es muy baja y no caben los dos,
+     la columna se puede bajar por dentro, en vez de quedar cortada.
+   - padding + margin negativo: overflow-y corta lo que se sale de la columna,
+     ¡incluida la sombra de las tarjetas! Con 10px de relleno, la sombra cabe;
+     y con -10px de margen, la columna queda en el mismo lugar de antes.
      Por ese relleno, top y max-height usan 6px (16px de separación - 10px). */
 @media (min-width: 801px) {
   .ficha-columna-derecha {
@@ -159,8 +184,8 @@
   }
 }
 
-/* Aviso que ven el docente y el departamento en lugar del formulario
-   de cambio de estado (RNF-03). Ocupa la columna derecha. */
+/* El aviso gris que ven el docente y el departamento en lugar de los
+   formularios (RNF-03). */
 .ficha-aviso-permiso {
   margin: 0;
   background-color: var(--color-fondo-menu);
@@ -170,8 +195,8 @@
   color: var(--color-texto-secundario);
 }
 
-/* D21: celular (375px). Menos relleno en las tarjetas para aprovechar el
-   ancho, título más chico y datos en una sola columna si no caben. */
+/* D21: en el celular (768px o menos): menos relleno para aprovechar el
+   ancho, el nombre más chico y los datos en una sola columna. */
 @media (max-width: 768px) {
   .ficha-tarjeta,
   .ficha-aviso-permiso {
@@ -187,8 +212,8 @@
     font-size: 1.25rem;
   }
 
-  /* Dato arriba y valor abajo, para que textos largos (observación,
-     proveedor) no queden apretados en una columna angosta */
+  /* El nombre del dato arriba y el valor abajo (una columna), para que los
+     textos largos (observación, proveedor) no queden apretados. */
   .ficha-datos {
     grid-template-columns: 1fr;
     gap: 2px;

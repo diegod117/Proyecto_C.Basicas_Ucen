@@ -1,15 +1,19 @@
 // PaginaInventario.tsx
-// Página del inventario: muestra los recursos en una grilla de tarjetas,
-// para que el docente sepa qué hay y en qué cantidad operativa.
-// Se puede filtrar por nombre, categoría, laboratorio y estado.
-// Si ningún recurso cumple los filtros, muestra un mensaje para limpiarlos.
-// Al hacer clic en una tarjeta, muestra la ficha completa del recurso.
-// El encargado también puede agregar recursos nuevos ("+ Agregar recurso").
+// ¿QUÉ ES ESTE ARCHIVO?
+// La página del INVENTARIO. Puede mostrar UNA de tres cosas:
+//   1. El LISTADO: los filtros arriba y las tarjetas de los recursos.
+//   2. La FICHA de un recurso (cuando haces clic en una tarjeta).
+//   3. El formulario "AGREGAR RECURSO" (solo el encargado).
+// Es como un álbum: normalmente ves todas las láminas (el listado), y si
+// tocas una, la ves en grande (la ficha).
+// Esta página es un "papá" que junta componentes más chicos (sus "hijos"):
+// EncabezadoInventario, FiltrosInventario, ContadorInventario, GrillaRecursos,
+// FichaRecurso y FormularioNuevoRecurso. Cada uno vive en su propio archivo.
+// En la guía: paso 3 (componentes papá e hijo) y paso 4 (useState).
 // Cubre: HU-01, HU-02, RF-02, RF-08, RNF-03
 
 import { useState } from 'react';
-// La página pide los recursos al SERVICIO, no directamente a src/data/.
-// Así no le importa de dónde vienen los datos (ver recursosService.ts).
+// La página le pide los recursos al SERVICIO (el bodeguero), no a src/data/.
 import { obtenerRecursos, obtenerRecursoPorId } from '../services/recursosService';
 import {
   filtrarRecursos,
@@ -27,43 +31,50 @@ import type { Usuario } from '../types/Usuario';
 import { puedeAgregarRecurso } from '../utils/permisos';
 import './PaginaInventario.css';
 
+// Las props que le pasa App.
 interface PropsPaginaInventario {
-  // Viene de App. Se llama cuando se guarda un cambio de estado, para que
-  // App recalcule las alertas del menú y redibuje la página (HU-02, HU-05).
+  // Una función de App. La llamamos cuando algo cambia en el inventario,
+  // para que App recalcule las alertas del menú y redibuje (HU-02, HU-05).
   onInventarioCambiado: () => void;
-  // Usuario conectado: decide si se ve el botón "+ Agregar recurso" y la
-  // ficha lo usa para decidir si muestra sus formularios (RNF-03).
+  // La persona conectada: decide si se ve el botón "+ Agregar recurso"
+  // y se le pasa a la ficha para que decida si muestra sus formularios (RNF-03).
   usuario: Usuario;
 }
 
 // Componente PaginaInventario
-// Recibe: la función para avisar a App que el inventario cambió y el usuario conectado.
-// Devuelve: el contenido de la página de inventario.
+// Recibe: la función para avisar a App y la persona conectada.
+// Devuelve: el listado, la ficha o el formulario, según corresponda.
 function PaginaInventario(props: PropsPaginaInventario) {
-  // Un useState por cada filtro. Cada uno guarda lo que el usuario eligió.
-  // Cuando cualquiera cambia, React vuelve a ejecutar esta función completa
-  // y la lista filtrada de abajo se recalcula sola.
+  // ---------------------------------------------------------------
+  // LA MEMORIA DE LA PÁGINA
+  // ---------------------------------------------------------------
+  // Un useState por cada filtro: lo que la persona eligió en cada uno.
+  // Cada vez que uno cambia, React vuelve a ejecutar ESTA función completa,
+  // de arriba a abajo, y la lista filtrada se recalcula sola.
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [categoria, setCategoria] = useState(SIN_FILTRO);
   const [laboratorio, setLaboratorio] = useState(SIN_FILTRO);
   const [estado, setEstado] = useState(SIN_FILTRO);
 
-  // Id del recurso cuya ficha está abierta.
-  // "number | null" significa que puede ser un número o null.
-  // null = no hay ninguna ficha abierta (se muestra el listado).
-  // Guardamos el ID y no el recurso completo: así, cuando el recurso cambie
-  // (por ejemplo, al cambiar su estado en J10), lo volvemos a buscar con
-  // su id y la ficha siempre muestra los datos actualizados.
+  // El número (id) del recurso cuya ficha está abierta, o null si no hay
+  // ninguna abierta (entonces se ve el listado).
+  // "number | null" = un número O nada.
+  // ¿Por qué guardar solo el id y no el recurso completo? Porque así, cada
+  // vez que se dibuja, lo volvemos a buscar y la ficha siempre muestra los
+  // datos más nuevos (por ejemplo, justo después de cambiar un estado).
   const [idRecursoSeleccionado, setIdRecursoSeleccionado] = useState<number | null>(null);
 
-  // true mientras se muestra el formulario "Agregar recurso" (en vez del listado)
+  // true mientras se muestra el formulario "Agregar recurso".
   const [agregandoRecurso, setAgregandoRecurso] = useState(false);
 
+  // ---------------------------------------------------------------
+  // CÁLCULOS (se repiten cada vez que la página se dibuja)
+  // ---------------------------------------------------------------
   const listaRecursos = obtenerRecursos();
   const laboratoriosDisponibles = obtenerLaboratorios(listaRecursos);
 
-  // El filtrado lo hace una función de utils, no el JSX.
-  // Le pasamos la lista completa y los 4 filtros elegidos.
+  // El "colador" está en utils (filtrarRecursos), no aquí: la página solo
+  // le entrega la lista completa y los 4 filtros, y recibe lo que pasó.
   const recursosFiltrados = filtrarRecursos(
     listaRecursos,
     textoBusqueda,
@@ -75,8 +86,8 @@ function PaginaInventario(props: PropsPaginaInventario) {
   const filtrosActivos = hayFiltrosActivos(textoBusqueda, categoria, laboratorio, estado);
 
   // limpiarFiltros
-  // No recibe nada ni devuelve nada: vuelve los 4 filtros a su valor inicial.
-  // Al cambiar los estados, React redibuja la página con todos los recursos.
+  // No recibe ni devuelve nada. Vuelve los 4 filtros a como estaban al principio.
+  // Al cambiar la memoria, React redibuja y aparecen todos los recursos.
   function limpiarFiltros() {
     setTextoBusqueda('');
     setCategoria(SIN_FILTRO);
@@ -85,34 +96,40 @@ function PaginaInventario(props: PropsPaginaInventario) {
   }
 
   // abrirFicha
-  // Recibe: el id del recurso en que el usuario hizo clic. No devuelve nada.
+  // Recibe: el id del recurso en que se hizo clic. No devuelve nada.
   function abrirFicha(idRecurso: number) {
     setIdRecursoSeleccionado(idRecurso);
-    // Subimos al inicio de la página, por si el usuario estaba más abajo
+    // window = la ventana del navegador. scrollTo(0, 0) = sube hasta arriba,
+    // por si estabas más abajo en la lista.
     window.scrollTo(0, 0);
   }
 
   // volverAlListado
-  // No recibe ni devuelve nada: cierra la ficha y vuelve a mostrar el listado.
-  // Los filtros NO se pierden, porque sus useState siguen guardados aquí.
+  // No recibe ni devuelve nada. Cierra la ficha (id = null) y vuelve el listado.
+  // Los filtros NO se pierden, porque siguen guardados en la memoria de esta página.
   function volverAlListado() {
     setIdRecursoSeleccionado(null);
   }
 
   // recursoAgregado
   // Recibe: el id del recurso que se acaba de agregar. No devuelve nada.
-  // Cierra el formulario, avisa a App (para recalcular las alertas, por
-  // si el recurso nuevo ya está bajo su stock mínimo) y abre su ficha.
+  // Cierra el formulario, le avisa a App (por si el recurso nuevo ya tiene
+  // pocas unidades y hay que mostrar una alerta) y abre su ficha.
   function recursoAgregado(idRecurso: number) {
     setAgregandoRecurso(false);
     props.onInventarioCambiado();
     abrirFicha(idRecurso);
   }
 
-  // Formulario "Agregar recurso": se muestra en vez del listado
+  // ---------------------------------------------------------------
+  // LO QUE SE DIBUJA (3 casos posibles)
+  // ---------------------------------------------------------------
+
+  // Caso 3: el formulario "Agregar recurso", en vez del listado.
   if (agregandoRecurso) {
     return (
       <section className="contenido-pagina">
+        {/* onCancelar recibe una función flecha que cierra el formulario. */}
         <FormularioNuevoRecurso
           usuario={props.usuario}
           onGuardado={recursoAgregado}
@@ -122,8 +139,8 @@ function PaginaInventario(props: PropsPaginaInventario) {
     );
   }
 
-  // Si hay una ficha abierta, mostramos SOLO la ficha (en vez del listado).
-  // Buscamos el recurso por su id; si por algún motivo no existe
+  // Caso 2: hay una ficha abierta -> mostramos SOLO la ficha.
+  // Buscamos el recurso por su id. Si por alguna razón no existe
   // (undefined), no entramos al if y se muestra el listado normal.
   if (idRecursoSeleccionado !== null) {
     const recursoSeleccionado = obtenerRecursoPorId(idRecursoSeleccionado);
@@ -141,18 +158,20 @@ function PaginaInventario(props: PropsPaginaInventario) {
     }
   }
 
+  // Caso 1 (el normal): el listado.
   return (
     <section className="contenido-pagina">
-      {/* Encabezado de página (D17): título, descripción y el botón
-          "+ Agregar recurso", que solo ve el encargado (RNF-03) */}
+      {/* El encabezado (D17): el título, la descripción y el botón
+          "+ Agregar recurso", que solo ve el encargado (RNF-03). */}
       <EncabezadoInventario
         mostrarBotonAgregar={puedeAgregarRecurso(props.usuario.rol)}
         onAgregar={() => setAgregandoRecurso(true)}
       />
 
-      {/* Le pasamos a FiltrosInventario los valores actuales y las funciones
-          "set" de cada useState. Cuando el usuario cambia un filtro, el
-          componente llama a la función y el estado de ESTA página cambia. */}
+      {/* Los filtros. Le pasamos lo que hay elegido ahora Y las funciones
+          "set" para cambiarlo. Cuando la persona cambia un filtro, el hijo
+          (FiltrosInventario) llama a la función, y cambia la memoria de
+          ESTA página (el papá). Así el papá siempre manda. */}
       <FiltrosInventario
         textoBusqueda={textoBusqueda}
         categoria={categoria}
@@ -165,6 +184,7 @@ function PaginaInventario(props: PropsPaginaInventario) {
         onCambiarEstado={setEstado}
       />
 
+      {/* "Mostrando 3 de 10 recursos" + el botón "Limpiar filtros". */}
       <ContadorInventario
         cantidadMostrada={recursosFiltrados.length}
         cantidadTotal={listaRecursos.length}
@@ -172,7 +192,8 @@ function PaginaInventario(props: PropsPaginaInventario) {
         onLimpiarFiltros={limpiarFiltros}
       />
 
-      {/* La grilla decide sola si muestra las tarjetas o el mensaje vacío */}
+      {/* La grilla de tarjetas. Ella sola decide si muestra las tarjetas o
+          el mensaje "no hay resultados". */}
       <GrillaRecursos
         recursos={recursosFiltrados}
         onSeleccionarRecurso={abrirFicha}

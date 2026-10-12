@@ -1,36 +1,43 @@
 // fechas.ts
-// Funciones de ayuda para trabajar con fechas.
-// HU-10 pide que la fecha de la incidencia se ponga sola (automática),
-// así que el usuario no la escribe en el formulario.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Una "caja de herramientas" para fechas. La carpeta utils/ está llena de
+// estas cajas: funciones pequeñas que ayudan a varias pantallas.
+// Aquí hay una sola herramienta: la que dice qué día y hora es AHORA,
+// escrita siempre igual. La usan el historial y las incidencias, porque
+// la fecha se pone sola (la persona no la escribe).
+// En la guía: paso 2 (funciones con tipos).
 // Cubre: HU-10 (fecha automática al registrar una incidencia)
 
 // obtenerFechaActual
 // No recibe nada.
-// Devuelve la fecha y hora actual como texto en formato "AAAA-MM-DD HH:MM".
-// Ejemplo: "2026-10-02 23:15"
+// Devuelve: la fecha y hora de ahora como texto, así: "2026-10-02 23:15".
 //
-// ¿Por qué una función aparte?
-// Porque armar la fecha manualmente con new Date() requiere varios pasos
-// (getMonth() empieza en 0, hay que agregar ceros a la izquierda, etc.).
-// Si lo hacemos en un solo lugar, evitamos repetir ese código y
-// nos aseguramos de que todas las fechas tengan el mismo formato.
+// ¿Por qué hacer una función solo para esto?
+// Porque armar la fecha tiene varios pasos con trampas (los meses empiezan
+// en 0, hay que poner ceros a la izquierda...). Si lo hacemos UNA vez aquí,
+// todas las fechas de la app quedan iguales y no repetimos el código.
+// ": string" después de los paréntesis = esta función devuelve un texto.
 export function obtenerFechaActual(): string {
+  // new Date() = "un reloj que marca este preciso momento".
   const ahora = new Date();
 
-  // getFullYear() devuelve el año completo, ej: 2026
+  // El año completo, ej: 2026.
   const anio = ahora.getFullYear();
 
-  // getMonth() devuelve el mes empezando en 0 (enero = 0, octubre = 9),
-  // por eso le sumamos 1. padStart(2, '0') agrega un cero a la izquierda
-  // si el número tiene un solo dígito: "9" → "09".
+  // ¡Trampa! getMonth() cuenta los meses desde 0: enero = 0, octubre = 9.
+  // Por eso le sumamos 1.
+  // String(...) convierte el número en texto.
+  // padStart(2, '0') = "si el texto tiene menos de 2 letras, rellena con
+  // ceros a la izquierda": "9" -> "09". Así todas las fechas miden lo mismo.
   const mes = String(ahora.getMonth() + 1).padStart(2, '0');
 
-  // getDate() devuelve el día del mes (1-31)
+  // El día del mes (del 1 al 31).
   const dia = String(ahora.getDate()).padStart(2, '0');
 
-  // getHours() y getMinutes() devuelven la hora y los minutos (0-59)
+  // La hora (0 a 23) y los minutos (0 a 59).
   const hora = String(ahora.getHours()).padStart(2, '0');
   const minutos = String(ahora.getMinutes()).padStart(2, '0');
 
+  // Pegamos todo con + : "2026" + "-" + "10" + ... = "2026-10-02 23:15".
   return anio + '-' + mes + '-' + dia + ' ' + hora + ':' + minutos;
 }

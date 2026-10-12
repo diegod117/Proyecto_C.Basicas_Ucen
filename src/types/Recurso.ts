@@ -1,20 +1,28 @@
 // Recurso.ts
-// Define cómo es un "recurso" del laboratorio: un instrumento, equipo, insumo, etc.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el molde más importante de la app: el de un RECURSO del laboratorio.
+// Un recurso es cualquier cosa que el laboratorio tiene: un multímetro,
+// una caja de guantes, una mesa, un reactivo...
+// En la guía: paso 2 (TypeScript) y paso 9 (cómo cambiar datos de la ficha).
 // Cubre: RF-01 (estado operativo), RF-02 (cantidad operativa), RF-08 (categoría),
 //        RF-10 y HU-11 (ubicación física), HU-09 (stock mínimo de insumos)
 
-// ¿Qué es este archivo?
-// Aquí NO hay lógica ni pantallas, solo "moldes" de datos.
-// TypeScript usa estos moldes para avisarnos si nos equivocamos,
-// por ejemplo si escribimos "dañdo" en vez de "danado" o si olvidamos un campo.
-// Estos tipos desaparecen al compilar: el navegador nunca los ve.
+// ¿Por qué un archivo solo de moldes?
+// Aquí no hay pantallas ni cálculos, solo DESCRIPCIONES de cómo son los datos.
+// TypeScript usa estas descripciones para avisarnos de errores ANTES de
+// abrir la app. Por ejemplo, si escribimos "dañdo" en vez de "danado",
+// o si se nos olvida un dato. Es como un corrector ortográfico, pero para datos.
+// Estos moldes desaparecen cuando la app se arma (npm run build):
+// el navegador nunca los ve. Solo nos ayudan a nosotros mientras escribimos.
 
 // ------------------------------------------------------------------
-// Categoría del recurso (RF-08)
+// ¿Qué clase de recurso es? (RF-08)
 // ------------------------------------------------------------------
-// Esto es un "tipo unión" (union type): la variable solo puede tener
-// UNO de estos textos exactos. Si escribimos otro texto, TypeScript marca error.
-// Para agregar una categoría nueva basta con sumarla aquí (RNF-05).
+// Un tipo unión: la categoría solo puede ser UNO de estos textos.
+// Las rayitas "|" se leen "o". Se pueden escribir una por línea, como aquí,
+// para que se lean más fácil cuando son muchas.
+// ¿Quieres una categoría nueva? Agrégala aquí (RNF-05) y después dale
+// su nombre bonito en utils/inventario.ts (ver guía, paso 9).
 export type CategoriaRecurso =
   | 'instrumento'
   | 'insumo'
@@ -24,12 +32,14 @@ export type CategoriaRecurso =
   | 'instalacion';
 
 // ------------------------------------------------------------------
-// Estado operativo (RF-01)
+// ¿Cómo está cada unidad? (RF-01)
 // ------------------------------------------------------------------
-// Son los 5 estados que pide el requerimiento.
-// Ojo: "reservado" NO es un estado del recurso. Una reserva se guarda
-// aparte (ver Reserva.ts), porque depende de la fecha y el horario.
-// Usamos guion bajo y sin tildes para evitar problemas al escribir el código.
+// Los 5 estados en que puede estar una unidad.
+// Ojo: "reservado" NO es un estado. Una reserva depende del día y la hora,
+// así que se guarda aparte (ver Reserva.ts).
+// Se escriben con guion bajo y sin tilde (en_uso, danado) porque así es más
+// fácil escribirlos en el código sin equivocarse. En pantalla se muestran
+// bonitos ("En uso", "Dañado") gracias a utils/inventario.ts.
 export type EstadoRecurso =
   | 'disponible'
   | 'en_uso'
@@ -38,38 +48,35 @@ export type EstadoRecurso =
   | 'dado_de_baja';
 
 // ------------------------------------------------------------------
-// Torre donde está el laboratorio
+// ¿En qué edificio está?
 // ------------------------------------------------------------------
-// Los laboratorios del departamento están en los edificios (torres) B y C
-// (ver sección 1.1 de los requerimientos).
+// Los laboratorios están en la torre B o en la torre C. Solo esas dos.
 export type Torre = 'B' | 'C';
 
 // ------------------------------------------------------------------
-// Ubicación física (RF-10, HU-11)
+// ¿Dónde está guardado exactamente? (RF-10, HU-11)
 // ------------------------------------------------------------------
-// Una "interface" describe la forma de un objeto: qué propiedades tiene
-// y de qué tipo es cada una. Todas son obligatorias porque HU-11 dice
-// que la ubicación es obligatoria.
-//
-// El laboratorio se identifica con torre + sala. Ejemplo: "B307" es la
-// sala 307 de la torre B. Los guardamos separados para poder filtrar
-// por torre o por sala más adelante (HU-01).
+// "interface" = la lista de datos que un objeto TIENE QUE tener.
+// Ninguno lleva "?", así que TODOS son obligatorios (HU-11 lo pide).
+// Ejemplo: torre "B" + sala "307" = laboratorio B307.
+// Se guardan separados para poder filtrar por torre o por sala.
 export interface Ubicacion {
   torre: Torre; // "B" o "C"
   sala: string; // ej: "307"
   bodega: string; // ej: "Bodega 1"
   mueble: string; // ej: "Mueble 2"
-  codigo: string; // código corto para encontrarlo rápido, ej: "B307-B1-M2"
+  codigo: string; // un código corto para encontrarlo rápido, ej: "B307-B1-M2"
 }
 
 // ------------------------------------------------------------------
-// Cantidad de unidades en cada estado (RF-01, RF-02)
+// ¿Cuántas unidades hay en cada estado? (RF-01, RF-02)
 // ------------------------------------------------------------------
-// Un recurso puede tener varias unidades (ej: 14 multímetros) y no todas
-// están igual: 12 disponibles, 1 dañado, 1 en mantención.
-// Por eso guardamos cuántas unidades hay en CADA estado.
-// Los nombres de las propiedades son iguales a los de EstadoRecurso
-// para que sea fácil relacionarlos más adelante.
+// Un recurso puede tener muchas unidades (ej: 14 multímetros), y no todas
+// están igual: 12 disponibles, 1 dañado y 1 en mantención.
+// Por eso guardamos un número para CADA estado, como cajones de un mueble:
+// el cajón "disponible" tiene 12, el cajón "danado" tiene 1, etc.
+// Los nombres son iguales a los de EstadoRecurso a propósito, así podemos
+// escribir cantidades['danado'] usando el estado como nombre del cajón.
 export interface CantidadesPorEstado {
   disponible: number;
   en_uso: number;
@@ -79,44 +86,45 @@ export interface CantidadesPorEstado {
 }
 
 // ------------------------------------------------------------------
-// Recurso (el dato principal del inventario)
+// El RECURSO completo (el dato principal del inventario)
 // ------------------------------------------------------------------
-// Los primeros campos son los mismos que tiene hoy la planilla Excel
-// (descriptor, número de serie, marca, proveedor, observación),
-// así será más fácil pasar los datos al sistema.
+// Los datos son casi los mismos que tenía la planilla Excel del laboratorio
+// (descriptor, número de serie, marca, proveedor, observación).
 //
-// El signo "?" significa que el campo es OPCIONAL: puede no venir.
-// Por ejemplo, un reactivo o un insumo normalmente no tiene número de serie.
+// El "?" después del nombre = OPCIONAL (puede no venir).
+// Por ejemplo, un reactivo no tiene número de serie, así que no lo ponemos.
+// Si un dato opcional no viene, la ficha muestra "No registrado".
 export interface Recurso {
-  id: number;
-  nombre: string; // en la planilla se llama "descriptor"
-  categoria: CategoriaRecurso; // usa el tipo de arriba, no un texto cualquiera
-  ubicacion: Ubicacion; // un objeto dentro de otro objeto
-  cantidades: CantidadesPorEstado;
+  id: number; // su número único (como un RUT)
+  nombre: string; // ej: "Multímetro Fluke 87V" (en el Excel se llamaba "descriptor")
+  categoria: CategoriaRecurso; // solo una de las categorías de arriba
+  ubicacion: Ubicacion; // ¡un objeto dentro de otro objeto! (una caja dentro de otra)
+  cantidades: CantidadesPorEstado; // los "cajones" con cuántas unidades hay en cada estado
   numeroSerie?: string;
   marca?: string;
   proveedor?: string;
   observacion?: string;
-  // Solo tiene sentido para insumos y reactivos: si la cantidad disponible
-  // baja de este número, el sistema debería avisar para reponer (HU-09).
+  // Solo para insumos y reactivos: si quedan esta cantidad o menos
+  // disponibles, la app avisa que hay que comprar más (HU-09).
   stockMinimo?: number;
 }
 
-// Nota: no guardamos la "cantidad total" porque se puede calcular
-// sumando las cantidades de cada estado. Si la guardáramos aparte,
-// podría quedar desactualizada. Ese cálculo irá en src/utils/.
+// ¿Y la cantidad TOTAL? No la guardamos: se calcula sumando todos los
+// cajones (ver calcularCantidadTotal en utils/inventario.ts).
+// Si la guardáramos aparte, alguien podría olvidar actualizarla y quedaría mal.
 
 // ------------------------------------------------------------------
-// Datos del formulario "Agregar recurso"
+// Lo que se escribe en el formulario "Agregar recurso"
 // ------------------------------------------------------------------
-// Es lo que escribe el encargado en el formulario. Todo es texto porque
-// así lo entregan los <input>; se convierte a Recurso al guardar
-// (ver utils/nuevoRecurso.ts). La categoría puede quedar '' mientras
-// el encargado todavía no la elige.
+// Todo es texto (string) porque las cajitas <input> SIEMPRE entregan texto,
+// aunque escribas un número. Al guardar, utils/nuevoRecurso.ts lo convierte
+// en un Recurso de verdad.
+// "CategoriaRecurso | ''" = una categoría O un texto vacío (''). El vacío es
+// para cuando el encargado todavía no elige la categoría.
 export interface DatosNuevoRecurso {
   nombre: string;
   categoria: CategoriaRecurso | '';
-  cantidadTexto: string; // unidades iniciales (entran como "disponible")
+  cantidadTexto: string; // cuántas unidades llegan (entran como "disponible")
   stockMinimoTexto: string; // solo se usa en insumos y reactivos
   torre: Torre;
   sala: string;

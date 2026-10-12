@@ -1,14 +1,18 @@
 // MensajeSinResultados.tsx
-// Mensaje que se muestra cuando ningún recurso cumple los filtros,
-// con un botón para limpiarlos. Así el usuario no ve una pantalla vacía
-// sin saber qué pasó.
+// ¿QUÉ ES ESTE ARCHIVO?
+// El recuadro que aparece cuando los filtros no encuentran NINGÚN recurso.
+// Dice "No hay recursos que coincidan..." y tiene un botón para limpiar los
+// filtros. Así la persona no queda mirando una pantalla vacía sin entender por qué.
+// En la guía: paso 3 (props con funciones).
 // Cubre: HU-01
 
 import './MensajeSinResultados.css';
 
 interface PropsMensajeSinResultados {
-  // Función que se llama al hacer clic en "Limpiar filtros".
-  // El mensaje no sabe cómo limpiar los filtros: solo avisa a la página.
+  // La función que se llama al apretar "Limpiar filtros".
+  // Este componente NO sabe limpiar los filtros (los filtros viven en la
+  // página): solo AVISA que apretaron el botón, y la página hace el trabajo.
+  // Es como un timbre: el timbre no abre la puerta, solo avisa que alguien llegó.
   onLimpiarFiltros: () => void;
 }
 

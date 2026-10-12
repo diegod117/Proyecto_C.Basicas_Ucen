@@ -1,47 +1,47 @@
 // reservasService.ts
-// Servicio de reservas: es el ÚNICO lugar desde donde las páginas y componentes
-// leen y modifican las reservas de recursos del laboratorio.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el "bodeguero" de las RESERVAS. Las pantallas le piden aquí ver,
+// crear o cancelar reservas; nunca van directo a Firestore ni a src/data/.
+// Usa la misma idea de "copia en memoria" que recursosService.ts.
+// En la guía: paso 8 (Firebase y los datos).
 // Cubre: HU-03 (crear reserva), RF-03 (gestionar y cancelar reservas)
 // y RNF-03 (el docente solo ve sus propias reservas)
-
-// ¿Para qué sirve este servicio?
-// En lugar de que las pantallas importen directamente de src/data/reservas.ts,
-// pasan por este servicio. Hoy los datos viven en la memoria del navegador, pero
-// cuando exista un backend, solo se modifica este archivo y las vistas quedan intactas.
 
 import type { Reserva } from '../types/Reserva';
 import type { Usuario } from '../types/Usuario';
 import { listaReservasPrueba } from '../data/reservas';
 import { puedeVerTodasLasReservas } from '../utils/permisos';
+// deleteDoc = borra una hoja de Firestore (las reservas SÍ se pueden borrar:
+// cancelar una reserva = borrarla).
 import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
-// Esta lista es la copia en memoria de la base de datos de Firestore.
-// Empieza vacía y se llena al llamar a cargarReservas() al iniciar sesión.
+// La copia en memoria. Parte vacía y se llena con cargarReservas() al iniciar sesión.
 let listaReservas: Reserva[] = [];
 
 // obtenerReservas
 // Recibe: nada.
-// Devuelve: la lista completa de reservas.
+// Devuelve: TODAS las reservas.
 export function obtenerReservas(): Reserva[] {
   return listaReservas;
 }
 
 // obtenerReservasVisibles (RNF-03)
-// Recibe: el usuario conectado.
-// Devuelve: las reservas que ese usuario puede ver.
+// Recibe: la persona conectada.
+// Devuelve: solo las reservas que esa persona tiene permiso de ver:
 //   - Encargado y departamento: todas.
 //   - Docente: solo las que están a su nombre ("Mis reservas").
-// La usan la tabla y el contador de la página, así los dos muestran
-// siempre el mismo número.
+// La usan la tabla y el contador de la página, así los dos muestran el mismo número.
 export function obtenerReservasVisibles(usuario: Usuario): Reserva[] {
+  // puedeVerTodasLasReservas viene de utils/permisos.ts: ahí están TODAS
+  // las reglas de "quién puede hacer qué".
   if (puedeVerTodasLasReservas(usuario.rol)) {
     return listaReservas;
   }
 
-  // Recorremos todas las reservas y guardamos solo las del docente.
-  // Comparamos con su nombre porque así se guarda la reserva: desde J18
-  // el docente reserva siempre a su propio nombre (no lo puede cambiar).
+  // Es docente: armamos una lista nueva solo con SUS reservas.
+  // Comparamos por nombre porque el docente siempre reserva a su propio
+  // nombre (el campo "Docente" del formulario está bloqueado para él).
   const reservasDelDocente: Reserva[] = [];
   for (const reserva of listaReservas) {
     if (reserva.docente === usuario.nombre) {
@@ -52,10 +52,12 @@ export function obtenerReservasVisibles(usuario: Usuario): Reserva[] {
 }
 
 // agregarReserva
-// Recibe: una reserva nueva sin su id.
-// Devuelve: nada.
+// Recibe: una reserva nueva, sin número todavía.
+//   Omit<Reserva, 'id'> = "una Reserva, pero SIN el dato id".
+// Devuelve: una promesa vacía (Promise<void>) que avisa cuando terminó.
+// Si Firestore falla, lanza un error que atrapa el formulario con su try/catch.
 export async function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): Promise<void> {
-  // Buscamos el ID más alto que exista actualmente
+  // Buscamos el número más grande que exista.
   let idMayor = 0;
   for (const reserva of listaReservas) {
     if (reserva.id > idMayor) {
@@ -63,28 +65,29 @@ export async function agregarReserva(reservaSinId: Omit<Reserva, 'id'>): Promise
     }
   }
 
-  // Asignamos el siguiente ID correlativo
+  // Le toca el siguiente.
   const idNuevo = idMayor + 1;
 
-  // Creamos la reserva completa incorporando el nuevo ID generado
+  // La reserva completa = el número nuevo + todos los datos que llegaron
+  // (los "..." copian todos los datos de reservaSinId aquí adentro).
   const reservaCompleta: Reserva = {
     id: idNuevo,
     ...reservaSinId,
   };
 
-  // Guardamos en Firestore primero
+  // Primero la guardamos en Firestore.
   const docRef = doc(baseDatos, 'reservas', reservaCompleta.id.toString());
   await setDoc(docRef, reservaCompleta);
 
-  // La guardamos en el arreglo en memoria
+  // Firestore dijo "ok": la agregamos también a la copia.
   listaReservas.push(reservaCompleta);
 }
 
 // cancelarReserva (RF-03)
-// Recibe: el ID de la reserva a cancelar.
-// Devuelve: true si se encontró y eliminó, o false si no existía.
+// Recibe: el número de la reserva que se quiere cancelar.
+// Devuelve: una promesa de true (se borró) o false (no se pudo o no existía).
 export async function cancelarReserva(id: number): Promise<boolean> {
-  // Primero intentamos borrar de Firestore
+  // Primero la borramos de Firestore.
   try {
     const docRef = doc(baseDatos, 'reservas', id.toString());
     await deleteDoc(docRef);
@@ -93,9 +96,11 @@ export async function cancelarReserva(id: number): Promise<boolean> {
     return false;
   }
 
-  // Si Firestore funcionó, la borramos de la memoria
+  // Firestore dijo "ok": la sacamos también de la copia.
+  // For clásico: i parte en 0 y sube de 1 en 1 mientras sea menor que el largo.
   for (let i = 0; i < listaReservas.length; i++) {
     if (listaReservas[i].id === id) {
+      // splice(i, 1) = "en la posición i, saca 1 elemento".
       listaReservas.splice(i, 1);
       return true;
     }
@@ -106,8 +111,9 @@ export async function cancelarReserva(id: number): Promise<boolean> {
 // ------------------------------------------------------------------
 // cargarReservas (D25)
 // ------------------------------------------------------------------
-// Descarga las reservas desde Firestore y las guarda en memoria.
-// Si la colección está vacía, sube los datos de prueba automáticamente.
+// Trae las reservas desde Firestore y llena la copia.
+// Si la carpeta está vacía, primero planta la semilla (data/reservas.ts).
+// Funciona igual que cargarIncidencias() de incidenciasService.ts.
 export async function cargarReservas(): Promise<void> {
   const coleccion = collection(baseDatos, 'reservas');
   const snapshot = await getDocs(coleccion);
@@ -119,6 +125,7 @@ export async function cargarReservas(): Promise<void> {
       await setDoc(docRef, reserva);
     }
     const nuevoSnapshot = await getDocs(coleccion);
+    // .map transforma cada hoja (d) en sus datos con forma de Reserva.
     listaReservas = nuevoSnapshot.docs.map(d => d.data() as Reserva);
   } else {
     listaReservas = snapshot.docs.map(d => d.data() as Reserva);

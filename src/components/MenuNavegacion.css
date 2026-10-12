@@ -1,69 +1,84 @@
 /* MenuNavegacion.css
-   M17 — RNF-01: rediseño del menú.
-   Layout de pantalla completa:
-     - Barra superior azul (header) con el título y el usuario conectado.
-     - Menú lateral gris a la izquierda (aside) con los botones de navegación.
-   En celular (max-width 768px): el menú lateral pasa a fila horizontal arriba. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del menú (M17 — RNF-01). Dibuja dos cosas que siempre se ven:
+     - La BARRA AZUL de arriba (.app-header): el título a la izquierda y,
+       a la derecha, tu nombre, tu rol y "Cerrar sesión".
+     - El MENÚ GRIS de la izquierda (.app-sidebar) con los botones.
+   En el celular (pantallas de 768px o menos), el menú gris se convierte en
+   una fila de botones arriba, debajo de la barra azul.
+   *** ¿Quieres cambiar el tamaño o color de tu nombre arriba a la derecha?
+       Busca .app-header-usuario-nombre y .app-header-usuario-rol. (ver guía, paso 9) ***
+   En la guía: paso 7 (CSS: flex, position fixed y @media). */
 
 /* =====================================================
-   BARRA SUPERIOR (header)
+   LA BARRA AZUL DE ARRIBA (header)
    ===================================================== */
 
-/* Franja azul fija en la parte superior de la pantalla.
-   Muestra el título del sistema a la izquierda y los datos
-   del usuario + botón de cerrar sesión a la derecha. */
+/* La franja azul pegada arriba de la pantalla. */
 .app-header {
+  /* position: fixed = "quédate PEGADA a la pantalla aunque bajen la página".
+     Como un sticker en el vidrio: la página se mueve por detrás, el sticker no.
+     top/left/right: 0 = pegada arriba, desde el borde izquierdo al derecho. */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: var(--alto-header);
+  height: var(--alto-header); /* alto = 56px (ver global.css) */
   background-color: var(--color-principal);
   color: white;
+  /* display: flex = "acomoda a mis hijos en una FILA".
+     Los hijos aquí son: el título y la zona del usuario. */
   display: flex;
-  align-items: center;
+  align-items: center; /* centrados de arriba a abajo */
+  /* space-between = el primero a la izquierda, el último a la derecha,
+     y todo el espacio libre en el medio. */
   justify-content: space-between;
   padding: 0 var(--espacio-lg);
+  /* z-index = quién va "encima" cuando dos cosas se tapan. Número más alto
+     = más arriba en la pila. 100 para que la barra tape todo lo demás. */
   z-index: 100;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18); /* sombrita debajo */
 }
 
-/* Título del sistema en la barra superior */
+/* El título "UCEN — Gestión de Inventario". */
 .app-header-titulo {
-  margin: 0;
+  margin: 0; /* margin = el espacio de AFUERA; los títulos traen uno, lo quitamos */
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 700; /* negrita */
   color: white;
-  white-space: nowrap;
+  white-space: nowrap; /* que no se parta en dos líneas */
 }
 
-/* Zona del usuario: nombre, rol y botón cerrar sesión */
+/* La zona derecha: los datos de la persona + el botón. También es una fila (flex). */
 .app-header-usuario {
   display: flex;
   align-items: center;
-  gap: var(--espacio-md);
+  gap: var(--espacio-md); /* espacio entre los datos y el botón */
 }
 
+/* El nombre y el rol, uno ENCIMA del otro. */
 .app-header-usuario-datos {
   display: flex;
-  flex-direction: column;
-  text-align: right;
+  flex-direction: column; /* column = en COLUMNA (uno abajo del otro), no en fila */
+  text-align: right;      /* texto alineado a la derecha */
   line-height: 1.2;
 }
 
+/* TU NOMBRE (ej: "Pedro Soto"). Para hacerlo más grande, sube font-size. */
 .app-header-usuario-nombre {
   font-size: 0.875rem;
   font-weight: 600;
 }
 
+/* TU ROL (ej: "Encargado de laboratorio"): más chico y un poco transparente. */
 .app-header-usuario-rol {
   font-size: 0.75rem;
-  opacity: 0.82;
+  opacity: 0.82; /* 82% visible: se ve más suave que el nombre */
 }
 
-/* Botón "Cerrar sesión" en la barra superior */
+/* El botón "Cerrar sesión": blanco medio transparente sobre el azul. */
 .boton-cerrar-sesion {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.15); /* blanco con 15% = azul aclarado */
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radio-borde-sm);
@@ -76,46 +91,46 @@
   white-space: nowrap;
 }
 
+/* Con el mouse encima, un poco más blanco. */
 .boton-cerrar-sesion:hover {
   background-color: rgba(255, 255, 255, 0.28);
 }
 
 /* =====================================================
-   MENÚ LATERAL (aside)
+   EL MENÚ GRIS DE LA IZQUIERDA (sidebar)
    ===================================================== */
 
-/* Panel gris fijo a la izquierda, debajo de la barra superior.
-   Solo contiene los botones de las páginas que el rol puede ver. */
+/* Una columna gris pegada a la izquierda, debajo de la barra azul. */
 .app-sidebar {
   position: fixed;
-  top: var(--alto-header);
+  top: var(--alto-header); /* empieza donde termina la barra azul */
   left: 0;
-  bottom: 0;
+  bottom: 0;               /* llega hasta abajo de la pantalla */
   width: var(--ancho-menu);
   background-color: var(--color-fondo-menu);
-  border-right: 1px solid var(--color-borde);
+  border-right: 1px solid var(--color-borde); /* una línea a la derecha */
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* los botones uno debajo del otro */
   padding: var(--espacio-lg) 0;
   gap: var(--espacio-xs);
-  overflow-y: auto;
-  z-index: 90;
+  overflow-y: auto; /* si hay demasiados botones, se puede bajar con la ruedita */
+  z-index: 90; /* debajo de la barra azul (100), encima del resto */
 }
 
 /* =====================================================
-   CONTENIDO DE LA PÁGINA (el <main> de App.tsx)
+   EL CONTENIDO DE LA PÁGINA (el <main> de App.tsx)
    ===================================================== */
 
-/* La barra superior y el menú lateral son "fixed": quedan pegados a la
-   pantalla y NO ocupan espacio en la página. Por eso hay que correr el
-   contenido hacia abajo (alto de la barra) y hacia la derecha (ancho del
-   menú); si no, el título de cada página queda tapado. */
+/* La barra azul y el menú gris son "fixed": flotan pegados a la pantalla y
+   NO ocupan lugar en la página. Si no hacemos nada, el contenido queda
+   DEBAJO de ellos (tapado). Por eso le damos margen: lo empujamos hacia
+   abajo (el alto de la barra) y hacia la derecha (el ancho del menú). */
 .app-contenido {
   margin-top: var(--alto-header);
   margin-left: var(--ancho-menu);
 }
 
-/* Cada botón del menú lateral ocupa todo el ancho */
+/* Cada botón del menú: ocupa todo el ancho de la columna. */
 .boton-menu {
   width: 100%;
   display: flex;
@@ -125,6 +140,7 @@
   background-color: transparent;
   color: var(--color-texto);
   border: none;
+  /* Una rayita a la izquierda, invisible. Se pinta azul en el botón elegido. */
   border-left: 3px solid transparent;
   font-family: inherit;
   font-size: 0.9rem;
@@ -140,7 +156,7 @@
   color: var(--color-principal);
 }
 
-/* Página activa: resaltada en azul claro con línea lateral */
+/* El botón de la página que estás mirando: azul clarito con la rayita azul. */
 .boton-menu-activo {
   background-color: var(--color-principal-claro);
   color: var(--color-principal);
@@ -152,55 +168,55 @@
   background-color: var(--color-principal-claro);
 }
 
-/* Badge rojo del contador de alertas (HU-05) */
+/* El numerito rojo de alertas (HU-05). */
 .badge-alertas-menu {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  background-color: #ef4444;
+  justify-content: center; /* el número centrado */
+  background-color: #ef4444; /* rojo */
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: var(--radio-pildora);
-  min-width: 18px;
+  border-radius: var(--radio-pildora); /* forma de pastilla */
+  min-width: 18px; /* nunca más angosto que 18px (para que el "7" no quede flaquito) */
   line-height: 1;
-  margin-left: auto;
+  margin-left: auto; /* truco: "auto" a la izquierda lo empuja hasta la derecha del botón */
 }
 
 /* =====================================================
-   RESPONSIVE — celular (RNF-01, max 768px)
+   EN EL CELULAR (RNF-01): pantallas de 768px o menos
    ===================================================== */
 
 @media (max-width: 768px) {
-  /* El sidebar se convierte en una fila horizontal FIJA justo debajo
-     de la barra azul. Antes era "static": empezaba arriba de todo
-     y la barra azul (que es fixed) la tapaba completa. */
+  /* El menú gris se convierte en una FILA fija justo debajo de la barra azul.
+     (Antes no estaba fijo, y la barra azul, que sí lo está, lo tapaba.) */
   .app-sidebar {
     position: fixed;
     top: var(--alto-header);
     left: 0;
     right: 0;
-    bottom: auto;
+    bottom: auto; /* auto = ya no llega hasta abajo */
     width: auto;
     height: var(--alto-menu-celular);
-    flex-direction: row;
+    flex-direction: row; /* row = en FILA (uno al lado del otro) */
     align-items: center;
     padding: 0 var(--espacio-xs);
     border-right: none;
     border-bottom: 1px solid var(--color-borde);
-    /* Si las pestañas no caben, la fila se desliza hacia el lado */
+    /* Si los botones no caben, la fila se puede deslizar hacia el lado con el dedo. */
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  /* Cada botón se ajusta al contenido (no ocupa todo el ancho) */
+  /* Cada botón mide lo que mide su texto (ya no todo el ancho). */
   .boton-menu {
     width: auto;
-    /* flex-shrink: 0 evita que los botones se aplasten si no caben:
-       en vez de achicarse, la fila se desliza hacia el lado */
+    /* flex-shrink: 0 = "no te achiques". Si no caben, en vez de aplastarse,
+       la fila se desliza hacia el lado. */
     flex-shrink: 0;
     border-left: none;
+    /* La rayita ahora va ABAJO del botón, no a la izquierda. */
     border-bottom: 3px solid transparent;
     white-space: nowrap;
     padding: var(--espacio-sm) var(--espacio-md);
@@ -211,44 +227,45 @@
     border-bottom-color: var(--color-principal);
   }
 
-  /* En celular el contenido ocupa todo el ancho */
+  /* El contenido ocupa todo el ancho. */
   .app-contenido {
-    /* El menú ya no está a la izquierda, así que no hace falta margin-left */
+    /* El menú ya no está a la izquierda: no hace falta empujar hacia la derecha. */
     margin-left: 0;
-    /* Barra azul + fila de pestañas: el contenido empieza debajo de ambas */
+    /* Pero sí hacia abajo: la barra azul + la fila de botones.
+       calc(...) = "calcula esta suma". 56px + 52px = 108px. */
     margin-top: calc(var(--alto-header) + var(--alto-menu-celular));
   }
 
-  /* El header también se adapta */
+  /* El título de la barra, un poco más chico. */
   .app-header-titulo {
     font-size: 0.875rem;
   }
 
-  /* Asegura altura mínima táctil (44px) en los botones del sidebar */
+  /* Botones de al menos 44px de alto: el tamaño mínimo para tocarlos
+     cómodo con el dedo. */
   .boton-menu {
     min-height: 44px;
   }
 }
 
-/* M21: ajustes para pantallas muy pequeñas (375px — iPhone SE, Galaxy S)
-   Se prueban a 375px de ancho en las DevTools del navegador. */
+/* M21: celulares MUY chicos (375px, como un iPhone SE).
+   Se prueban en el navegador con F12 > ícono de celular > 375px de ancho. */
 @media (max-width: 420px) {
-  /* Ocultar el rol del usuario para liberar espacio en el header */
+  /* Escondemos el rol para que quepa todo. display: none = invisible y sin ocupar espacio. */
   .app-header-usuario-rol {
     display: none;
   }
 
-  /* Acortar el título del sistema si no cabe en una línea */
+  /* Achicamos el título y, si igual no cabe, se corta con "..." */
   .app-header-titulo {
     font-size: 0.8rem;
-    /* Truncar con puntos suspensivos si desborda */
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: hidden;        /* lo que se sale, no se ve */
+    text-overflow: ellipsis; /* y en vez de cortarlo feo, pone "..." */
     white-space: nowrap;
     max-width: 160px;
   }
 
-  /* Botón cerrar sesión más compacto */
+  /* El botón "Cerrar sesión" más chiquito. */
   .boton-cerrar-sesion {
     font-size: 0.75rem;
     padding: 5px var(--espacio-sm);

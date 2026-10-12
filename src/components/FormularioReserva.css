@@ -1,10 +1,13 @@
 /* FormularioReserva.css
-   M19 — HU-03: rediseño del formulario de reservas.
-   Usa variables de global.css (nunca valores sueltos).
-   Mantiene toda la lógica de validación y disponibilidad sin cambios. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del formulario "Nueva reserva" (M19 — HU-03): la tarjeta,
+   las filas de cajitas, el botón, los mensajes y el aviso de
+   "cuántas quedan libres".
+   Usa las variables de global.css.
+   En la guía: paso 7 (CSS: flex, min-width y @media). */
 
 /* =====================================================
-   TARJETA DEL FORMULARIO
+   LA TARJETA DEL FORMULARIO
    ===================================================== */
 
 .formulario-reserva {
@@ -12,10 +15,11 @@
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
   padding: var(--espacio-lg);
-  max-width: 620px;
+  max-width: 620px; /* nunca más ancha que 620px */
   box-shadow: var(--sombra-tarjeta);
 }
 
+/* El título "Nueva reserva". */
 .formulario-reserva h3 {
   margin: 0 0 var(--espacio-lg) 0;
   font-size: 1.1rem;
@@ -24,22 +28,24 @@
 }
 
 /* =====================================================
-   GRUPOS DE CAMPOS
-   Dos campos lado a lado en PC; apilados en celular.
+   LAS FILAS DE CAJITAS
+   En el computador van lado a lado; en el celular, una debajo de otra.
    ===================================================== */
 
-/* Fila de campos alineados horizontalmente */
+/* Una fila: los campos uno al lado del otro (flex en fila). */
 .grupo-campos {
   display: flex;
   gap: var(--espacio-md);
   margin-bottom: var(--espacio-md);
 }
 
-/* Contenedor vertical de etiqueta + input/select.
-   min-width: 0 permite que el campo se achique para caber en la fila.
-   Sin esto, flex no lo deja ser más angosto que su contenido (el <select>
-   mide lo que mide el nombre de recurso más largo) y los campos de la
-   derecha se salían de la tarjeta. */
+/* Un campo: la etiqueta arriba y la cajita abajo (columna).
+   flex: 1 = "todos los campos de la fila se reparten el ancho por igual".
+   min-width: 0 = "puedes achicarte para caber en la fila".
+   ¿Por qué hace falta? Por defecto, flex NO deja que un campo sea más angosto
+   que lo que tiene adentro. El menú de recursos es tan ancho como el nombre
+   de recurso más largo, y empujaba a los campos de la derecha FUERA de la
+   tarjeta. Con min-width: 0 se arregla. */
 .campo {
   display: flex;
   flex-direction: column;
@@ -47,6 +53,7 @@
   min-width: 0;
 }
 
+/* Las etiquetas ("Recurso *", "Fecha *"...). */
 .campo label {
   font-size: 0.825rem;
   font-weight: 600;
@@ -54,8 +61,9 @@
   color: var(--color-texto);
 }
 
-/* width: 100% hace que cada campo ocupe todo el ancho de su columna, así
-   quedan alineados con los de las otras filas */
+/* Las cajitas y menús.
+   width: 100% = cada uno llena todo el ancho de su columna; así quedan
+   alineados con los de las otras filas. */
 .campo input,
 .campo select {
   width: 100%;
@@ -69,6 +77,7 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+/* Escribiendo (:focus): borde azul y anillo azul clarito. */
 .campo input:focus,
 .campo select:focus {
   outline: none;
@@ -78,9 +87,9 @@
 }
 
 /* =====================================================
-   BOTÓN CONFIRMAR
-   Usa variables; no duplica el estilo de .boton-principal
-   porque el botón de confirmar tiene su propio contexto.
+   EL BOTÓN "CONFIRMAR RESERVA"
+   Tiene su propio estilo (no usa .boton-principal) porque se pone gris
+   cuando no alcanzan las unidades.
    ===================================================== */
 
 .boton-confirmar {
@@ -97,12 +106,13 @@
   transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+/* Mouse encima, PERO solo si no está apagado. */
 .boton-confirmar:hover:not(:disabled) {
   background-color: var(--color-principal-oscuro);
   box-shadow: var(--sombra-tarjeta);
 }
 
-/* Estado inactivo cuando no hay disponibilidad (HU-08) */
+/* Apagado: cuando no alcanzan las unidades (HU-08) o mientras guarda. Gris. */
 .boton-confirmar:disabled {
   background-color: #9ca3af;
   color: #f3f4f6;
@@ -112,7 +122,7 @@
 }
 
 /* =====================================================
-   MENSAJES DE VALIDACIÓN Y CONFIRMACIÓN
+   LOS MENSAJES (rojo = error, verde = listo)
    ===================================================== */
 
 .mensaje-error {
@@ -136,7 +146,8 @@
   font-weight: 500;
 }
 
-/* Aviso dinámico de disponibilidad en tiempo real (HU-07) */
+/* El aviso de "cuántas quedan libres a esa hora" (HU-07).
+   Lo común: la forma. El color depende de la segunda clase (abajo). */
 .aviso-disponibilidad {
   display: flex;
   align-items: center;
@@ -148,12 +159,15 @@
   margin-bottom: var(--espacio-md);
 }
 
+/* ".aviso-disponibilidad.hay-unidades" (SIN espacio entre las dos) =
+   "un elemento que tiene LAS DOS clases a la vez". Verde: sí hay. */
 .aviso-disponibilidad.hay-unidades {
   color: var(--color-disponible);
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
 }
 
+/* Rojo: no queda ninguna. */
 .aviso-disponibilidad.sin-unidades {
   color: var(--color-danado);
   background-color: #fef2f2;
@@ -161,7 +175,7 @@
 }
 
 /* =====================================================
-   RESPONSIVE — celular (RNF-01)
+   EN EL CELULAR (RNF-01)
    ===================================================== */
 
 @media (max-width: 768px) {
@@ -169,21 +183,22 @@
     padding: var(--espacio-md);
   }
 
-  /* Apilar campos en columna vertical para facilidad táctil */
+  /* Las filas se vuelven columnas: cada cajita en su propia línea,
+     más fácil de tocar con el dedo. */
   .grupo-campos {
     flex-direction: column;
     gap: var(--espacio-sm);
     margin-bottom: var(--espacio-sm);
   }
 
-  /* 16px evita el zoom automático en iOS al hacer foco en un input */
+  /* Letra de 16px: si es más chica, el iPhone hace zoom al tocar la cajita. */
   .campo input,
   .campo select {
     font-size: 16px;
     padding: 10px var(--espacio-md);
   }
 
-  /* Botón ocupa todo el ancho para fácil pulsación con el pulgar */
+  /* El botón ocupa todo el ancho: fácil de apretar con el pulgar. */
   .boton-confirmar {
     width: 100%;
     padding: 12px var(--espacio-md);

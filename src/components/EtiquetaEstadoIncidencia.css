@@ -1,10 +1,11 @@
 /* EtiquetaEstadoIncidencia.css
-   Estilos de la etiqueta que muestra el estado de una incidencia
-   con un color diferente para cada estado (HU-10).
-   Es un componente pequeño y reutilizable.
-   D20: forma de píldora (--radio-pildora) y colores de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los colores de la "pastilla" que dice en qué etapa va una incidencia (HU-10, D20):
+   amarillo = Pendiente, azul = En revisión, verde = Resuelta (como un semáforo).
+   *** Para cambiar un color del semáforo, cámbialo aquí. ***
+   En la guía: paso 7 (CSS). */
 
-/* Base de la etiqueta: texto pequeño, en forma de píldora, en línea */
+/* Lo común: la forma de pastilla. */
 .etiqueta-estado {
   display: inline-block;
   padding: 3px 10px;
@@ -12,23 +13,23 @@
   font-weight: 600;
   border-radius: var(--radio-pildora);
   border: 1px solid;
-  border-color: currentColor;
+  border-color: currentColor; /* el borde del mismo color que la letra */
   white-space: nowrap;
 }
 
-/* Pendiente: amarillo (la incidencia acaba de ser registrada) */
+/* Pendiente: amarillo (recién anotada). */
 .etiqueta-estado-pendiente {
   color: var(--color-mantencion);
   background-color: #fef9c3;
 }
 
-/* En revisión: azul (el encargado está investigando) */
+/* En revisión: azul (el encargado la está mirando). */
 .etiqueta-estado-en-revision {
   color: var(--color-en-uso);
   background-color: #dbeafe;
 }
 
-/* Resuelta: verde (ya se solucionó) */
+/* Resuelta: verde (ya se arregló). */
 .etiqueta-estado-resuelta {
   color: var(--color-disponible);
   background-color: #dcfce7;

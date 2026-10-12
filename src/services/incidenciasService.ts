@@ -1,29 +1,36 @@
 // incidenciasService.ts
-// Servicio que centraliza el acceso a las incidencias.
-// Las páginas y componentes SIEMPRE usan este servicio para leer o
-// modificar incidencias; nunca importan directamente src/data/.
-// Así, cuando exista un backend, solo se cambia este archivo.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el "bodeguero" de las INCIDENCIAS (accidentes o problemas en el laboratorio).
+// Las pantallas le piden a este archivo leer, agregar o cambiar incidencias;
+// nunca van a buscarlas a src/data/ ni a Firestore por su cuenta.
+// Así, si algún día cambia de dónde vienen los datos, solo se toca este archivo.
+// Usa la misma idea de "copia en memoria" que recursosService.ts.
+// En la guía: paso 8 (Firebase y los datos).
 // Cubre: HU-04 (registrar incidencia), HU-10 (historial con estado)
 
 import type { Incidencia, EstadoIncidencia } from '../types/Incidencia';
 import { listaIncidenciasPrueba } from '../data/incidencias';
 import { obtenerFechaActual } from '../utils/fechas';
+// Herramientas de Firestore:
+//   setDoc    = escribe UNA hoja completa
+//   updateDoc = cambia solo algunos datos de una hoja que ya existe
 import { collection, getDocs, setDoc, doc, updateDoc } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
 // ------------------------------------------------------------------
-// Lista en memoria
+// La copia en memoria
 // ------------------------------------------------------------------
-// Esta es la copia local de los datos. Empieza vacía y se llena al
-// llamar a cargarIncidencias() al iniciar sesión.
+// Parte vacía y se llena con cargarIncidencias() al iniciar sesión.
+// Es "let" (y no const) porque más abajo se le asigna una lista nueva completa.
 let incidencias: Incidencia[] = [];
 
 // ------------------------------------------------------------------
 // obtenerIncidencias
 // ------------------------------------------------------------------
-// No recibe nada. Devuelve una copia de la lista completa de incidencias.
-// Se devuelve una copia ([...]) para que nadie modifique la lista
-// original por accidente desde afuera del servicio.
+// No recibe nada. Devuelve una COPIA de la lista de incidencias.
+// [...incidencias] = "una lista nueva con los mismos elementos".
+// Es como prestar una fotocopia en vez del original: si alguien la raya,
+// el original queda intacto.
 function obtenerIncidencias(): Incidencia[] {
   return [...incidencias];
 }
@@ -31,9 +38,8 @@ function obtenerIncidencias(): Incidencia[] {
 // ------------------------------------------------------------------
 // obtenerIncidenciaPorId
 // ------------------------------------------------------------------
-// Recibe el id de una incidencia.
-// Devuelve la incidencia si la encuentra, o undefined si no existe.
-// Útil para mostrar el detalle de una incidencia específica.
+// Recibe: el número (id) de una incidencia.
+// Devuelve: esa incidencia, o undefined (= nada) si no existe.
 function obtenerIncidenciaPorId(id: number): Incidencia | undefined {
   for (const incidencia of incidencias) {
     if (incidencia.id === id) {
@@ -46,18 +52,18 @@ function obtenerIncidenciaPorId(id: number): Incidencia | undefined {
 // ------------------------------------------------------------------
 // agregarIncidencia
 // ------------------------------------------------------------------
-// Recibe los datos que escribe el usuario en el formulario (sin id,
-// sin fecha y sin estado, porque esos los pone el servicio).
-// Devuelve la incidencia ya guardada con todos sus campos.
+// Recibe: lo que escribió la persona en el formulario.
+// Devuelve: una promesa con la incidencia ya guardada, con todos sus datos.
 //
-// Omit<Incidencia, 'id' | 'fecha' | 'estado'> significa:
-// "una Incidencia pero sin los campos id, fecha ni estado".
-// HU-10 pide que la fecha sea automática y el estado empiece en 'pendiente'.
+// Omit<Incidencia, 'id' | 'fecha' | 'estado'> se lee:
+// "una Incidencia, pero SIN los datos id, fecha y estado".
+// (Omit = "omitir", dejar fuera.) Esos tres no los escribe la persona:
+// los pone este archivo, porque HU-10 pide que la fecha sea automática
+// y que toda incidencia empiece en 'pendiente'.
 async function agregarIncidencia(
   datos: Omit<Incidencia, 'id' | 'fecha' | 'estado'>
 ): Promise<Incidencia> {
-  // Generamos un id nuevo: tomamos el mayor id que exista y le sumamos 1.
-  // Si la lista está vacía, el id será 1.
+  // El número nuevo es el más grande + 1. Si no hay ninguna, será 1.
   let mayorId = 0;
   for (const incidencia of incidencias) {
     if (incidencia.id > mayorId) {
@@ -65,18 +71,23 @@ async function agregarIncidencia(
     }
   }
 
+  // Armamos la incidencia completa.
+  // ...datos = "y agrega aquí todos los datos que vinieron del formulario".
   const nuevaIncidencia: Incidencia = {
     id: mayorId + 1,
-    fecha: obtenerFechaActual(), // fecha automática (HU-10)
-    estado: 'pendiente',         // toda incidencia nace como pendiente (HU-10)
+    fecha: obtenerFechaActual(), // la fecha la pone la app sola (HU-10)
+    estado: 'pendiente',         // toda incidencia nace pendiente (HU-10)
     ...datos,
   };
 
-  // Guardamos en Firestore primero
+  // Primero la guardamos en Firestore (en la hoja "incidencias/<número>").
+  // toString() convierte el número en texto: 5 -> "5".
+  // Si Firestore falla, aquí salta un error y la línea de abajo NO se ejecuta.
+  // Ese error lo atrapa el try/catch del formulario (FormularioIncidencia.tsx).
   const docRef = doc(baseDatos, 'incidencias', nuevaIncidencia.id.toString());
   await setDoc(docRef, nuevaIncidencia);
 
-  // Si Firestore no falló, actualizamos la copia local en memoria
+  // Firestore dijo "ok": la agregamos también a la copia.
   incidencias.push(nuevaIncidencia);
   return nuevaIncidencia;
 }
@@ -84,16 +95,16 @@ async function agregarIncidencia(
 // ------------------------------------------------------------------
 // cambiarEstadoIncidencia
 // ------------------------------------------------------------------
-// Recibe el id de una incidencia y el nuevo estado al que debe pasar
-// ('pendiente', 'en_revision' o 'resuelta').
-// Busca la incidencia en la lista y le actualiza el estado.
-// Devuelve true si la encontró y la actualizó, o false si no existía.
-// Cubre: HU-10 (avanzar incidencia de pendiente -> en_revision -> resuelta)
+// Avanza el semáforo de una incidencia: pendiente -> en revisión -> resuelta.
+// Recibe: el número de la incidencia y su nueva etapa.
+// Devuelve: una promesa de true (se cambió) o false (no se pudo).
+// Cubre: HU-10
 async function cambiarEstadoIncidencia(
   id: number,
   nuevoEstado: EstadoIncidencia
 ): Promise<boolean> {
-  // Primero actualizamos en Firestore
+  // Primero en Firestore. updateDoc cambia SOLO el dato "estado"
+  // (las reglas de Firestore no dejan cambiar ningún otro).
   try {
     const docRef = doc(baseDatos, 'incidencias', id.toString());
     await updateDoc(docRef, { estado: nuevoEstado });
@@ -102,7 +113,7 @@ async function cambiarEstadoIncidencia(
     return false;
   }
 
-  // Si Firestore funcionó, actualizamos en memoria
+  // Firestore dijo "ok": la cambiamos también en la copia.
   for (const incidencia of incidencias) {
     if (incidencia.id === id) {
       incidencia.estado = nuevoEstado;
@@ -115,19 +126,25 @@ async function cambiarEstadoIncidencia(
 // ------------------------------------------------------------------
 // cargarIncidencias (D22)
 // ------------------------------------------------------------------
-// Descarga las incidencias desde Firestore y las guarda en memoria.
-// Si la colección está vacía, sube los datos de prueba automáticamente.
+// Trae las incidencias desde Firestore y llena la copia.
+// Si la carpeta está vacía, primero planta la semilla (data/incidencias.ts).
 export async function cargarIncidencias(): Promise<void> {
   const coleccion = collection(baseDatos, 'incidencias');
+  // "snapshot" = una "foto" de cómo estaba la carpeta en ese momento.
   const snapshot = await getDocs(coleccion);
 
   if (snapshot.empty) {
+    // console.log escribe un mensaje en la consola (F12), solo para nosotros.
     console.log('Colección incidencias vacía, subiendo datos de prueba...');
     for (const incidencia of listaIncidenciasPrueba) {
       const docRef = doc(baseDatos, 'incidencias', incidencia.id.toString());
       await setDoc(docRef, incidencia);
     }
+    // Volvemos a sacar la foto, ahora con la semilla ya plantada.
     const nuevoSnapshot = await getDocs(coleccion);
+    // .map(...) = "transforma cada elemento de la lista y dame la lista nueva".
+    // d => d.data() as Incidencia es una "función flecha" cortita:
+    // recibe una hoja (d) y devuelve sus datos con forma de Incidencia.
     incidencias = nuevoSnapshot.docs.map(d => d.data() as Incidencia);
   } else {
     incidencias = snapshot.docs.map(d => d.data() as Incidencia);
@@ -135,8 +152,10 @@ export async function cargarIncidencias(): Promise<void> {
 }
 
 // ------------------------------------------------------------------
-// Exportamos las funciones para que las usen las páginas
+// Lo que las pantallas pueden usar
 // ------------------------------------------------------------------
+// Otra forma de exportar: en vez de poner "export" delante de cada
+// función, se juntan todas aquí al final. Hacen lo mismo.
 export {
   obtenerIncidencias,
   obtenerIncidenciaPorId,

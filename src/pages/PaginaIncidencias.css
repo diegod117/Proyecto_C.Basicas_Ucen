@@ -1,12 +1,16 @@
 /* PaginaIncidencias.css
-   Estilos propios de la página de incidencias.
-   Los estilos del formulario están en FormularioIncidencia.css.
-   Los estilos comunes (contenido-pagina) están en global.css.
-   D20: usa las variables de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos propios de la página de Incidencias (D20). Es cortito porque:
+     - el formulario tiene los suyos en FormularioIncidencia.css,
+     - la tabla tiene los suyos en TablaIncidencias.css,
+     - el contenedor (.contenido-pagina) está en global.css.
+   Aquí solo queda el mensaje verde de "¡listo!".
+   En la guía: paso 7 (CSS). */
 
-/* Mensaje verde que aparece tras registrar una incidencia */
+/* El mensaje verde que aparece 3 segundos después de registrar una incidencia.
+   Tiene una franja verde gruesa a la izquierda (border-left). */
 .mensaje-confirmacion {
-  background-color: #dcfce7;
+  background-color: #dcfce7; /* verde clarito */
   color: var(--color-disponible);
   border-left: 4px solid var(--color-disponible);
   border-radius: var(--radio-borde-sm);

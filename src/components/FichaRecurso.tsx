@@ -1,11 +1,22 @@
 // FichaRecurso.tsx
-// Ficha con TODOS los datos de un recurso: categoría, ubicación física
-// completa, datos de la planilla (serie, marca, proveedor, observación)
-// y cuántas unidades hay en cada estado.
-// Se abre al hacer clic en una tarjeta del inventario.
-// A la derecha muestra los formularios "Cambiar estado" y "Reponer stock",
-// y debajo de los datos, el historial.
-// Los formularios solo los ve el encargado; los demás roles ven un aviso.
+// ¿QUÉ ES ESTE ARCHIVO?
+// La FICHA de un recurso: la página con TODOS sus datos. Se abre al hacer
+// clic en una tarjeta del inventario. Tiene dos columnas:
+//   - Izquierda: la categoría, el nombre, la ubicación, los datos de la
+//     planilla (serie, marca, proveedor, observación), las unidades por
+//     estado y, abajo, el historial.
+//   - Derecha: los recuadros "Cambiar estado" y "Reponer stock" (solo el
+//     encargado). Los demás roles ven un aviso en su lugar.
+//
+// *** ¿CÓMO CAMBIO COSAS DE LA FICHA? (ver guía, paso 9) ***
+//   - Un TÍTULO o ETIQUETA (ej: "N° de serie", "Datos del recurso"):
+//     cambia el texto entre las etiquetas <dt>...</dt> o <h3>...</h3> de abajo.
+//   - Un DATO NUEVO (ej: "Fecha de compra"): hay que agregarlo en 4 lugares:
+//     el molde (types/Recurso.ts), el formulario (CamposDetalleRecurso.tsx),
+//     armarRecurso (utils/nuevoRecurso.ts) y aquí un <dt> + <dd> nuevos.
+//   - Los COLORES y el ORDEN de las columnas: en FichaRecurso.css.
+//
+// En la guía: paso 3 (componentes), paso 9 (recetas).
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
 //        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03,
 //        RF-04 (reponer stock)
@@ -22,35 +33,38 @@ import TablaHistorial from './TablaHistorial';
 import AvisoUbicacion from './AvisoUbicacion';
 import './FichaRecurso.css';
 
+// Las props que le pasa PaginaInventario.
 interface PropsFichaRecurso {
-  // El recurso que se muestra
+  // El recurso que hay que mostrar.
   recurso: Recurso;
-  // Función para volver al listado (la página decide qué hacer)
+  // La función para volver al listado (la página decide qué hacer).
   onVolver: () => void;
-  // Función para avisar que se guardó un cambio de estado. La ficha no la
-  // usa: solo se la pasa al formulario. El aviso viaja así:
+  // La función para avisar que se guardó un cambio. La ficha NO la usa ella
+  // misma: solo se la pasa a sus formularios. El aviso viaja como una carta
+  // que pasa de mano en mano:
   // formulario -> ficha -> página -> App (que redibuja todo).
   onEstadoCambiado: () => void;
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
+  // La persona conectada: decide si se muestran los formularios (RNF-03).
   usuario: Usuario;
 }
 
 // Componente FichaRecurso
-// Recibe: el recurso, la función para volver, la de aviso de cambio de estado
-// y el usuario conectado.
-// Devuelve: la ficha completa del recurso.
+// Recibe: el recurso, la función para volver, la de avisar cambios y la persona.
+// Devuelve: la ficha completa.
 function FichaRecurso(props: PropsFichaRecurso) {
+  // Nombres cortos para no escribir "props.recurso.ubicacion." todo el rato.
   const recurso = props.recurso;
   const ubicacion = recurso.ubicacion;
 
-  // Pedimos el historial al servicio cada vez que se dibuja la ficha.
-  // Cuando se guarda un cambio de estado, App redibuja todo, esta línea
-  // se vuelve a ejecutar y el cambio nuevo aparece arriba en la tabla.
+  // Le pedimos el diario de ESTE recurso al servicio, cada vez que se dibuja.
+  // Cuando se guarda un cambio, App redibuja todo, esta línea se vuelve a
+  // ejecutar, y la línea nueva aparece arriba en la tabla.
   const historial = obtenerHistorialDeRecurso(recurso.id);
 
   return (
     <div className="ficha-recurso">
-      {/* Ruta de navegación, como en el mockup: "← Inventario / Nombre" */}
+      {/* La "ruta" de arriba: "← Inventario / Nombre del recurso".
+          El botón "← Inventario" llama a onVolver (vuelve al listado). */}
       <div className="ficha-ruta">
         <button className="ficha-boton-volver" onClick={props.onVolver}>
           ← Inventario
@@ -59,9 +73,9 @@ function FichaRecurso(props: PropsFichaRecurso) {
         <span className="ficha-ruta-actual">{recurso.nombre}</span>
       </div>
 
-      {/* Dos columnas: datos a la izquierda y formulario a la derecha */}
+      {/* Las dos columnas (el CSS las pone lado a lado; en celular, una abajo de la otra). */}
       <div className="ficha-columnas">
-        {/* Columna izquierda: datos del recurso y, debajo, su historial */}
+        {/* ===== COLUMNA IZQUIERDA: los datos y, abajo, el historial ===== */}
         <div className="ficha-columna-izquierda">
           <div className="ficha-tarjeta">
             <div className="ficha-encabezado">
@@ -69,10 +83,13 @@ function FichaRecurso(props: PropsFichaRecurso) {
               <h2 className="ficha-nombre">{recurso.nombre}</h2>
             </div>
 
-            {/* Ubicación física completa (RF-10, HU-11) */}
+            {/* --- UBICACIÓN (RF-10, HU-11) --- */}
             <h3 className="ficha-subtitulo">Ubicación</h3>
-            {/* <dl> es una "lista de definiciones": pares de nombre (dt) y valor (dd).
-                Es la etiqueta HTML pensada justo para mostrar "Dato: valor". */}
+            {/* <dl> es una "lista de definiciones" de HTML: pares de
+                  <dt> = el nombre del dato (ej: "Torre")
+                  <dd> = su valor (ej: "B")
+                Es la etiqueta pensada justo para mostrar "Dato: valor".
+                El CSS (.ficha-datos) los acomoda en dos columnas. */}
             <dl className="ficha-datos">
               <dt>Torre</dt>
               <dd>{ubicacion.torre}</dd>
@@ -85,11 +102,13 @@ function FichaRecurso(props: PropsFichaRecurso) {
               <dt>Código</dt>
               <dd className="ficha-codigo">{ubicacion.codigo}</dd>
             </dl>
-            {/* Solo aparece si la ubicación tiene algún problema (HU-11) */}
+            {/* Un recuadro amarillo que SOLO aparece si la ubicación tiene
+                algún problema (HU-11). Si está bien, no dibuja nada. */}
             <AvisoUbicacion ubicacion={ubicacion} />
 
-            {/* Datos que hoy vienen de la planilla Excel. Son opcionales, por eso
-                usamos textoCampoOpcional: si no vienen, muestra "No registrado". */}
+            {/* --- DATOS DE LA PLANILLA --- Son opcionales (pueden no venir).
+                textoCampoOpcional muestra "No registrado" si no vienen.
+                *** Aquí se agrega un dato nuevo: copia un par <dt> + <dd>. *** */}
             <h3 className="ficha-subtitulo">Datos del recurso</h3>
             <dl className="ficha-datos">
               <dt>N° de serie</dt>
@@ -101,10 +120,9 @@ function FichaRecurso(props: PropsFichaRecurso) {
               <dt>Observación</dt>
               <dd>{textoCampoOpcional(recurso.observacion)}</dd>
               {/* El stock mínimo solo se muestra si el recurso lo tiene
-                  (normalmente insumos y reactivos, ver HU-09).
-                  "<> ... </>" se llama Fragment: agrupa dos elementos (dt y dd)
-                  sin agregar una etiqueta extra al HTML, porque React exige
-                  devolver un solo elemento en cada expresión. */}
+                  (insumos y reactivos, HU-09). "!== undefined" = "sí existe".
+                  <> ... </> (Fragment) es una caja invisible: agrupa el <dt> y
+                  el <dd> porque después de && solo puede ir UNA cosa. */}
               {recurso.stockMinimo !== undefined && (
                 <>
                   <dt>Stock mínimo</dt>
@@ -113,17 +131,18 @@ function FichaRecurso(props: PropsFichaRecurso) {
               )}
             </dl>
 
-            {/* Cantidad de unidades en cada estado (RF-01) */}
+            {/* --- UNIDADES POR ESTADO (RF-01) --- en su propio componente. */}
             <TablaUnidadesEstado recurso={recurso} />
           </div>
 
-          {/* Historial de cambios de estado (HU-06), como en el mockup */}
+          {/* --- HISTORIAL (HU-06) --- el "diario" del recurso. */}
           <TablaHistorial historial={historial} />
         </div>
 
-        {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
-            Los demás roles ven los datos y el historial, pero en lugar
-            de los formularios aparece un aviso. */}
+        {/* ===== COLUMNA DERECHA (RNF-03) =====
+            Solo el encargado puede modificar el inventario. Le preguntamos
+            al reglamento (permisos.ts): "¿este rol puede cambiar estados?".
+            Si sí: dibujamos los dos formularios. */}
         {puedeCambiarEstado(props.usuario.rol) && (
           <div className="ficha-columna-derecha">
             <FormularioCambioEstado
@@ -131,9 +150,9 @@ function FichaRecurso(props: PropsFichaRecurso) {
               onEstadoCambiado={props.onEstadoCambiado}
               usuario={props.usuario}
             />
-            {/* Reponer stock: suma unidades nuevas (resuelve las alertas
-                de reposición). Usa el mismo aviso hacia App que el cambio
-                de estado, porque también cambia los números. */}
+            {/* Reponer stock: suma unidades nuevas (apaga las alertas de
+                reposición). Usa el MISMO aviso hacia App que el cambio de
+                estado, porque también cambia los números. */}
             {puedeReponerStock(props.usuario.rol) && (
               <FormularioReponerStock
                 recurso={recurso}
@@ -143,6 +162,7 @@ function FichaRecurso(props: PropsFichaRecurso) {
             )}
           </div>
         )}
+        {/* Si NO puede (el ! da vuelta la respuesta): mostramos un aviso. */}
         {!puedeCambiarEstado(props.usuario.rol) && (
           <p className="ficha-aviso-permiso">
             Solo el encargado de laboratorio puede cambiar el estado o reponer el stock

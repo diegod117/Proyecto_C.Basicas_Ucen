@@ -1,6 +1,8 @@
 // FiltrosInventario.tsx
-// Barra de filtros del inventario: buscador por nombre y listas
-// desplegables para categoría, laboratorio y estado.
+// ¿QUÉ ES ESTE ARCHIVO?
+// La barra de FILTROS del inventario: un buscador por nombre y tres menús
+// desplegables (categoría, laboratorio y estado).
+// En la guía: paso 4 (formularios controlados) y paso 3 (props con funciones).
 // Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-08
 
 import {
@@ -12,19 +14,23 @@ import {
 import { SIN_FILTRO } from '../utils/filtrosInventario';
 import './FiltrosInventario.css';
 
-// Este componente NO guarda los filtros: los guarda la página (con useState).
-// El componente solo los MUESTRA (props con los valores) y AVISA cuando el
-// usuario cambia algo (props con funciones). Es el mismo patrón que usamos
-// en MenuNavegacion: los datos bajan por props y los cambios suben por funciones.
+// IDEA IMPORTANTE: este componente NO tiene memoria (no usa useState).
+// Lo que está elegido en cada filtro lo guarda la PÁGINA (el papá).
+// Este componente solo:
+//   - MUESTRA lo que el papá le dice (props con valores), y
+//   - AVISA cuando la persona cambia algo (props con funciones).
+// "Los datos bajan por props y los avisos suben por funciones."
+// Es el mismo patrón que MenuNavegacion. ¡Es EL patrón de React! (ver guía, paso 3)
 interface PropsFiltrosInventario {
-  // Valores actuales de cada filtro
+  // Lo que está elegido ahora en cada filtro.
   textoBusqueda: string;
   categoria: string;
   laboratorio: string;
   estado: string;
-  // Laboratorios que existen (ej: ["B307", "B308", "C210"]), para las opciones
+  // Los laboratorios que existen (ej: ["B307", "B308", "C210"]), para el menú.
   laboratoriosDisponibles: string[];
-  // Funciones para avisarle a la página que un filtro cambió
+  // Las funciones para avisarle a la página que un filtro cambió.
+  // "(texto: string) => void" = recibe un texto y no devuelve nada.
   onCambiarTexto: (texto: string) => void;
   onCambiarCategoria: (categoria: string) => void;
   onCambiarLaboratorio: (laboratorio: string) => void;
@@ -32,16 +38,18 @@ interface PropsFiltrosInventario {
 }
 
 // Componente FiltrosInventario
-// Recibe: los valores de los filtros, los laboratorios y las funciones de cambio.
+// Recibe: lo elegido en cada filtro, los laboratorios y las 4 funciones.
 // Devuelve: la barra con los 4 filtros.
 function FiltrosInventario(props: PropsFiltrosInventario) {
   return (
     <div className="filtros-inventario">
       <div className="campo-filtro">
-        {/* htmlFor conecta el label con el input (en HTML es "for") */}
+        {/* htmlFor une la etiqueta con su cajita (en HTML normal se escribe "for"). */}
         <label htmlFor="filtro-nombre">Buscar por nombre</label>
-        {/* Input controlado: el valor viene de las props y cada letra
-            escrita se avisa a la página con onCambiarTexto */}
+        {/* Cajita CONTROLADA:
+              value = lo que dice la página que hay escrito,
+              onChange = cada letra nueva se la avisamos a la página.
+            placeholder = el texto gris de ejemplo que se ve cuando está vacía. */}
         <input
           id="filtro-nombre"
           type="text"
@@ -53,15 +61,17 @@ function FiltrosInventario(props: PropsFiltrosInventario) {
 
       <div className="campo-filtro">
         <label htmlFor="filtro-categoria">Categoría</label>
-        {/* Un <select> también se controla con value + onChange */}
+        {/* Un menú desplegable (<select>) se controla igual: value + onChange. */}
         <select
           id="filtro-categoria"
           value={props.categoria}
           onChange={(evento) => props.onCambiarCategoria(evento.target.value)}
         >
+          {/* La primera opción: "Todas" = sin filtro. */}
           <option value={SIN_FILTRO}>Todas</option>
-          {/* Una <option> por cada categoría. El "value" es lo que se guarda
-              ('instalacion') y el texto es lo que ve el usuario ("Instalación") */}
+          {/* Una <option> por cada categoría, fabricadas con .map().
+              value = lo que se guarda por dentro ('instalacion').
+              El texto entre las etiquetas = lo que ve la persona ("Instalación"). */}
           {listaCategoriasRecurso.map((categoria) => (
             <option key={categoria} value={categoria}>
               {textoCategoria(categoria)}

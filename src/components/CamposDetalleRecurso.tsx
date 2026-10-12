@@ -1,22 +1,27 @@
 // CamposDetalleRecurso.tsx
-// Parte del formulario "Agregar recurso" con los datos OPCIONALES que hoy
-// tiene la planilla Excel: marca, número de serie, proveedor y observación.
-// Si se dejan vacíos, la ficha muestra "No registrado".
+// ¿QUÉ ES ESTE ARCHIVO?
+// Otro pedazo del formulario "Agregar recurso": las cajitas OPCIONALES que
+// también tenía la planilla Excel: marca, número de serie, proveedor y
+// observación. Si se dejan vacías, la ficha muestra "No registrado".
 // Usa los estilos de FormularioNuevoRecurso.css.
+// *** Para agregar un dato nuevo al formulario, copia un bloque <label>
+//     de aquí (ver guía, paso 9). ***
+// En la guía: paso 4 (props con la "mochila" de datos).
 // Cubre: datos de la planilla (sección 1.1 de requerimientos)
 
 import type { DatosNuevoRecurso } from '../types/Recurso';
 
 interface PropsCamposDetalleRecurso {
+  // La mochila completa del formulario.
   datos: DatosNuevoRecurso;
-  // Igual que en CamposUbicacionRecurso: recibe los datos completos
-  // con un campo cambiado
+  // Igual que en CamposUbicacionRecurso: recibe la mochila completa con
+  // un bolsillo cambiado.
   onCambiar: (datos: DatosNuevoRecurso) => void;
 }
 
 // Componente CamposDetalleRecurso
-// Recibe: los datos del formulario y la función para cambiarlos.
-// Devuelve: el grupo de campos opcionales.
+// Recibe: la mochila de datos y la función para cambiarla.
+// Devuelve: el grupo de cajitas opcionales.
 function CamposDetalleRecurso(props: PropsCamposDetalleRecurso) {
   const datos = props.datos;
 
@@ -24,6 +29,7 @@ function CamposDetalleRecurso(props: PropsCamposDetalleRecurso) {
     <fieldset className="nuevo-recurso-grupo">
       <legend>Datos de la planilla (opcionales)</legend>
 
+      {/* Marca y N° de serie lado a lado (en celular, uno abajo del otro). */}
       <div className="nuevo-recurso-fila">
         <label className="nuevo-recurso-campo">
           Marca
@@ -43,6 +49,7 @@ function CamposDetalleRecurso(props: PropsCamposDetalleRecurso) {
         </label>
       </div>
 
+      {/* Proveedor y Observación ocupan todo el ancho. */}
       <label className="nuevo-recurso-campo">
         Proveedor
         <input

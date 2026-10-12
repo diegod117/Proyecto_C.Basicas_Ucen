@@ -1,14 +1,18 @@
 /* FormularioRecuperarContrasena.css
-   Estilos propios del formulario "¿Olvidaste tu contraseña?".
-   La tarjeta, los campos y el botón usan las clases de PaginaLogin.css;
-   aquí solo va el aviso verde de "correo enviado". */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del formulario "¿Olvidaste tu contraseña?".
+   La tarjeta, las cajitas y el botón ya usan las clases de PaginaLogin.css
+   (por eso se ven igual que el login). Aquí solo va lo que es NUEVO:
+   el aviso verde de "te mandamos el correo".
+   En la guía: paso 7 (CSS). */
 
+/* El aviso verde: letra verde, fondo verde clarito y un borde suave. */
 .recuperar-exito {
   color: var(--color-disponible);
-  background-color: #f0fdf4;
+  background-color: #f0fdf4; /* verde muy clarito */
   border: 1px solid #bbf7d0;
   border-radius: var(--radio-borde-sm);
   padding: var(--espacio-sm) var(--espacio-md);
   font-size: 0.85rem;
-  margin: 0 0 var(--espacio-md);
+  margin: 0 0 var(--espacio-md); /* espacio solo abajo */
 }

@@ -1,15 +1,19 @@
 /* FiltrosInventario.css
-   Estilos de la barra de filtros del inventario.
-   D16: los filtros van en una franja blanca y el buscador es más grande.
-   Todos los colores, sombras y radios vienen de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la barra de FILTROS del inventario (D16): una franja
+   blanca con el buscador (más grande) y los tres menús.
+   Todos los colores, sombras y esquinas vienen de global.css.
+   En la guía: paso 7 (CSS: grid y @media). */
 
-/* Franja blanca: fondo, esquinas redondeadas y sombra suave, igual que
-   las tarjetas. El buscador ocupa más espacio que los 3 select.
-   En pantallas angostas (celular) cada filtro ocupa una fila completa. */
+/* La franja blanca. Usa GRID: una cuadrícula con columnas.
+   grid-template-columns: 2.4fr 1fr 1fr 1fr = 4 columnas.
+   "fr" = "fracción del espacio libre". El buscador recibe 2.4 partes y
+   cada menú 1 parte: el buscador queda más del doble de ancho.
+   Es como repartir una torta: 2.4 + 1 + 1 + 1 = 5.4 pedazos en total. */
 .filtros-inventario {
   display: grid;
   grid-template-columns: 2.4fr 1fr 1fr 1fr;
-  gap: var(--espacio-md);
+  gap: var(--espacio-md); /* espacio entre columnas */
   padding: var(--espacio-md) var(--espacio-lg);
   margin-bottom: var(--espacio-lg);
   background-color: var(--color-blanco);
@@ -17,21 +21,23 @@
   box-shadow: var(--sombra-tarjeta);
 }
 
-/* Cada filtro: el label arriba y el input/select abajo */
+/* Cada filtro: la etiqueta arriba y la cajita abajo (columna). */
 .campo-filtro {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+/* Las etiquetas ("BUSCAR POR NOMBRE", "CATEGORÍA"...). */
 .campo-filtro label {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em; /* letras un poquito separadas */
+  text-transform: uppercase; /* TODO EN MAYÚSCULAS (sin cambiar el texto del .tsx) */
   color: var(--color-texto-secundario);
 }
 
+/* Las cajitas y los menús. */
 .campo-filtro input,
 .campo-filtro select {
   padding: 10px 12px;
@@ -45,24 +51,25 @@
     background-color 0.18s ease;
 }
 
-/* Buscador más grande: más alto y con letra más grande que los select */
+/* El buscador es más grande: más alto y con letra más grande. */
 .campo-filtro input {
   padding: 14px 16px;
   font-size: 16px;
 }
 
+/* ::placeholder = el texto gris de ejemplo ("Ej: termómetro..."). */
 .campo-filtro input::placeholder {
   color: var(--color-texto-secundario);
 }
 
-/* Al pasar el mouse el borde se marca un poco */
+/* Con el mouse encima, el borde se pinta azul. */
 .campo-filtro input:hover,
 .campo-filtro select:hover {
   border-color: var(--color-principal);
 }
 
-/* Cuando un filtro está seleccionado se marca con el azul principal.
-   El aro de enfoque usa el azul claro de las variables. */
+/* Cuando estás escribiendo o eligiendo (:focus): borde azul y un anillo
+   azul clarito alrededor. */
 .campo-filtro input:focus,
 .campo-filtro select:focus {
   outline: none;
@@ -71,16 +78,16 @@
   box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
-/* @media aplica estas reglas SOLO si la pantalla mide 700px o menos.
-   En celular, los filtros se apilan uno debajo del otro (RNF-01). */
+/* En pantallas de 700px o menos (celular), los filtros van uno debajo
+   del otro: UNA sola columna (1fr) (RNF-01). */
 @media (max-width: 700px) {
   .filtros-inventario {
     grid-template-columns: 1fr;
     padding: var(--espacio-md);
   }
 
-  /* D21: letra de 16px en los campos para que el celular no haga zoom
-     solo al tocarlos. El buscador sigue siendo más alto que los select. */
+  /* D21: letra de 16px en los menús, para que el celular no haga zoom
+     solo al tocarlos. */
   .campo-filtro select {
     font-size: 16px;
   }

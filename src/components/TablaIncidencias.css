@@ -1,10 +1,12 @@
 /* TablaIncidencias.css
-   Estilos de la tabla que muestra el historial de incidencias (HU-10).
-   D20: tarjeta blanca con sombra, cabeceras discretas y botones de acción
-   con los colores de las variables de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la tabla de incidencias (HU-10, D20): una tarjeta blanca
+   con sombra, títulos de columna discretos y los botones para avanzar el
+   semáforo ("Pasar a en revisión" azul, "Marcar como resuelta" verde).
+   En la guía: paso 7 (CSS de tablas y :first-child). */
 
-/* Contenedor de la tabla: tarjeta con esquinas redondeadas.
-   overflow-x: auto permite deslizar la tabla hacia el lado en celular. */
+/* La tarjeta que contiene la tabla.
+   overflow-x: auto = si la tabla no cabe (celular), se desliza hacia el lado. */
 .tabla-incidencias-contenedor {
   background-color: var(--color-blanco);
   border-radius: var(--radio-borde);
@@ -13,7 +15,7 @@
   margin-top: var(--espacio-lg);
 }
 
-/* Encabezado de la sección */
+/* El título "Historial de incidencias", con una línea abajo. */
 .tabla-incidencias-titulo {
   font-size: 1rem;
   font-weight: 600;
@@ -23,14 +25,14 @@
   border-bottom: 1px solid var(--color-borde);
 }
 
-/* La tabla ocupa todo el ancho */
+/* La tabla ocupa todo el ancho y las celdas comparten sus bordes. */
 .tabla-incidencias {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
 
-/* Encabezados de columna */
+/* Los títulos de las columnas: chiquitos, grises, en mayúsculas, fondo gris. */
 .tabla-incidencias th {
   text-align: left;
   padding: 10px var(--espacio-md);
@@ -42,7 +44,7 @@
   background-color: var(--color-fondo-menu);
 }
 
-/* Celdas de datos */
+/* Las celdas normales, con una línea arriba que separa las filas. */
 .tabla-incidencias td {
   padding: 12px var(--espacio-md);
   color: var(--color-texto);
@@ -50,16 +52,17 @@
   vertical-align: middle;
 }
 
-/* Efecto hover en las filas: azul claro de la paleta */
+/* Las filas cambian de color suavemente... */
 .tabla-incidencias tbody tr {
   transition: background-color 0.15s ease;
 }
 
+/* ...y se pintan azul clarito con el mouse encima. */
 .tabla-incidencias tbody tr:hover {
   background-color: var(--color-principal-claro);
 }
 
-/* Mensaje cuando no hay incidencias */
+/* El texto "No hay incidencias registradas.", centrado y gris. */
 .tabla-incidencias-vacia {
   padding: var(--espacio-lg) var(--espacio-md);
   margin: 0;
@@ -68,8 +71,8 @@
   font-size: 0.875rem;
 }
 
-/* Botones de acción para cambiar de estado (HU-10).
-   Usan el estilo secundario de la app: borde de color y fondo suave. */
+/* Lo común de los dos botones de acción (HU-10): fondo transparente y
+   borde de color (estilo "secundario"). */
 .boton-accion-incidencia {
   padding: 6px 12px;
   font-family: inherit;
@@ -83,7 +86,7 @@
     border-color 0.18s ease;
 }
 
-/* Botón para pasar a 'en_revision': secundario azul */
+/* "Pasar a en revisión": azul. */
 .boton-accion-revision {
   color: var(--color-principal);
   background-color: transparent;
@@ -94,7 +97,7 @@
   background-color: var(--color-principal-claro);
 }
 
-/* Botón para marcar como 'resuelta': verde de "disponible" */
+/* "Marcar como resuelta": verde (el mismo verde de "disponible"). */
 .boton-accion-resuelta {
   color: var(--color-disponible);
   background-color: transparent;
@@ -105,15 +108,15 @@
   background-color: #dcfce7;
 }
 
-/* Guion centrado para incidencias que ya están resueltas */
+/* La rayita "—" de las incidencias ya resueltas. */
 .texto-accion-finalizada {
   color: var(--color-texto-secundario);
   font-weight: 600;
   padding-left: var(--espacio-sm);
 }
 
-/* D21: celular (375px). La tabla tiene un ancho mínimo: en vez de
-   aplastar las columnas, el contenedor (overflow-x: auto) la desliza. */
+/* D21: en el celular, la tabla mide al menos 640px. En vez de aplastar las
+   columnas, la tarjeta (con overflow-x: auto) la deja deslizar hacia el lado. */
 @media (max-width: 768px) {
   .tabla-incidencias {
     min-width: 640px;
@@ -123,7 +126,8 @@
     padding: var(--espacio-md);
   }
 
-  /* La fecha y la descripción no se parten en renglones de una palabra */
+  /* td:first-child = "la PRIMERA celda de cada fila" (la fecha).
+     Que no se parta en dos líneas. */
   .tabla-incidencias td:first-child {
     white-space: nowrap;
   }

@@ -1,11 +1,15 @@
 /* FormularioCambioEstado.css
-   Estilos del recuadro "Cambiar estado" (basado en el mockup).
-   D18: tarjeta blanca de acciones a la derecha de la ficha, con las
-   variables de global.css y botón principal azul. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del recuadro "Cambiar estado" de la ficha (D18): una tarjeta
+   blanca a la derecha, con las etiquetas, las cajitas, los mensajes y el
+   botón azul. El recuadro "Reponer stock" usa ESTAS MISMAS clases para
+   verse igual.
+   En la guía: paso 7 (CSS: flex en columna, :hover y :focus). */
 
+/* La tarjeta blanca. Todo lo de adentro va en COLUMNA (uno debajo del otro). */
 .formulario-cambio-estado {
   display: flex;
-  flex-direction: column; /* cada label e input uno debajo del otro */
+  flex-direction: column; /* cada etiqueta y cajita una debajo de la otra */
   gap: 6px;
   background-color: var(--color-blanco);
   border-radius: var(--radio-borde);
@@ -13,6 +17,7 @@
   padding: var(--espacio-lg);
 }
 
+/* El título ("Cambiar estado"), con una línea debajo. */
 .formulario-cambio-titulo {
   margin: 0 0 var(--espacio-sm) 0;
   padding-bottom: var(--espacio-sm);
@@ -21,6 +26,7 @@
   border-bottom: 1px solid var(--color-borde);
 }
 
+/* Las etiquetas ("ESTADO ACTUAL", "MOTIVO"...): chiquitas, grises, en mayúsculas. */
 .formulario-cambio-estado label {
   font-size: 12px;
   font-weight: 600;
@@ -30,6 +36,7 @@
   margin-top: 6px;
 }
 
+/* Las cajitas y los menús. */
 .formulario-cambio-estado select,
 .formulario-cambio-estado input {
   padding: 10px 12px;
@@ -43,11 +50,13 @@
     background-color 0.18s ease;
 }
 
+/* Mouse encima: borde azul. */
 .formulario-cambio-estado select:hover,
 .formulario-cambio-estado input:hover {
   border-color: var(--color-principal);
 }
 
+/* Escribiendo (:focus): borde azul y anillo azul clarito. */
 .formulario-cambio-estado select:focus,
 .formulario-cambio-estado input:focus {
   outline: none;
@@ -56,7 +65,7 @@
   box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
-/* Mensaje de error en rojo */
+/* El mensaje de error: letra roja sobre fondo rojo clarito. */
 .formulario-cambio-error {
   margin: var(--espacio-sm) 0 0 0;
   padding: var(--espacio-sm) 10px;
@@ -66,7 +75,7 @@
   border-radius: var(--radio-borde-sm);
 }
 
-/* Mensaje verde que confirma que el cambio se guardó */
+/* El mensaje de "listo": letra verde sobre fondo verde clarito. */
 .formulario-cambio-exito {
   margin: var(--espacio-sm) 0 0 0;
   padding: var(--espacio-sm) 10px;
@@ -76,7 +85,7 @@
   border-radius: var(--radio-borde-sm);
 }
 
-/* Botón "Guardar cambio": mismo aspecto que .boton-principal de global.css */
+/* El botón "Guardar cambio": igual que .boton-principal de global.css. */
 .formulario-cambio-boton {
   margin-top: var(--espacio-md);
   padding: 11px;
@@ -98,14 +107,15 @@
   box-shadow: var(--sombra-tarjeta);
 }
 
+/* Apagado (mientras guarda): medio transparente y con el cursor de "prohibido". */
 .formulario-cambio-boton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-/* D21: celular (375px). Menos relleno y campos con letra de 16px: así el
-   navegador del celular no hace zoom solo al tocar un campo. */
+/* D21: en el celular: menos relleno, y letra de 16px en las cajitas para
+   que el celular no haga zoom solo al tocarlas. */
 @media (max-width: 768px) {
   .formulario-cambio-estado {
     padding: var(--espacio-md);

@@ -1,29 +1,35 @@
 // CamposUbicacionRecurso.tsx
-// Parte del formulario "Agregar recurso" con la ubicación física:
-// torre, sala, bodega y mueble. Muestra el código de ubicación que se
-// genera solo (ej: "B307-B1-M2"), así nadie tiene que escribirlo.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Un pedazo del formulario "Agregar recurso": las cajitas de la UBICACIÓN
+// (torre, sala, bodega y mueble). Abajo muestra el código de ubicación que
+// se arma SOLO mientras escribes (ej: "B307-B1-M2"), así nadie tiene que
+// inventarlo ni escribirlo.
 // Usa los estilos de FormularioNuevoRecurso.css.
+// En la guía: paso 4 (props con la "mochila" de datos).
 // Cubre: RF-10, HU-11 (ubicación obligatoria con código)
 
 import type { DatosNuevoRecurso, Torre } from '../types/Recurso';
 import { armarUbicacion } from '../utils/nuevoRecurso';
 
 interface PropsCamposUbicacionRecurso {
-  // Todos los datos del formulario (este componente usa solo los de ubicación)
+  // La "mochila" completa del formulario (este componente solo usa los
+  // bolsillos de ubicación, pero recibe todo).
   datos: DatosNuevoRecurso;
-  // Función del formulario para guardar los datos con un campo cambiado.
-  // Recibe los datos COMPLETOS: { ...props.datos, sala: '307' } copia todos
-  // los campos y cambia solo "sala".
+  // La función del papá para guardar la mochila con un bolsillo cambiado.
+  // Recibe la mochila COMPLETA: { ...props.datos, sala: '307' } copia todos
+  // los bolsillos y cambia solo "sala".
   onCambiar: (datos: DatosNuevoRecurso) => void;
 }
 
 // Componente CamposUbicacionRecurso
-// Recibe: los datos del formulario y la función para cambiarlos.
-// Devuelve: el grupo de campos de ubicación.
+// Recibe: la mochila de datos y la función para cambiarla.
+// Devuelve: el grupo de cajitas de ubicación.
+// No tiene useState: no guarda nada, todo lo guarda el papá (FormularioNuevoRecurso).
 function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
   const datos = props.datos;
 
-  // El código solo se puede generar cuando la sala y la bodega están escritas
+  // El código solo se puede armar cuando ya están la sala y la bodega.
+  // Mientras tanto mostramos un texto de ayuda.
   let codigo = 'Se genera al completar la ubicación';
   if (datos.sala.trim() !== '' && datos.bodega.trim() !== '') {
     codigo = armarUbicacion(datos).codigo;
@@ -36,6 +42,8 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
       <div className="nuevo-recurso-fila">
         <label className="nuevo-recurso-campo">
           Torre
+          {/* "as Torre": el <select> entrega texto; le aseguramos a TypeScript
+              que es 'B' o 'C' (las únicas opciones que hay). */}
           <select
             value={datos.torre}
             onChange={(evento) => props.onCambiar({ ...datos, torre: evento.target.value as Torre })}
@@ -46,6 +54,7 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
         </label>
         <label className="nuevo-recurso-campo">
           Sala
+          {/* inputMode="numeric" = en el celular aparece el teclado de números. */}
           <input
             type="text"
             inputMode="numeric"
@@ -59,6 +68,7 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
       <div className="nuevo-recurso-fila">
         <label className="nuevo-recurso-campo">
           Bodega
+          {/* placeholder con comillas simples ' ' porque el texto lleva comillas dobles adentro. */}
           <input
             type="text"
             placeholder='Ej: Bodega 1 (o "Sala")'
@@ -77,6 +87,8 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
         </label>
       </div>
 
+      {/* El código se actualiza solo con cada letra, porque cada letra cambia
+          la mochila, el papá redibuja, y este componente vuelve a calcularlo. */}
       <p className="nuevo-recurso-codigo">
         Código de ubicación: <strong>{codigo}</strong>
       </p>

@@ -1,9 +1,11 @@
 /* FormularioNuevoRecurso.css
-   Estilos del formulario "Agregar recurso". También los usan sus partes:
-   CamposUbicacionRecurso y CamposDetalleRecurso.
-   Los botones usan .boton-principal y .boton-secundario de global.css. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del formulario "Agregar recurso". También los usan sus dos
+   pedazos: CamposUbicacionRecurso y CamposDetalleRecurso.
+   Los botones usan .boton-principal y .boton-secundario de global.css.
+   En la guía: paso 7 (CSS: fieldset, grid de dos columnas y @media). */
 
-/* Tarjeta blanca que contiene todo el formulario */
+/* La tarjeta blanca que contiene todo el formulario. */
 .nuevo-recurso {
   max-width: 720px;
   background-color: var(--color-blanco);
@@ -12,13 +14,15 @@
   padding: var(--espacio-lg);
 }
 
+/* El título "Agregar recurso al inventario". */
 .nuevo-recurso-titulo {
   margin: 0 0 var(--espacio-xs) 0;
   font-size: 1.4rem;
 }
 
-/* Cada grupo de campos (Recurso, Ubicación, Datos de la planilla).
-   <fieldset> agrupa campos relacionados y <legend> es su título. */
+/* Cada grupo de cajitas ("Recurso", "Ubicación", "Datos de la planilla").
+   En el .tsx es un <fieldset> (agrupa cajitas con un borde) y su título
+   es un <legend> (el texto que queda "montado" sobre el borde). */
 .nuevo-recurso-grupo {
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde-sm);
@@ -29,20 +33,22 @@
   gap: var(--espacio-md);
 }
 
+/* El título de cada grupo, azul y en negrita. */
 .nuevo-recurso-grupo legend {
   padding: 0 var(--espacio-xs);
   font-weight: 600;
   color: var(--color-principal);
 }
 
-/* Dos campos uno al lado del otro (en celular bajan, ver abajo) */
+/* Una fila con DOS cajitas lado a lado: grid con dos columnas iguales
+   (1fr 1fr = mitad y mitad). En el celular bajan (ver abajo). */
 .nuevo-recurso-fila {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--espacio-md);
 }
 
-/* El texto del <label> va arriba y el campo debajo */
+/* Cada campo: el texto del <label> arriba y la cajita abajo. */
 .nuevo-recurso-campo {
   display: flex;
   flex-direction: column;
@@ -52,6 +58,8 @@
   color: var(--color-texto-secundario);
 }
 
+/* Las cajitas y los menús. font-weight: 400 = letra normal (el label la
+   tenía en negrita, y la cajita la "heredaría" sin esto). */
 .nuevo-recurso-campo input,
 .nuevo-recurso-campo select {
   padding: 10px 12px;
@@ -64,6 +72,7 @@
   background-color: var(--color-fondo);
 }
 
+/* Escribiendo: borde azul y anillo azul clarito. */
 .nuevo-recurso-campo input:focus,
 .nuevo-recurso-campo select:focus {
   outline: none;
@@ -72,17 +81,19 @@
   box-shadow: 0 0 0 3px var(--color-principal-claro);
 }
 
-/* "Código de ubicación: B307-B1-M2" (se genera solo) */
+/* La línea "Código de ubicación: B307-B1-M2" (se arma sola). */
 .nuevo-recurso-codigo {
   margin: 0;
   font-size: 14px;
   color: var(--color-texto-secundario);
 }
 
+/* El código en sí (el <strong>), en azul. */
 .nuevo-recurso-codigo strong {
   color: var(--color-principal);
 }
 
+/* El mensaje de error, rojo. */
 .nuevo-recurso-error {
   margin: var(--espacio-md) 0 0 0;
   padding: var(--espacio-sm) 10px;
@@ -92,7 +103,8 @@
   border-radius: var(--radio-borde-sm);
 }
 
-/* Botones "Cancelar" y "Agregar recurso", a la derecha */
+/* Los botones "Cancelar" y "Agregar recurso", juntos a la DERECHA.
+   flex-end = "pégalos al final de la fila" (a la derecha). */
 .nuevo-recurso-botones {
   display: flex;
   justify-content: flex-end;
@@ -100,8 +112,8 @@
   margin-top: var(--espacio-lg);
 }
 
-/* Celular (RNF-01): campos uno debajo del otro y letra de 16px para que
-   el iPhone no haga zoom al tocarlos */
+/* En el celular (RNF-01): cajitas una debajo de la otra (una columna),
+   y letra de 16px para que el iPhone no haga zoom al tocarlas. */
 @media (max-width: 768px) {
   .nuevo-recurso {
     padding: var(--espacio-md);

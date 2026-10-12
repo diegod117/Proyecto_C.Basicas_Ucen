@@ -1,40 +1,48 @@
 // Incidencia.ts
-// Define cómo es una incidencia o accidente ocurrido en el laboratorio.
-// Reemplaza la "hoja de incidencia" en papel que se usa hoy.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el molde de una INCIDENCIA: un accidente o problema que pasó en el
+// laboratorio (ej: "se cayó un multímetro y se rompió la punta").
+// Antes esto se anotaba en una hoja de papel; ahora se guarda en la app.
+// En la guía: paso 2 (TypeScript: tipos unión, boolean y "?").
 // Cubre: RF-05, HU-04 (formulario de incidencia), HU-10 (historial con estado inicial)
 
 // ------------------------------------------------------------------
-// Estado de la incidencia (HU-10)
+// ¿En qué etapa va la incidencia?
 // ------------------------------------------------------------------
-// Toda incidencia nace como "pendiente" (lo pide HU-10).
-// Luego el encargado la revisa y finalmente la marca como resuelta.
-// Orden esperado: pendiente -> en_revision -> resuelta
+// Como un semáforo que avanza en un solo sentido:
+//   'pendiente'   -> recién anotada, nadie la ha mirado todavía
+//   'en_revision' -> el encargado la está revisando
+//   'resuelta'    -> ya se arregló
+// Toda incidencia nueva parte en 'pendiente' (eso lo pide HU-10).
 export type EstadoIncidencia = 'pendiente' | 'en_revision' | 'resuelta';
 
 // ------------------------------------------------------------------
-// Incidencia (RF-05)
+// ¿Qué datos tiene una incidencia?
 // ------------------------------------------------------------------
-// Los campos son los mismos que pide RF-05: fecha, docente presente,
-// descripción, ítem afectado y afectación a usuarios.
-// HU-10 agrega: usuario que la registra y estado.
+// Son los mismos datos que pedía la hoja de papel (RF-05), más quién
+// la anotó y en qué etapa va (HU-10).
 export interface Incidencia {
-  id: number;
+  id: number; // el número de la incidencia (1, 2, 3...)
 
-  // El ítem afectado. Igual que en Reserva, guardamos solo el id del recurso.
+  // A qué recurso le pasó. Guardamos solo su NÚMERO (id), no el recurso
+  // completo. Es como anotar "el alumno con RUT 12.345" en vez de copiar
+  // toda su ficha: si después cambia algo de la ficha, el RUT sigue sirviendo.
   recursoId: number;
 
-  // Fecha y hora en que se registró. HU-10 pide que se ponga sola
-  // (automática), así que el usuario no la escribe en el formulario.
-  fecha: string; // ej: "2026-10-01 11:20"
+  // Cuándo se anotó, ej: "2026-10-01 11:20".
+  // La app la pone sola: la persona no la escribe.
+  fecha: string;
 
-  docentePresente: string; // docente que estaba en la clase cuando ocurrió
-  descripcion: string; // qué pasó
+  docentePresente: string; // qué profesor estaba en la sala cuando pasó
+  descripcion: string; // qué pasó, contado con palabras
 
-  // Afectación a usuarios: primero un sí/no (boolean = true o false)
-  // y, solo si hubo personas afectadas, un detalle. Por eso el "?" (opcional).
+  // boolean = un dato que solo puede ser true (sí) o false (no).
+  // Es como un interruptor de luz: prendido o apagado.
   hayPersonasAfectadas: boolean;
+  // El "?" después del nombre significa OPCIONAL: este dato puede no estar.
+  // Solo se llena si hubo personas afectadas (si el interruptor está en true).
   detalleAfectacion?: string;
 
-  registradaPor: string; // nombre del encargado que la registró (HU-10)
-  estado: EstadoIncidencia; // usa el tipo de arriba
+  registradaPor: string; // nombre de quien la anotó (la persona conectada)
+  estado: EstadoIncidencia; // en qué etapa va (ver el semáforo de arriba)
 }

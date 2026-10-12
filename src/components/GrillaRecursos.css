@@ -1,18 +1,22 @@
 /* GrillaRecursos.css
-   Estilos de la grilla de tarjetas del inventario. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la cuadrícula de tarjetas del inventario.
+   En la guía: paso 7 (CSS: grid automático). */
 
-/* Grilla de tarjetas.
-   "display: grid" ordena los elementos en filas y columnas.
-   "repeat(auto-fill, minmax(240px, 1fr))" significa:
-     - cada columna mide como mínimo 240px y crece para llenar el espacio (1fr)
-     - caben tantas columnas como entren en el ancho de la pantalla
-   Así, en un computador se ven 3 o 4 tarjetas por fila y en un celular 1,
-   sin escribir reglas distintas para cada pantalla (RNF-01). */
+/* La cuadrícula de tarjetas.
+   display: grid = acomoda a los hijos en filas y columnas.
+   repeat(auto-fill, minmax(240px, 1fr)) es un truco MÁGICO. Se lee:
+     "haz tantas columnas como quepan (auto-fill), donde cada una mide
+      como mínimo 240px y como máximo una parte del espacio libre (1fr)".
+   Resultado: en un computador caben 3 o 4 tarjetas por fila, y en un
+   celular cabe 1. ¡Sin escribir reglas distintas para cada pantalla! (RNF-01)
+   Es como acomodar libros en un estante: caben los que caben, y si el
+   estante es más corto, los demás bajan al siguiente. */
 .grilla-recursos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--espacio-lg);
-  /* Un poco de espacio arriba y abajo para que la sombra y la elevación
-     de las tarjetas (D15) no se vean cortadas. */
+  gap: var(--espacio-lg); /* espacio entre tarjetas */
+  /* Un poco de espacio arriba y abajo para que la sombra de las tarjetas
+     (y cuando "se levantan" con el mouse, D15) no se vea cortada. */
   padding: var(--espacio-xs) 0 var(--espacio-md);
 }

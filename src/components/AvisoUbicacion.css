@@ -1,19 +1,24 @@
 /* AvisoUbicacion.css
-   Recuadro amarillo de advertencia para ubicaciones con problemas.
-   D18: usa las variables de global.css y el radio común. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del recuadro AMARILLO de "¡ojo!" que aparece cuando la
+   ubicación de un recurso tiene problemas (D18).
+   En la guía: paso 7 (CSS). */
 
+/* El recuadro amarillo. */
 .aviso-ubicacion {
   margin-top: 10px;
   padding: 10px 14px;
   font-size: 13px;
-  color: var(--color-mantencion);
-  background-color: #fef9c3;
-  /* franja de color a la izquierda, sin borde duro alrededor */
+  color: var(--color-mantencion); /* letra amarillo oscuro */
+  background-color: #fef9c3;      /* fondo amarillo clarito */
+  /* En vez de un borde alrededor, solo una franja gruesa a la IZQUIERDA.
+     Es una forma común de marcar un aviso. */
   border-left: 4px solid var(--color-mantencion);
   border-radius: var(--radio-borde-sm);
 }
 
+/* La lista de problemas (la <ul> que está dentro del aviso). */
 .aviso-ubicacion ul {
   margin: 6px 0 0 0;
-  padding-left: 18px; /* sangría de los puntos de la lista */
+  padding-left: 18px; /* cuánto se corren los puntitos de la lista hacia adentro */
 }

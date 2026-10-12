@@ -1,6 +1,10 @@
 // GrillaRecursos.tsx
-// Muestra los recursos (ya filtrados) en una grilla de tarjetas.
-// Si la lista viene vacía, muestra el mensaje para limpiar los filtros.
+// ¿QUÉ ES ESTE ARCHIVO?
+// La "grilla" (cuadrícula) de tarjetas del inventario: una tarjeta por
+// cada recurso, ordenadas en filas y columnas como un álbum de láminas.
+// Si no hay ningún recurso que mostrar (los filtros no encontraron nada),
+// muestra un mensaje con un botón para limpiar los filtros.
+// En la guía: paso 3 (listas con .map y key).
 // Cubre: HU-01
 
 import type { Recurso } from '../types/Recurso';
@@ -9,29 +13,34 @@ import MensajeSinResultados from './MensajeSinResultados';
 import './GrillaRecursos.css';
 
 interface PropsGrillaRecursos {
-  // Los recursos que hay que mostrar (la página ya los filtró)
+  // Los recursos que hay que mostrar (la página ya los pasó por el colador).
   recursos: Recurso[];
-  // Se llama al hacer clic en una tarjeta, con el id del recurso
+  // Una función que se llama al hacer clic en una tarjeta, con el id del recurso.
   onSeleccionarRecurso: (idRecurso: number) => void;
-  // Se llama al hacer clic en "Limpiar filtros" (cuando no hay resultados)
+  // Una función que se llama al apretar "Limpiar filtros" (cuando no hay resultados).
   onLimpiarFiltros: () => void;
 }
 
 // Componente GrillaRecursos
-// Recibe: la lista de recursos y las funciones para seleccionar y limpiar.
-// Devuelve: la grilla de tarjetas, o el mensaje si no hay recursos.
+// Recibe: la lista de recursos y las dos funciones.
+// Devuelve: la grilla de tarjetas, o el mensaje si la lista está vacía.
 function GrillaRecursos(props: PropsGrillaRecursos) {
-  // Si no hay recursos que mostrar, devolvemos el mensaje y la función
-  // termina aquí (no se ejecuta el return de más abajo).
+  // ¿La lista está vacía (largo 0)? Mostramos el mensaje y TERMINAMOS aquí:
+  // el return de más abajo ya no se ejecuta.
   if (props.recursos.length === 0) {
     return <MensajeSinResultados onLimpiarFiltros={props.onLimpiarFiltros} />;
   }
 
   return (
     <div className="grilla-recursos">
-      {/* .map() recorre la lista y por cada recurso devuelve una TarjetaRecurso.
-          La "key" (el id del recurso) le permite a React saber qué tarjetas
-          quitar o mantener cuando cambia un filtro. */}
+      {/* DIBUJAR UNA LISTA (ver guía, paso 3):
+          .map() recorre la lista y, por CADA recurso, devuelve una TarjetaRecurso.
+          Es como una fábrica: entran 10 recursos y salen 10 tarjetas.
+          (recurso) => ( ... ) es una función flecha: recibe un recurso y
+          devuelve el JSX de su tarjeta.
+          key={recurso.id}: React necesita un "nombre único" para cada elemento
+          de una lista. Así, cuando cambias un filtro, sabe qué tarjetas sacar
+          y cuáles dejar, sin redibujar todo. Es como el número de lista en un curso. */}
       {props.recursos.map((recurso) => (
         <TarjetaRecurso
           key={recurso.id}

@@ -1,8 +1,12 @@
 // FormularioIncidencia.tsx
-// Formulario para registrar una incidencia en el laboratorio (HU-04).
-// Campos: recurso afectado, docente presente, descripción y personas afectadas.
-// Valida que los campos obligatorios estén llenos antes de guardar.
-// RNF-02: el registro se completa en 5 pasos como máximo.
+// ¿QUÉ ES ESTE ARCHIVO?
+// El formulario para ANOTAR UNA INCIDENCIA (un accidente o problema en el
+// laboratorio), como la antigua hoja de papel (HU-04).
+// Cajitas: qué recurso, qué profesor estaba, qué pasó, y si hubo personas
+// afectadas (y en ese caso, cómo).
+// Revisa que las cajitas obligatorias estén llenas antes de guardar.
+// RNF-02 pide que se pueda registrar en 5 pasos o menos.
+// En la guía: paso 4 (formularios, checkbox) y paso 8 (incidencias).
 // Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia),
 // HU-10 (la incidencia guarda quién la registró)
 
@@ -12,56 +16,56 @@ import { agregarIncidencia } from '../services/incidenciasService';
 import type { Usuario } from '../types/Usuario';
 import './FormularioIncidencia.css';
 
-// Props que recibe el formulario desde la página.
-// onIncidenciaRegistrada se llama cuando el formulario se envía con éxito,
-// para que la página pueda mostrar un mensaje o actualizar la vista.
+// Las props que le pasa PaginaIncidencias.
 interface PropsFormularioIncidencia {
+  // Se llama cuando la incidencia se guardó bien, para que la página
+  // muestre el mensaje verde y actualice la tabla.
   onIncidenciaRegistrada: () => void;
-  // Usuario conectado: su nombre queda como "registrada por" (HU-10)
+  // La persona conectada: su nombre queda como "registrada por" (HU-10).
   usuario: Usuario;
 }
 
 // Componente FormularioIncidencia
-// Recibe: onIncidenciaRegistrada (función que avisa a la página que se registró)
-// y el usuario conectado.
-// Devuelve: el formulario con los campos de la incidencia.
+// Recibe: la función de "listo" y la persona conectada.
+// Devuelve: el formulario de la incidencia.
 function FormularioIncidencia(props: PropsFormularioIncidencia) {
-  // Obtenemos la lista de recursos para llenar el <select>.
-  // Viene del servicio de Johann (recursosService).
+  // Los recursos, para las opciones del menú "Recurso afectado".
   const recursos = obtenerRecursos();
 
-  // Estado de cada campo del formulario (formulario controlado).
-  // "Controlado" significa que React guarda el valor actual de cada campo
-  // con useState, y el campo siempre muestra ese valor.
+  // ---------------------------------------------------------------
+  // LA MEMORIA DEL FORMULARIO (formulario controlado).
+  // ---------------------------------------------------------------
+  // "Controlado" = React guarda lo que hay en cada cajita con useState,
+  // y la cajita siempre muestra lo que React tiene guardado.
+  // useState<string>('') = "guarda un texto, que parte vacío".
   const [recursoId, setRecursoId] = useState<string>('');
   const [docentePresente, setDocentePresente] = useState('');
   const [descripcion, setDescripcion] = useState('');
 
-  // Estado del checkbox: ¿hubo personas afectadas? (true o false)
-  // Parte en false porque la mayoría de incidencias no afectan personas.
+  // El cuadradito para marcar (checkbox): ¿hubo personas afectadas?
+  // Guarda true (marcado) o false (sin marcar). Parte sin marcar.
   const [hayPersonasAfectadas, setHayPersonasAfectadas] = useState(false);
 
-  // Detalle de la afectación: solo se usa si hayPersonasAfectadas es true.
-  // Es el campo opcional ("?") del tipo Incidencia.
+  // El detalle de la afectación: solo se usa si el cuadradito está marcado.
   const [detalleAfectacion, setDetalleAfectacion] = useState('');
 
-  // Mensaje de error que se muestra si falta algún campo obligatorio.
-  // Si es un texto vacío, no se muestra nada.
+  // El mensaje rojo de error ('' = no se muestra).
   const [mensajeError, setMensajeError] = useState('');
 
-  // Estado para saber si estamos esperando a que Firestore guarde.
+  // true mientras esperamos a Firestore.
   const [guardando, setGuardando] = useState(false);
 
   // manejarEnvio
-  // Se ejecuta cuando el usuario hace clic en "Registrar".
-  // Recibe el evento del formulario. No devuelve nada.
+  // Se ejecuta al apretar "Registrar incidencia".
+  // Recibe: el evento del formulario. No devuelve nada.
+  // React.FormEvent es el mismo tipo que FormEvent de los otros formularios,
+  // solo que escrito con su "apellido" (React.) en vez de importarlo aparte.
   async function manejarEnvio(evento: React.FormEvent) {
-    // preventDefault evita que el navegador recargue la página
-    // (comportamiento por defecto de un <form>).
+    // Que el navegador no recargue la página (lo que hace un <form> por defecto).
     evento.preventDefault();
 
-    // Validación: los 3 campos obligatorios deben estar llenos.
-    // .trim() quita espacios al inicio y al final.
+    // Revisamos las 3 cajitas obligatorias, una por una.
+    // .trim() borra los espacios: así "   " cuenta como vacío.
     if (recursoId === '') {
       setMensajeError('Debe seleccionar un recurso afectado.');
       return;
@@ -75,39 +79,41 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       return;
     }
 
-    // Si llegamos aquí, todo está bien. Limpiamos el error y activamos "guardando".
+    // Todo bien: borramos el error y prendemos "guardando".
     setMensajeError('');
     setGuardando(true);
 
     try {
-      // Guardamos la incidencia usando el servicio (D1).
-      // El servicio se encarga de asignar la fecha automática y el estado
-      // "pendiente" (D5), así que solo enviamos los datos del formulario.
+      // Le pedimos al servicio (el bodeguero) que la guarde.
+      // El servicio pone solo la fecha y el estado "pendiente", así que
+      // aquí mandamos solo lo que escribió la persona.
       await agregarIncidencia({
         recursoId: Number(recursoId),
         docentePresente: docentePresente.trim(),
         descripcion: descripcion.trim(),
+        // Atajo: "hayPersonasAfectadas," = "hayPersonasAfectadas: hayPersonasAfectadas".
         hayPersonasAfectadas,
+        // Ternario: si está marcado, mandamos el detalle; si no, undefined (nada).
         detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
-        // Antes era un texto fijo; ahora es el nombre de quien inició sesión
+        // El nombre de quien está conectado.
         registradaPor: props.usuario.nombre,
       });
 
-      // Limpiamos todos los campos para que el formulario quede listo
-      // para registrar otra incidencia.
+      // Dejamos todas las cajitas vacías para la próxima incidencia.
       setRecursoId('');
       setDocentePresente('');
       setDescripcion('');
       setHayPersonasAfectadas(false);
       setDetalleAfectacion('');
 
-      // Avisamos a la página que se registró una incidencia.
+      // Le avisamos a la página: "¡listo!".
       props.onIncidenciaRegistrada();
     } catch (error) {
+      // Algo falló (ej: sin internet).
       console.error('Error al guardar incidencia:', error);
       setMensajeError('Error al guardar la incidencia. Revise su conexión.');
     } finally {
-      // Ya terminamos de intentar guardar (haya funcionado o no)
+      // finally se ejecuta SIEMPRE, haya salido bien o mal: apagamos "guardando".
       setGuardando(false);
     }
   }
@@ -119,7 +125,7 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         Registre un accidente o problema ocurrido en el laboratorio.
       </p>
 
-      {/* Campo 1: Recurso afectado (select con los recursos del inventario) */}
+      {/* Cajita 1: qué recurso (menú con todos los recursos del inventario). */}
       <div className="campo-formulario">
         <label htmlFor="campo-recurso">Recurso afectado</label>
         <select
@@ -136,7 +142,7 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         </select>
       </div>
 
-      {/* Campo 2: Docente presente en el momento de la incidencia */}
+      {/* Cajita 2: qué profesor estaba en la sala. */}
       <div className="campo-formulario">
         <label htmlFor="campo-docente">Docente presente</label>
         <input
@@ -148,7 +154,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         />
       </div>
 
-      {/* Campo 3: Descripción de lo que ocurrió (textarea) */}
+      {/* Cajita 3: qué pasó. <textarea> es una cajita GRANDE para textos largos.
+          rows={4} = se ve con 4 líneas de alto. */}
       <div className="campo-formulario">
         <label htmlFor="campo-descripcion">Descripción</label>
         <textarea
@@ -160,9 +167,10 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         />
       </div>
 
-      {/* Campo 4: ¿Hubo personas afectadas? (checkbox) */}
-      {/* Un checkbox usa "checked" en vez de "value", y el evento
-          entrega true o false en "evento.target.checked". */}
+      {/* Cajita 4: el cuadradito "¿Hubo personas afectadas?".
+          Un checkbox es distinto a las otras cajitas:
+            usa "checked" (en vez de "value") para saber si está marcado,
+            y el evento trae true/false en evento.target.checked. */}
       <div className="campo-formulario campo-checkbox">
         <label>
           <input
@@ -174,9 +182,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         </label>
       </div>
 
-      {/* Campo 5: Detalle de la afectación (solo si se marcó el checkbox) */}
-      {/* "hayPersonasAfectadas && ..." es renderizado condicional:
-          React solo muestra lo que viene después del && si la condición es true. */}
+      {/* Cajita 5: el detalle. SOLO aparece si el cuadradito está marcado.
+          "hayPersonasAfectadas && (...)" = si es true, dibuja lo de la derecha. */}
       {hayPersonasAfectadas && (
         <div className="campo-formulario">
           <label htmlFor="campo-detalle-afectacion">Detalle de la afectación</label>
@@ -190,12 +197,12 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         </div>
       )}
 
-      {/* Mensaje de error: solo se muestra si hay texto en mensajeError */}
+      {/* El mensaje rojo, solo si hay error. */}
       {mensajeError !== '' && (
         <p className="mensaje-error">{mensajeError}</p>
       )}
 
-      {/* Botón para registrar la incidencia */}
+      {/* El botón. Su texto cambia con un ternario mientras guarda. */}
       <button type="submit" className="boton-registrar" disabled={guardando}>
         {guardando ? 'Guardando...' : 'Registrar incidencia'}
       </button>

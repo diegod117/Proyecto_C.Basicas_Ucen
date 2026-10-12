@@ -1,19 +1,23 @@
 /* PaginaReservas.css
-   M19 — HU-03: rediseño de la página de reservas.
-   Todos los colores usan var() de global.css (nunca valores sueltos). */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la página de Reservas (M19 — HU-03): el encabezado con el
+   título y el contador, y cómo se acomodan el formulario y la tabla.
+   Todos los colores usan var() de global.css.
+   En la guía: paso 7 (CSS). */
 
 /* =====================================================
-   ENCABEZADO DE PÁGINA
-   Título grande + descripción en gris, patrón reutilizado
-   en todas las páginas (ver plan-fase-2, sección 5).
+   EL ENCABEZADO
+   Título grande + frase gris + el contador en una "pastilla".
    ===================================================== */
 
+/* El encabezado completo, con una línea gris abajo que lo separa del resto. */
 .pagina-reservas-header {
   margin-bottom: var(--espacio-xl);
   padding-bottom: var(--espacio-md);
   border-bottom: 1px solid var(--color-borde);
 }
 
+/* El título "Reservas de Laboratorio" (el <h2> dentro del encabezado). */
 .pagina-reservas-header h2 {
   margin: 0 0 var(--espacio-xs) 0;
   font-size: 1.6rem;
@@ -21,13 +25,14 @@
   color: var(--color-principal);
 }
 
+/* La frase gris debajo del título. */
 .pagina-reservas-descripcion {
   margin: 0;
   font-size: 0.9rem;
   color: var(--color-texto-secundario);
 }
 
-/* Badge con el total de reservas activas */
+/* La pastilla azul clarito con el contador ("Reservas registradas: 4"). */
 .contador-reservas-badge {
   display: inline-flex;
   align-items: center;
@@ -36,13 +41,13 @@
   font-size: 0.8rem;
   font-weight: 600;
   padding: var(--espacio-xs) var(--espacio-sm);
-  border-radius: var(--radio-pildora);
+  border-radius: var(--radio-pildora); /* forma de pastilla */
   margin-top: var(--espacio-sm);
 }
 
 /* =====================================================
-   LAYOUT DE LA PÁGINA
-   Formulario y tabla apilados verticalmente con separación.
+   CÓMO SE ACOMODA LA PÁGINA
+   El formulario arriba y la tabla abajo, con espacio entre ellos.
    ===================================================== */
 
 .pagina-reservas-contenedor {
@@ -52,7 +57,7 @@
 }
 
 /* =====================================================
-   RESPONSIVE (RNF-01)
+   EN EL CELULAR (RNF-01)
    ===================================================== */
 
 @media (max-width: 768px) {
@@ -61,7 +66,7 @@
   }
 
   .pagina-reservas-header h2 {
-    font-size: 1.3rem;
+    font-size: 1.3rem; /* título más chico */
   }
 
   .pagina-reservas-contenedor {

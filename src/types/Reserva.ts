@@ -1,34 +1,34 @@
 // Reserva.ts
-// Define cómo es una reserva que hace un docente sobre un recurso.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el molde de una RESERVA: cuando un profesor aparta recursos para su clase.
+// Es como reservar una mesa en un restaurante: quién, qué día, a qué hora
+// y para cuántos.
+// En la guía: paso 2 (TypeScript) y paso 8 (reservas).
 // Cubre: RF-03, HU-03 (formulario de reserva), y sirve de base para
 //        HU-07 (calcular disponibilidad por horario) y HU-08 (evitar choques)
 
-// ------------------------------------------------------------------
-// Reserva
-// ------------------------------------------------------------------
-// Una reserva dice: "este docente usará X unidades de este recurso,
-// tal día, entre tal hora y tal hora".
-// Con la lista de reservas podremos calcular cuántas unidades quedan
-// libres en un horario (HU-07) y bloquear reservas que se pasen (HU-08).
+// Una reserva se lee así: "este profesor va a usar X unidades de este
+// recurso, tal día, desde tal hora hasta tal hora".
+// Juntando todas las reservas, la app puede saber cuántas unidades quedan
+// libres a cierta hora (HU-07) y no dejar reservar más de las que hay (HU-08).
 export interface Reserva {
-  id: number;
+  id: number; // el número de la reserva
 
-  // En vez de copiar todo el recurso dentro de la reserva,
-  // guardamos solo su "id". Así, si el recurso cambia de nombre o ubicación,
-  // la reserva sigue apuntando al recurso correcto.
+  // Qué recurso se reserva. Guardamos solo su número (id), no el recurso
+  // entero: así, si el recurso cambia de nombre, la reserva sigue apuntando
+  // al recurso correcto. (Es como anotar el número de mesa, no la mesa.)
   recursoId: number;
 
-  // Por ahora es el nombre del docente. Cuando exista el inicio de sesión
-  // con roles (pendiente en el punto 3.4 de los requerimientos) podría cambiar.
+  // El nombre del profesor, ej: 'Prof. Ana Morales'.
   docente: string;
 
-  // Fechas y horas como texto (string) porque así las entregan los
-  // <input type="date"> y <input type="time"> del navegador.
-  fecha: string; // formato "AAAA-MM-DD", ej: "2026-10-08"
-  horaInicio: string; // formato "HH:MM", ej: "10:00"
-  horaFin: string; // formato "HH:MM", ej: "11:30"
+  // Las fechas y horas se guardan como TEXTO (string) porque así nos las
+  // entregan las cajitas <input type="date"> y <input type="time">.
+  fecha: string; // ej: "2026-10-08" (año-mes-día)
+  horaInicio: string; // ej: "10:00"
+  horaFin: string; // ej: "11:30"
 
-  cantidad: number; // cuántas unidades se reservan
-  asignatura: string; // ej: "Física I"
-  sala: string; // ej: "B302"
+  cantidad: number; // cuántas unidades se apartan
+  asignatura: string; // para qué ramo, ej: "Física I"
+  sala: string; // a qué sala se las llevan, ej: "B302"
 }

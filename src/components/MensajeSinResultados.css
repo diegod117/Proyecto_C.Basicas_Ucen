@@ -1,28 +1,34 @@
 /* MensajeSinResultados.css
-   Estilos del mensaje que aparece cuando los filtros no encuentran nada.
-   D17: usa las variables de global.css y el mismo look de las tarjetas. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del recuadro "No hay recursos que coincidan..." que aparece
+   cuando los filtros no encuentran nada (D17).
+   En la guía: paso 7 (CSS). */
 
+/* El recuadro: blanco, centrado y con un borde de rayitas. */
 .sin-resultados {
   text-align: center;
   padding: var(--espacio-xl) var(--espacio-md);
   background-color: var(--color-blanco);
-  /* borde punteado: indica "aquí no hay nada" */
+  /* dashed = borde de rayitas (- - - -). Da la idea de "aquí no hay nada",
+     como el dibujo de un espacio vacío. */
   border: 2px dashed var(--color-borde);
   border-radius: var(--radio-borde);
 }
 
+/* La frase grande en negrita. */
 .sin-resultados-titulo {
   font-size: 1.05rem;
   font-weight: 600;
   margin: 0 0 6px 0;
 }
 
+/* La frase de ayuda en gris. */
 .sin-resultados-texto {
   color: var(--color-texto-secundario);
   margin: 0 0 var(--espacio-md) 0;
 }
 
-/* Mismo aspecto que .boton-principal de global.css */
+/* El botón "Limpiar filtros": se ve igual que .boton-principal de global.css. */
 .sin-resultados-boton {
   background-color: var(--color-principal);
   color: var(--color-blanco);

@@ -1,7 +1,9 @@
 // reservas.ts
-// Datos de prueba de reservas hechas por docentes (datos INVENTADOS).
-// Incluye un caso pensado para probar choques de horario:
-// dos docentes reservan TODOS los termómetros disponibles a la misma hora.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Son reservas de PRUEBA (inventadas). También son "semilla" para Firestore.
+// Tiene una trampa a propósito para probar los choques de horario:
+// dos profesores reservan TODOS los termómetros a la misma hora, así que
+// un tercero que intente reservar a esa hora no debería poder.
 // Cubre: datos de apoyo para HU-03, HU-07 y HU-08
 
 import type { Reserva } from '../types/Reserva';
@@ -29,10 +31,11 @@ export const listaReservasPrueba: Reserva[] = [
     asignatura: 'Electrónica Básica',
     sala: 'B307',
   },
-  // --- Caso de prueba para HU-08 ---
-  // Hay 8 termómetros disponibles. Entre estas dos reservas se ocupan
-  // los 8 (5 + 3) el mismo día y a la misma hora. Si un tercer docente
-  // intenta reservar termómetros en ese horario, el sistema debe impedirlo.
+  // --- La trampa para probar HU-08 ---
+  // Hay 8 termómetros disponibles. Estas dos reservas se llevan 5 + 3 = 8,
+  // el mismo día y a la misma hora. No queda ninguno.
+  // Si un tercer profesor intenta reservar termómetros a esa hora,
+  // la app tiene que decirle que no.
   {
     id: 3,
     recursoId: 6, // Termómetro digital

@@ -1,9 +1,11 @@
 // historialEstados.ts
-// Datos de prueba del historial de cambios de estado (datos INVENTADOS).
-// Son los dos cambios del multímetro que aparecen en el mockup, más uno
-// de los termómetros, para que el historial no parta vacío.
-// IMPORTANTE: van ordenados del más antiguo al más nuevo, igual que como
-// se van agregando los cambios reales (ver historialService.ts).
+// ¿QUÉ ES ESTE ARCHIVO?
+// Son líneas de PRUEBA del historial (el "diario de vida" de los recursos).
+// También son "semilla": si Firestore no tiene historial, la app copia estas.
+// Son los dos cambios del multímetro que aparecen en el dibujo del diseño,
+// más uno de los termómetros, para que el historial no parta vacío.
+// IMPORTANTE: van de la más antigua a la más nueva, igual que un diario:
+// lo nuevo se escribe al final (ver historialService.ts).
 // Cubre: datos de apoyo para HU-06
 
 import type { CambioEstado } from '../types/CambioEstado';

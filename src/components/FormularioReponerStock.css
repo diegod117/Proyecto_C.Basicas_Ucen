@@ -1,8 +1,11 @@
 /* FormularioReponerStock.css
-   El recuadro usa las clases de FormularioCambioEstado.css para verse
-   igual que "Cambiar estado". Aquí solo va lo propio de este formulario. */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del recuadro "Reponer stock".
+   Casi todo lo saca de FormularioCambioEstado.css (usa sus mismas clases
+   para verse igual que "Cambiar estado"). Aquí solo va lo que tiene de propio.
+   En la guía: paso 7 (CSS: reutilizar clases). */
 
-/* Línea "Disponibles: 2 · Mínimo: 5" debajo del título */
+/* La línea "Disponibles: 2 · Mínimo: 5" que va debajo del título, en gris. */
 .reponer-stock-actual {
   margin: 0;
   font-size: 0.85rem;

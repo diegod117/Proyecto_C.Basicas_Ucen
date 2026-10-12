@@ -1,26 +1,30 @@
 /* PaginaAlertas.css
-   M20 — HU-05: rediseño de la página de alertas.
-   Encabezado con título + descripción + badge de total.
-   Filtros en franja blanca con botones tipo pastilla.
-   Todos los colores usan var() de global.css (nunca valores sueltos). */
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos del Panel de Alertas (M20 — HU-05):
+     - el encabezado con el título, la frase y la pastilla roja del total,
+     - la franja blanca con los botones de filtro (con forma de pastilla),
+     - la cuadrícula de tarjetas,
+     - el recuadro de "no hay alertas".
+   Los colores usan var() de global.css.
+   En la guía: paso 7 (CSS: flex, grid y dos clases juntas). */
 
 /* =====================================================
-   ENCABEZADO DE PÁGINA
-   Mismo patrón que PaginaReservas (ver plan-fase-2, sección 5):
-   título grande + descripción en gris + badge de conteo.
+   EL ENCABEZADO
+   Títulos a la izquierda y la pastilla del total a la derecha.
    ===================================================== */
 
 .pagina-alertas-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* títulos a la izquierda, total a la derecha */
   align-items: flex-start;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* si no caben, la pastilla baja */
   gap: var(--espacio-md);
   margin-bottom: var(--espacio-xl);
   padding-bottom: var(--espacio-md);
-  border-bottom: 1px solid var(--color-borde);
+  border-bottom: 1px solid var(--color-borde); /* línea gris abajo */
 }
 
+/* El título "Panel de Alertas". */
 .pagina-alertas-titulos h2 {
   margin: 0 0 var(--espacio-xs) 0;
   font-size: 1.6rem;
@@ -28,13 +32,14 @@
   color: var(--color-principal);
 }
 
+/* La frase gris debajo del título. */
 .pagina-alertas-titulos p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--color-texto-secundario);
 }
 
-/* Badge con el conteo total de alertas activas (rojo = urgencia) */
+/* La pastilla roja con el total ("6 alertas pendientes"). Rojo = urgente. */
 .contador-total-badge {
   display: inline-flex;
   align-items: center;
@@ -46,15 +51,15 @@
   border-radius: var(--radio-pildora);
   border: 1px solid #fecaca;
   white-space: nowrap;
-  align-self: center;
+  align-self: center; /* "yo me centro de arriba a abajo", aunque mis hermanos no */
 }
 
 /* =====================================================
-   FILTROS POR TIPO DE ALERTA
-   Fila de botones pastilla que filtra las tarjetas visibles.
-   El botón activo se rellena de azul principal.
+   LOS BOTONES DE FILTRO
+   Una fila de botones con forma de pastilla. El elegido se pinta azul.
    ===================================================== */
 
+/* La franja blanca que los contiene. */
 .filtros-alertas {
   display: flex;
   gap: var(--espacio-sm);
@@ -67,6 +72,7 @@
   box-shadow: var(--sombra-tarjeta);
 }
 
+/* Cada botón de filtro: transparente, con borde gris y forma de pastilla. */
 .boton-filtro-alerta {
   background-color: transparent;
   color: var(--color-texto);
@@ -86,7 +92,9 @@
   border-color: var(--color-texto-secundario);
 }
 
-/* Estado activo: azul relleno */
+/* El botón ELEGIDO: azul relleno.
+   ".boton-filtro-alerta.activo" (sin espacio) = un elemento con LAS DOS clases.
+   El .tsx le agrega "activo" solo al botón del filtro elegido. */
 .boton-filtro-alerta.activo {
   background-color: var(--color-principal);
   color: var(--color-blanco);
@@ -99,11 +107,11 @@
 }
 
 /* =====================================================
-   GRILLA DE TARJETAS
+   LA CUADRÍCULA DE TARJETAS
    ===================================================== */
 
-/* auto-fill + minmax: en PC, 2-3 columnas según el ancho;
-   en celular, una sola columna automáticamente. */
+/* El mismo truco mágico de GrillaRecursos.css: tantas columnas como quepan,
+   cada una de al menos 300px. En el computador salen 2 o 3; en el celular, 1. */
 .grid-alertas {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -111,10 +119,10 @@
 }
 
 /* =====================================================
-   ESTADO VACÍO
-   Cuando no hay alertas activas o el filtro no tiene resultados.
+   CUANDO NO HAY ALERTAS
    ===================================================== */
 
+/* Un recuadro blanco con borde de rayitas: "aquí no hay nada". */
 .panel-alertas-vacio {
   background-color: var(--color-blanco);
   border: 1px dashed var(--color-borde);
@@ -126,10 +134,11 @@
 }
 
 /* =====================================================
-   RESPONSIVE — celular (RNF-01)
+   EN EL CELULAR (RNF-01)
    ===================================================== */
 
 @media (max-width: 768px) {
+  /* El encabezado en columna: la pastilla del total baja debajo del título. */
   .pagina-alertas-header {
     flex-direction: column;
     align-items: flex-start;
@@ -140,7 +149,8 @@
     font-size: 1.3rem;
   }
 
-  /* En celular los filtros se desplazan en fila horizontal */
+  /* Los filtros en UNA fila que se desliza hacia el lado con el dedo
+     (nowrap = no bajan a otra línea). */
   .filtros-alertas {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -148,12 +158,13 @@
     padding: var(--espacio-sm);
   }
 
+  /* Los botones no se achican ni se parten. */
   .boton-filtro-alerta {
     white-space: nowrap;
     flex-shrink: 0;
   }
 
-  /* Una sola columna de tarjetas */
+  /* Una sola columna de tarjetas. */
   .grid-alertas {
     grid-template-columns: 1fr;
   }

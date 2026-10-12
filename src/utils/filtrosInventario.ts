@@ -1,24 +1,30 @@
 // filtrosInventario.ts
-// Funciones para filtrar el inventario por nombre, categoría,
-// laboratorio y estado. Las usa la página de inventario.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Herramientas para los FILTROS del inventario: el buscador por nombre y
+// los menús de categoría, laboratorio y estado.
+// Funciona como un colador: entra la lista completa de recursos y sale
+// solo la que cumple con lo que elegiste.
+// En la guía: paso 4 (estado y filtros).
 // Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-02
 
 import type { Recurso } from '../types/Recurso';
 
-// Valor especial que usamos en los <select> para decir "sin filtro".
-// Lo guardamos en una constante para no escribir 'todos' a mano en
-// varios archivos (si nos equivocamos en una letra, el filtro fallaría).
+// El valor especial que significa "no estoy filtrando nada" en los menús.
+// Se guarda en una constante con nombre en MAYÚSCULAS (así se marcan los
+// valores que nunca cambian). Si escribiéramos 'todos' a mano en varios
+// archivos y en uno pusiéramos 'Todos', el filtro fallaría sin avisar.
 export const SIN_FILTRO = 'todos';
 
 // prepararTextoParaBuscar
-// Recibe: un texto cualquiera, por ejemplo "Termómetro Digital".
+// Recibe: un texto, ej: "Termómetro Digital".
 // Devuelve: el mismo texto en minúsculas y sin tildes: "termometro digital".
-// Sirve para comparar textos sin que importen las mayúsculas ni las tildes,
-// porque los usuarios muchas veces escriben "termometro" sin tilde.
+// Así da igual si la persona escribe "TERMÓMETRO" o "termometro":
+// los dos se convierten en lo mismo y se pueden comparar.
 export function prepararTextoParaBuscar(texto: string): string {
+  // toLowerCase() = todo a minúsculas.
   let resultado = texto.toLowerCase();
 
-  // replaceAll reemplaza TODAS las apariciones de una letra por otra
+  // replaceAll('á', 'a') = cambia TODAS las 'á' por 'a'.
   resultado = resultado.replaceAll('á', 'a');
   resultado = resultado.replaceAll('é', 'e');
   resultado = resultado.replaceAll('í', 'i');
@@ -26,14 +32,13 @@ export function prepararTextoParaBuscar(texto: string): string {
   resultado = resultado.replaceAll('ú', 'u');
   resultado = resultado.replaceAll('ü', 'u');
 
-  // trim() quita los espacios sobrantes al inicio y al final
+  // trim() borra los espacios sobrantes al principio y al final.
   return resultado.trim();
 }
 
 // obtenerCodigoLaboratorio
 // Recibe: un recurso.
-// Devuelve: el laboratorio donde está, con el formato torre + sala.
-// Ejemplo: torre 'B' y sala '307' devuelve "B307".
+// Devuelve: su laboratorio = torre + sala. Ej: 'B' + '307' = "B307".
 export function obtenerCodigoLaboratorio(recurso: Recurso): string {
   return recurso.ubicacion.torre + recurso.ubicacion.sala;
 }
@@ -41,31 +46,32 @@ export function obtenerCodigoLaboratorio(recurso: Recurso): string {
 // obtenerLaboratorios
 // Recibe: la lista de recursos.
 // Devuelve: los laboratorios que existen, SIN repetir y ordenados.
-// Ejemplo: ["B307", "B308", "C210"].
-// Se calcula a partir de los recursos, así si mañana se agrega un recurso
-// en un laboratorio nuevo, aparece solo en el filtro.
+// Ej: ["B307", "B308", "C210"]. Son las opciones del menú "Laboratorio".
+// Se calcula mirando los recursos: si mañana agregas un recurso en un
+// laboratorio nuevo, aparece solo en el menú, sin tocar código.
 export function obtenerLaboratorios(listaRecursos: Recurso[]): string[] {
   const laboratorios: string[] = [];
 
   for (const recurso of listaRecursos) {
     const codigo = obtenerCodigoLaboratorio(recurso);
 
-    // Solo lo agregamos si todavía no está en la lista (para no repetir)
+    // includes = "¿la lista ya tiene este código?". Con el ! = "si NO lo tiene".
+    // Solo lo agregamos si es nuevo, para no repetir.
     if (!laboratorios.includes(codigo)) {
       laboratorios.push(codigo);
     }
   }
 
-  // sort() ordena los textos alfabéticamente: B307, B308, C210
+  // sort() ordena textos en orden alfabético: B307, B308, C210.
   laboratorios.sort();
   return laboratorios;
 }
 
 // hayFiltrosActivos
-// Recibe: los 4 filtros elegidos por el usuario.
-// Devuelve: true si el usuario está usando AL MENOS un filtro,
-// false si está todo en "Todos" y el buscador vacío.
-// Sirve para mostrar el botón "Limpiar filtros" solo cuando tiene sentido.
+// Recibe: los 4 filtros elegidos.
+// Devuelve: true si la persona está usando AL MENOS un filtro;
+// false si todo está en "Todos" y el buscador está vacío.
+// Sirve para mostrar el botón "Limpiar filtros" solo cuando hace falta.
 export function hayFiltrosActivos(
   textoBuscado: string,
   categoria: string,
@@ -82,11 +88,11 @@ export function hayFiltrosActivos(
 }
 
 // filtrarRecursos
-// Recibe: la lista de recursos y los 4 filtros elegidos por el usuario.
-//   - textoBuscado: lo escrito en el buscador ('' = sin filtro)
-//   - categoria, laboratorio, estado: lo elegido en cada <select>
-//     (SIN_FILTRO = el usuario no eligió nada en ese filtro)
-// Devuelve: una lista NUEVA solo con los recursos que cumplen TODOS los filtros.
+// EL COLADOR. Recibe la lista de recursos y los 4 filtros:
+//   - textoBuscado: lo escrito en el buscador ('' = no busca nada)
+//   - categoria, laboratorio, estado: lo elegido en cada menú
+//     (SIN_FILTRO = en ese menú dice "Todos")
+// Devuelve: una lista NUEVA solo con los recursos que pasan TODOS los filtros.
 export function filtrarRecursos(
   listaRecursos: Recurso[],
   textoBuscado: string,
@@ -98,12 +104,13 @@ export function filtrarRecursos(
   const recursosEncontrados: Recurso[] = [];
 
   for (const recurso of listaRecursos) {
-    // Partimos suponiendo que el recurso cumple todo, y revisamos
-    // filtro por filtro. Si falla uno, ya no se muestra.
+    // Partimos creyendo que el recurso pasa (true) y lo revisamos filtro
+    // por filtro. Si falla UNO solo, ya no pasa (false). Es como una
+    // carrera de obstáculos: si botas una valla, quedas fuera.
     let cumpleFiltros = true;
 
-    // 1) Nombre: el nombre debe contener el texto buscado.
-    //    Ej: "arduino uno r3".includes("ard") es true.
+    // Obstáculo 1) Nombre: ¿el nombre contiene lo que se buscó?
+    //    includes = "¿contiene?". Ej: "arduino uno r3".includes("ard") -> true.
     if (textoPreparado !== '') {
       const nombrePreparado = prepararTextoParaBuscar(recurso.nombre);
       if (!nombrePreparado.includes(textoPreparado)) {
@@ -111,21 +118,22 @@ export function filtrarRecursos(
       }
     }
 
-    // 2) Categoría: debe ser exactamente la elegida
+    // Obstáculo 2) Categoría: si se eligió una, tiene que ser esa.
+    //    && = "y": "si hay filtro de categoría Y el recurso es de otra...".
     if (categoria !== SIN_FILTRO && recurso.categoria !== categoria) {
       cumpleFiltros = false;
     }
 
-    // 3) Laboratorio: debe estar en el laboratorio elegido (ej: "B307")
+    // Obstáculo 3) Laboratorio: si se eligió uno (ej: "B307"), tiene que estar ahí.
     if (laboratorio !== SIN_FILTRO && obtenerCodigoLaboratorio(recurso) !== laboratorio) {
       cumpleFiltros = false;
     }
 
-    // 4) Estado: el recurso debe tener AL MENOS 1 unidad en ese estado.
-    //    Ej: con "danado" aparecen el multímetro (1) y los termómetros (2).
+    // Obstáculo 4) Estado: el recurso tiene que tener AL MENOS 1 unidad
+    //    en ese estado. Ej: con "Dañado" aparecen el multímetro (1) y los termómetros (2).
     if (estado !== SIN_FILTRO) {
-      // "estado" es un texto (viene de un <select>), así que revisamos
-      // uno por uno cuál es y si el recurso tiene unidades en él
+      // "estado" llega como texto desde el menú, así que preguntamos
+      // uno por uno cuál es y si el recurso tiene unidades en ese cajón.
       let tieneUnidadesEnEseEstado = false;
       if (estado === 'disponible' && recurso.cantidades.disponible > 0) {
         tieneUnidadesEnEseEstado = true;
@@ -144,6 +152,7 @@ export function filtrarRecursos(
       }
     }
 
+    // ¿Pasó todos los obstáculos? Entonces entra a la lista de resultados.
     if (cumpleFiltros) {
       recursosEncontrados.push(recurso);
     }

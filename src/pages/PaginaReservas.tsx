@@ -1,7 +1,12 @@
 // PaginaReservas.tsx
-// Página de reservas del laboratorio.
-// Permite al personal docente registrar nuevas reservas
-// y consultar o cancelar reservas existentes.
+// ¿QUÉ ES ESTE ARCHIVO?
+// La página de RESERVAS. Tiene tres partes, de arriba a abajo:
+//   1. El encabezado con el título y un contador ("Reservas registradas: 4").
+//   2. El formulario "Nueva reserva" (solo docente y encargado).
+//   3. La tabla con las reservas (el docente solo ve las suyas).
+// *** Para cambiar el título "Reservas de Laboratorio" o la frase de abajo,
+//     cámbialos aquí, en el <header>. ***
+// En la guía: paso 3 (componentes) y paso 8 (reservas).
 // Cubre: HU-03 (formulario), HU-07, HU-08, RF-03 (tabla y cancelación)
 // y RNF-03 (el departamento solo consulta; el docente ve solo sus reservas)
 
@@ -13,27 +18,38 @@ import type { Usuario } from '../types/Usuario';
 import { puedeReservar, puedeVerTodasLasReservas } from '../utils/permisos';
 import './PaginaReservas.css';
 
-// Props que recibe la página desde App
+// Las props que le pasa App.
 interface PropsPaginaReservas {
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
+  // La persona conectada: decide si se ve el formulario y qué reservas (RNF-03).
   usuario: Usuario;
 }
 
 // Componente PaginaReservas
-// Renderiza el encabezado del módulo, el formulario y la tabla de reservas.
-// Recibe el usuario conectado. El formulario solo aparece si su rol puede reservar.
+// Recibe: la persona conectada.
+// Devuelve: el encabezado, el formulario (si corresponde) y la tabla.
 function PaginaReservas(props: PropsPaginaReservas) {
+  // Un contador que sube cada vez que se crea o cancela una reserva.
+  // ¿Para qué? Las reservas viven en el servicio (no en un useState), así
+  // que React no se entera solo cuando cambian. Al subir este contador,
+  // la página se redibuja y el contador de arriba se actualiza.
   const [actualizaciones, setActualizaciones] = useState(0);
 
-  // Mismas reservas que muestra la tabla: todas, o solo las del docente (RNF-03)
+  // Las mismas reservas que muestra la tabla: todas, o solo las del docente.
   const listaReservas = obtenerReservasVisibles(props.usuario);
 
-  // Texto del contador según el rol
+  // El texto del contador depende del rol.
   let textoContador = 'Reservas registradas';
   if (!puedeVerTodasLasReservas(props.usuario.rol)) {
     textoContador = 'Mis reservas';
   }
 
+  // refrescarDatos
+  // No recibe ni devuelve nada. Sube el contador en 1 para que React redibuje.
+  // Aquí se usa la forma "con función" de un set:
+  //   setActualizaciones(function (valorAnterior) { return valorAnterior + 1; })
+  // React nos pasa el valor anterior y nosotros devolvemos el nuevo.
+  // Hace lo mismo que setActualizaciones(actualizaciones + 1), pero es más
+  // seguro si se llama varias veces seguidas.
   function refrescarDatos() {
     setActualizaciones(function (valorAnterior) {
       return valorAnterior + 1;
@@ -44,19 +60,19 @@ function PaginaReservas(props: PropsPaginaReservas) {
     <section className="contenido-pagina">
       <header className="pagina-reservas-header">
         <h2>Reservas de Laboratorio</h2>
-        {/* M19: clase pagina-reservas-descripcion para el estilo del encabezado */}
+        {/* M19: la clase pagina-reservas-descripcion le da el estilo a esta frase. */}
         <p className="pagina-reservas-descripcion">
           Módulo para solicitar recursos, instrumentos y espacios de trabajo.
         </p>
+        {/* La "pastilla" azul con el contador, ej: "Reservas registradas: 4". */}
         <span className="contador-reservas-badge">
           {textoContador}: {listaReservas.length}
         </span>
       </header>
 
       <div className="pagina-reservas-contenedor">
-        {/* Formulario para registrar una nueva reserva.
-            Solo se dibuja si el rol puede reservar (RNF-03);
-            si no, se muestra un aviso en su lugar. */}
+        {/* El formulario solo se dibuja si el rol puede reservar (RNF-03).
+            Si no puede (departamento), se muestra un aviso en su lugar. */}
         {puedeReservar(props.usuario.rol) && (
           <FormularioReserva onReservaCreada={refrescarDatos} usuario={props.usuario} />
         )}
@@ -67,7 +83,8 @@ function PaginaReservas(props: PropsPaginaReservas) {
           </p>
         )}
 
-        {/* Tabla con el historial de reservas y botón de cancelación */}
+        {/* La tabla. Le pasamos "version" (el contador): cuando cambia,
+            la tabla sabe que tiene que mostrarse de nuevo. */}
         <TablaReservas
           version={actualizaciones}
           onReservaModificada={refrescarDatos}

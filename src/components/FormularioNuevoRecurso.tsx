@@ -1,11 +1,14 @@
 // FormularioNuevoRecurso.tsx
-// Formulario "Agregar recurso" de la página de inventario: el encargado
-// agrega un recurso nuevo sin tener que entrar a la consola de Firebase.
-// Las unidades iniciales entran como "disponible" y el alta queda
-// registrada en el historial del recurso.
-// La ubicación y los datos opcionales van en componentes aparte
-// (CamposUbicacionRecurso y CamposDetalleRecurso) para que este archivo
-// no crezca demasiado.
+// ¿QUÉ ES ESTE ARCHIVO?
+// El formulario "Agregar recurso" (botón "+ Agregar recurso", solo el
+// encargado). Sirve para sumar un recurso NUEVO al inventario sin tener que
+// entrar a la consola de Firebase.
+// Las unidades entran como "disponible" y queda una línea de "alta" en el historial.
+// Es un formulario grande, así que se partió en 3 pedazos (componentes):
+//   - este archivo: nombre, categoría, cantidad y stock mínimo,
+//   - CamposUbicacionRecurso.tsx: torre, sala, bodega y mueble,
+//   - CamposDetalleRecurso.tsx: marca, serie, proveedor y observación.
+// En la guía: paso 4 (un useState con un OBJETO) y paso 9 (agregar un dato nuevo).
 // Cubre: RF-01, RF-08 (categoría), RF-10 y HU-11 (ubicación), RNF-03
 
 import { useState } from 'react';
@@ -19,58 +22,68 @@ import CamposUbicacionRecurso from './CamposUbicacionRecurso';
 import CamposDetalleRecurso from './CamposDetalleRecurso';
 import './FormularioNuevoRecurso.css';
 
+// Las props que le pasa PaginaInventario.
 interface PropsFormularioNuevoRecurso {
-  // Usuario conectado: su nombre queda en el registro de "alta" del historial
+  // La persona conectada: su nombre queda en la línea de "alta" del historial.
   usuario: Usuario;
-  // Se llama después de guardar, con el id del recurso nuevo
-  // (la página lo usa para abrir su ficha)
+  // Se llama después de guardar, con el número del recurso nuevo
+  // (la página lo usa para abrir su ficha).
   onGuardado: (idRecurso: number) => void;
-  // Se llama al apretar "Cancelar" (la página vuelve al listado)
+  // Se llama al apretar "Cancelar" (la página vuelve al listado).
   onCancelar: () => void;
 }
 
 // Componente FormularioNuevoRecurso
-// Recibe: el usuario, la función que avisa que se guardó y la de cancelar.
+// Recibe: la persona, la función de "listo" y la de "cancelar".
 // Devuelve: el formulario completo.
 function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
-  // Todos los campos del formulario en un solo objeto (ver DatosNuevoRecurso).
-  // Para cambiar un campo se usa { ...datos, campo: valor }: copia el objeto
-  // completo y cambia solo ese campo. Así React detecta el cambio.
+  // UN SOLO useState para TODAS las cajitas: un objeto con 12 datos
+  // (ver DatosNuevoRecurso en types/Recurso.ts). Es como una mochila con
+  // 12 bolsillos, en vez de 12 mochilas separadas.
+  // Para cambiar UN bolsillo se escribe { ...datos, nombre: 'nuevo' }:
+  //   ...datos  = copia los 12 bolsillos como están,
+  //   nombre: ... = y reemplaza solo el bolsillo "nombre".
+  // ¿Por qué copiar y no cambiar directo (datos.nombre = 'x')? Porque React
+  // solo se da cuenta del cambio si le entregas un objeto NUEVO.
   const [datos, setDatos] = useState<DatosNuevoRecurso>(datosVaciosNuevoRecurso);
   const [mensajeError, setMensajeError] = useState('');
-  // true mientras se espera a Firestore: desactiva el botón
+  // true mientras esperamos a Firestore: apaga el botón.
   const [guardando, setGuardando] = useState(false);
 
   // cambiarDatos
-  // Recibe: los datos con algún campo cambiado. No devuelve nada.
-  // Además de guardarlos, borra el mensaje de error: si el encargado ya
-  // está corrigiendo el campo, el error anterior ya no corresponde.
+  // Recibe: la mochila con algún bolsillo cambiado. No devuelve nada.
+  // Además de guardarla, borra el mensaje de error: si la persona ya está
+  // corrigiendo, el error viejo ya no sirve.
+  // Esta función se la pasamos también a los componentes hijos.
   function cambiarDatos(nuevosDatos: DatosNuevoRecurso) {
     setDatos(nuevosDatos);
     setMensajeError('');
   }
 
   // guardar
-  // Recibe el evento del formulario. No devuelve nada.
-  // Es "async" porque agregarRecurso guarda en Firestore.
+  // Se ejecuta al apretar "Agregar recurso".
+  // Recibe: el evento del formulario. No devuelve nada.
   async function guardar(evento: FormEvent) {
-    evento.preventDefault();
+    evento.preventDefault(); // que no se recargue la página
 
+    // 1. Revisar (también revisa que no exista otro igual en el mismo lugar).
     const error = validarNuevoRecurso(datos, obtenerRecursos());
     if (error !== '') {
       setMensajeError(error);
       return;
     }
 
+    // 2. Guardar y esperar a Firestore.
     setMensajeError('');
     setGuardando(true);
     const recursoNuevo = await agregarRecurso(datos, props.usuario.nombre);
     setGuardando(false);
 
+    // 3. ¿Cómo nos fue? agregarRecurso devuelve null si falló.
     if (recursoNuevo === null) {
       setMensajeError('No se pudo guardar el recurso. Revisa tu conexión e inténtalo de nuevo.');
     } else {
-      props.onGuardado(recursoNuevo.id);
+      props.onGuardado(recursoNuevo.id); // la página abre la ficha del nuevo
     }
   }
 
@@ -82,8 +95,13 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
         cambia después en su ficha con "Cambiar estado".
       </p>
 
+      {/* <fieldset> agrupa cajitas que van juntas, con un borde.
+          <legend> es el título que aparece sobre el borde. */}
       <fieldset className="nuevo-recurso-grupo">
         <legend>Recurso</legend>
+        {/* Aquí la cajita va DENTRO del <label>: así no hace falta htmlFor
+            para unirlos (otra forma válida de hacerlo).
+            onChange: copiamos la mochila y cambiamos solo el bolsillo "nombre". */}
         <label className="nuevo-recurso-campo">
           Nombre
           <input
@@ -94,6 +112,7 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
           />
         </label>
 
+        {/* Una fila con dos cajitas lado a lado. */}
         <div className="nuevo-recurso-fila">
           <label className="nuevo-recurso-campo">
             Categoría
@@ -103,6 +122,7 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
                 cambiarDatos({ ...datos, categoria: evento.target.value as CategoriaRecurso })
               }
             >
+              {/* value="" = todavía no se elige nada. */}
               <option value="">Elige una categoría</option>
               {listaCategoriasRecurso.map((categoria) => (
                 <option key={categoria} value={categoria}>
@@ -122,7 +142,9 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
           </label>
         </div>
 
-        {/* El stock mínimo solo tiene sentido en insumos y reactivos (HU-09) */}
+        {/* El stock mínimo solo aparece si la categoría es insumo o reactivo
+            (HU-09). Si eliges "Insumo", ¡aparece solo! Porque al cambiar la
+            categoría React redibuja, y esta condición ahora da true. */}
         {usaStockMinimo(datos) && (
           <label className="nuevo-recurso-campo">
             Stock mínimo (opcional: avisa cuando quedan pocas unidades)
@@ -136,14 +158,17 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
         )}
       </fieldset>
 
-      {/* Le pasamos cambiarDatos: los componentes hijos la llaman con los datos cambiados */}
+      {/* Los otros dos pedazos del formulario. Les pasamos la mochila completa
+          (datos) y la función cambiarDatos: cuando la persona escribe en ellos,
+          llaman a cambiarDatos con la mochila cambiada, y la memoria de ESTE
+          componente se actualiza. Los hijos no tienen memoria propia. */}
       <CamposUbicacionRecurso datos={datos} onCambiar={cambiarDatos} />
       <CamposDetalleRecurso datos={datos} onCambiar={cambiarDatos} />
 
       {mensajeError !== '' && <p className="nuevo-recurso-error">{mensajeError}</p>}
 
       <div className="nuevo-recurso-botones">
-        {/* type="button" para que "Cancelar" NO envíe el formulario */}
+        {/* type="button" = "Cancelar" NO envía el formulario, solo llama a onCancelar. */}
         <button type="button" className="boton-secundario" onClick={props.onCancelar}>
           Cancelar
         </button>

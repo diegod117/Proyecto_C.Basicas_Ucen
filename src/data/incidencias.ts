@@ -1,6 +1,9 @@
 // incidencias.ts
-// Datos de prueba de incidencias (datos INVENTADOS).
-// Hay una incidencia en cada estado: pendiente, en revisión y resuelta.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Son incidencias de PRUEBA (inventadas). Igual que recursos.ts, son la
+// "semilla": si Firestore no tiene incidencias, la app copia estas.
+// Hay una en cada etapa del semáforo: pendiente, en revisión y resuelta,
+// para poder ver cómo se ve cada una.
 // Cubre: datos de apoyo para HU-04 y HU-10
 
 import type { Incidencia } from '../types/Incidencia';
@@ -13,7 +16,7 @@ export const listaIncidenciasPrueba: Incidencia[] = [
     docentePresente: 'Prof. Ana Morales',
     descripcion: 'Un estudiante dejó caer el multímetro y se rompió la punta de prueba.',
     hayPersonasAfectadas: false,
-    // No hay "detalleAfectacion" porque nadie resultó afectado (es opcional)
+    // No hay "detalleAfectacion": nadie salió herido, y como ese dato tiene "?" (opcional), se puede omitir
     registradaPor: 'Pedro Soto',
     estado: 'pendiente',
   },

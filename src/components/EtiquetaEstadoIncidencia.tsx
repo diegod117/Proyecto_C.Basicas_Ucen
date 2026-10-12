@@ -1,21 +1,26 @@
 // EtiquetaEstadoIncidencia.tsx
-// Componente pequeño y reutilizable que muestra el estado de una incidencia
-// como una etiqueta con color: amarillo (pendiente), azul (en revisión)
-// o verde (resuelta).
+// ¿QUÉ ES ESTE ARCHIVO?
+// Un componente chiquitito: la "pastilla" de color que dice en qué etapa
+// va una incidencia, como un semáforo:
+//   amarillo = Pendiente, azul = En revisión, verde = Resuelta.
+// Es "reutilizable": se puede usar en cualquier parte que necesite
+// mostrar la etapa de una incidencia.
+// *** Los colores están en EtiquetaEstadoIncidencia.css. ***
+// En la guía: paso 3 (componentes pequeños).
 // Cubre: HU-10 (historial de incidencias con estado visual)
 
 import type { EstadoIncidencia } from '../types/Incidencia';
 import './EtiquetaEstadoIncidencia.css';
 
-// Props que recibe la etiqueta: solo necesita el estado.
+// Solo necesita un dato: la etapa.
 interface PropsEtiquetaEstado {
   estado: EstadoIncidencia;
 }
 
 // textoEstadoIncidencia
-// Recibe: un estado de incidencia, por ejemplo 'en_revision'.
-// Devuelve: el texto para mostrar al usuario, por ejemplo "En revisión".
-// Es similar a textoEstado de inventario.ts, pero para incidencias.
+// Recibe: una etapa "fea", ej: 'en_revision'.
+// Devuelve: el texto bonito, ej: "En revisión".
+// Es el mismo truco de traductor que textoEstado en utils/inventario.ts.
 function textoEstadoIncidencia(estado: EstadoIncidencia): string {
   if (estado === 'pendiente') {
     return 'Pendiente';
@@ -27,8 +32,9 @@ function textoEstadoIncidencia(estado: EstadoIncidencia): string {
 }
 
 // claseDelEstado
-// Recibe: un estado de incidencia.
-// Devuelve: la clase CSS que le da el color correspondiente.
+// Recibe: una etapa.
+// Devuelve: las clases CSS que le dan su color.
+// Todas llevan "etiqueta-estado" (la forma de pastilla) + una del color.
 function claseDelEstado(estado: EstadoIncidencia): string {
   if (estado === 'pendiente') {
     return 'etiqueta-estado etiqueta-estado-pendiente';
@@ -40,8 +46,8 @@ function claseDelEstado(estado: EstadoIncidencia): string {
 }
 
 // Componente EtiquetaEstadoIncidencia
-// Recibe: estado (el estado de la incidencia).
-// Devuelve: un <span> con el texto y color del estado.
+// Recibe: la etapa de la incidencia.
+// Devuelve: un <span> (un pedacito de texto) con el color y el texto de la etapa.
 function EtiquetaEstadoIncidencia(props: PropsEtiquetaEstado) {
   return (
     <span className={claseDelEstado(props.estado)}>

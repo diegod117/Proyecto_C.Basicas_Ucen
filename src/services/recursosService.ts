@@ -1,18 +1,30 @@
 // recursosService.ts
-// Servicio de recursos: es el ÚNICO lugar desde donde las páginas
-// obtienen los recursos del inventario.
+// ¿QUÉ ES ESTE ARCHIVO?
+// Es el "bodeguero" de los recursos. Si una pantalla quiere ver, cambiar,
+// reponer o agregar recursos, se lo pide a este archivo. Nunca va a buscar
+// los datos por su cuenta.
+// En la guía: paso 8 (Firebase y los datos).
 // Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
 //        HU-06 (cada cambio de estado queda en el historial),
 //        RF-04 (reponer stock de un recurso),
 //        RNF-06 (los recursos se cargan desde Firestore),
 //        agregar recursos nuevos desde la página de inventario
 
-// ¿Para qué sirve un "servicio"?
-// Las páginas no deberían saber DE DÓNDE vienen los datos.
-// Los datos vienen de Firestore (la colección "recursos"), pero las páginas
-// no lo saben: siguen pidiéndolos con obtenerRecursos(), igual que antes.
-// Además, como todas las páginas leen de aquí, todas ven los mismos datos:
-// si alguien cambia el estado de un recurso, todos ven el cambio.
+// ¿Para qué sirve tener un "bodeguero" (un servicio)?
+// 1. Las pantallas no necesitan saber DE DÓNDE vienen los datos. Hoy vienen
+//    de Firestore; mañana podrían venir de otro lado, y las pantallas ni se enteran.
+// 2. Todas las pantallas leen de la MISMA lista. Si alguien cambia un recurso,
+//    todas ven el cambio.
+//
+// La idea más importante de este archivo: la COPIA EN MEMORIA.
+// Ir a internet es lento. Por eso, al iniciar sesión, traemos todos los
+// recursos de Firestore UNA vez y los guardamos en una lista aquí
+// (listaRecursos). Las pantallas leen esa lista al tiro, sin esperar.
+// Cuando algo cambia, primero se guarda en Firestore y, si Firestore dice
+// "ok", recién ahí se cambia también la copia.
+// Es como tener una fotocopia del cuaderno en tu mochila: lees la
+// fotocopia (rápido), pero cuando escribes algo, lo escribes primero
+// en el cuaderno original y después en la fotocopia.
 
 import type { Recurso, EstadoRecurso, CantidadesPorEstado, DatosNuevoRecurso } from '../types/Recurso';
 import type { CambioEstado } from '../types/CambioEstado';
@@ -25,54 +37,68 @@ import {
   agregarRegistroAlLote,
   agregarRegistroEnMemoria,
 } from './historialService';
+// Herramientas de Firestore:
+//   collection = una "carpeta" de Firestore (ej: la carpeta "recursos")
+//   getDocs    = trae todos los documentos (hojas) de una carpeta
+//   doc        = apunta a UNA hoja específica (ej: "recursos/7")
+//   writeBatch = un "lote": varias escrituras que se mandan juntas
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { baseDatos } from './firebase';
 
-// La lista de recursos que usa toda la aplicación: es una COPIA EN MEMORIA
-// de la colección "recursos" de Firestore (ver docs/plan-fase-3.md).
-// Parte vacía y se llena con cargarRecursos() al iniciar sesión.
-// Las páginas leen esta copia, así no tienen que esperar a internet.
+// LA COPIA EN MEMORIA. Parte vacía ([] = lista vacía) y se llena con
+// cargarRecursos() cuando alguien inicia sesión.
+// No lleva "export": nadie la toca directo. Para leerla se usa obtenerRecursos().
 const listaRecursos: Recurso[] = [];
 
 // cargarRecursos
-// No recibe nada. Descarga los recursos desde Firestore y llena la copia
-// en memoria. La llama cargarTodosLosDatos() (cargaDatos.ts) al iniciar sesión.
-// Devuelve una Promise<void>: "una promesa de que va a terminar", sin valor.
-// Si Firestore falla (ej: sin internet), lanza un error que atrapa cargaDatos.ts.
+// No recibe nada. Trae los recursos desde Firestore y llena la copia.
+// La llama cargarTodosLosDatos() (en cargaDatos.ts) al iniciar sesión.
+// Devuelve Promise<void> = "te prometo avisarte cuando termine" (sin entregar nada).
+// Si Firestore falla (ej: sin internet), el error sube hasta cargaDatos.ts,
+// que lo atrapa con su try/catch.
 export async function cargarRecursos(): Promise<void> {
-  // getDocs pide TODOS los documentos de la colección "recursos".
-  // "await" espera la respuesta de internet antes de seguir.
+  // "Firestore, dame todas las hojas de la carpeta 'recursos'".
+  // await = espera aquí hasta que llegue la respuesta de internet.
   const resultado = await getDocs(collection(baseDatos, 'recursos'));
 
-  // Vaciamos la copia antes de llenarla. splice(0, largo) borra todos los
-  // elementos sin crear una lista nueva, así todos siguen usando la misma.
+  // Vaciamos la copia antes de llenarla (por si tenía datos de otra sesión).
+  // splice(0, largo) = "saca todos los elementos desde la posición 0".
+  // Se vacía la MISMA lista, no se crea otra: así los demás archivos que
+  // ya la estaban mirando siguen mirando la correcta.
   listaRecursos.splice(0, listaRecursos.length);
 
   if (resultado.empty) {
-    // Primera vez: la colección está vacía, así que subimos los datos de
-    // prueba de src/data/recursos.ts. writeBatch ("lote") junta todas las
-    // escrituras y las envía de una sola vez: se guardan todas o ninguna.
+    // ¿La carpeta está vacía? Es la primera vez (o alguien la borró).
+    // Plantamos la "semilla": subimos los recursos de prueba de src/data/recursos.ts.
+    // writeBatch = un lote: juntamos todas las escrituras y las mandamos de
+    // una vez. Firestore guarda TODAS o NINGUNA (nunca la mitad).
     const lote = writeBatch(baseDatos);
     for (const recurso of listaRecursosPrueba) {
-      // El nombre del documento es el id como texto: el recurso 7 queda en "recursos/7"
+      // Cada recurso es una hoja cuyo nombre es su id como texto.
+      // String(7) convierte el número 7 en el texto "7" -> hoja "recursos/7".
       lote.set(doc(baseDatos, 'recursos', String(recurso.id)), recurso);
+      // push = agregar al final de la lista.
       listaRecursos.push(recurso);
     }
+    // commit = "¡ahora sí, manda el lote!"
     await lote.commit();
+    // return en una función sin valor = "listo, termina aquí".
     return;
   }
 
-  // Ya había datos: los copiamos a la memoria.
-  // documento.data() devuelve un objeto sin tipo; con "as Recurso" le
-  // decimos a TypeScript que tiene la forma de un Recurso (así lo guardamos).
+  // Ya había datos: copiamos cada hoja a nuestra lista.
+  // documento.data() entrega los datos, pero TypeScript no sabe de qué tipo son.
+  // "as Recurso" = "confía en mí, TypeScript: esto tiene forma de Recurso".
   for (const documento of resultado.docs) {
     listaRecursos.push(documento.data() as Recurso);
   }
 
-  // Firestore ordena los documentos por su nombre COMO TEXTO ("1", "10", "2"...).
-  // Los ordenamos por id como número para que el listado salga igual que antes.
-  // sort recibe una función que compara dos recursos: si el resultado es
-  // negativo, "a" va primero; si es positivo, "b" va primero.
+  // Firestore ordena las hojas por su nombre como TEXTO: "1", "10", "2"...
+  // (igual que un diccionario: "10" va antes que "2" porque empieza con "1").
+  // Las ordenamos por número para que el listado salga 1, 2, 3... 10.
+  // sort recibe una función que compara dos recursos (a y b):
+  //   si a.id - b.id da negativo -> "a" va primero
+  //   si da positivo             -> "b" va primero
   listaRecursos.sort(function (a, b) {
     return a.id - b.id;
   });
@@ -80,45 +106,43 @@ export async function cargarRecursos(): Promise<void> {
 
 // obtenerRecursos
 // Recibe: nada.
-// Devuelve: la lista completa de recursos del inventario.
+// Devuelve: la lista completa de recursos (la copia en memoria).
+// Es la función que más usan las pantallas. Es instantánea: no va a internet.
 export function obtenerRecursos(): Recurso[] {
   return listaRecursos;
 }
 
 // obtenerRecursoPorId
-// Recibe: el id del recurso que se quiere buscar (ej: 6).
-// Devuelve: el recurso con ese id, o "undefined" si no existe.
+// Recibe: el número (id) del recurso que buscas, ej: 6.
+// Devuelve: ese recurso, o undefined (= nada) si no existe.
 //
-// "Recurso | undefined" significa que la función puede devolver
-// un Recurso O nada (undefined). Así TypeScript nos obliga a revisar
-// con un if si el recurso existe antes de usarlo, y evitamos errores.
+// "Recurso | undefined" obliga a quien la usa a preguntar con un if
+// "¿lo encontraste?" antes de usarlo. Así evitamos usar algo que no existe.
 export function obtenerRecursoPorId(id: number): Recurso | undefined {
-  // Recorremos la lista uno por uno hasta encontrar el id buscado
+  // Revisamos la lista uno por uno, como buscar un libro en un estante.
   for (const recurso of listaRecursos) {
     if (recurso.id === id) {
-      return recurso; // lo encontramos: lo devolvemos y la función termina
+      return recurso; // ¡lo encontramos! lo entregamos y la función termina
     }
   }
 
-  // Si el for terminó sin encontrarlo, el recurso no existe
+  // Revisamos todo el estante y no estaba.
   return undefined;
 }
 
 // cambiarEstadoRecurso
+// Mueve unidades de un estado a otro. Ejemplo: 1 multímetro de "disponible"
+// a "danado" deja disponible 12 -> 11 y danado 1 -> 2. El total NO cambia
+// (es como pasar una pelota de una caja a otra: siguen siendo las mismas pelotas).
 // Recibe: el id del recurso, el estado de origen, el estado nuevo,
-//         cuántas unidades se mueven de uno a otro, el motivo del cambio
-//         y el nombre del usuario conectado (para el historial, HU-06).
-// Devuelve: una Promise<boolean>: true si se guardó, false si no.
-// Ejemplo: mover 1 multímetro de 'disponible' a 'danado' deja
-//          disponible: 12 -> 11 y danado: 1 -> 2. El total no cambia.
+//         cuántas unidades, el motivo y el nombre de quien lo hace.
+// Devuelve: una promesa de true (se guardó) o false (no se guardó).
 //
-// Es "async" porque guarda en Firestore (por internet). Quien la llama
-// debe usar "await" para esperar el resultado.
+// Es "async" porque guarda en Firestore. Quien la llama usa "await".
 //
-// El formulario ya valida los datos antes de llamar a esta función, pero
-// el servicio vuelve a revisar lo más importante (que el recurso exista y
-// que haya unidades suficientes). Así los datos nunca quedan con números
-// negativos, aunque alguien llame a esta función desde otra parte.
+// El formulario ya revisa los datos antes, pero aquí se vuelven a revisar
+// las cosas importantes. ¿Por qué dos veces? Como el cinturón de seguridad
+// y el airbag: si una falla, la otra te protege. Así nunca quedan números negativos.
 export async function cambiarEstadoRecurso(
   idRecurso: number,
   estadoOrigen: EstadoRecurso,
@@ -130,21 +154,26 @@ export async function cambiarEstadoRecurso(
   const recurso = obtenerRecursoPorId(idRecurso);
 
   if (recurso === undefined) {
-    return false; // no existe un recurso con ese id
+    return false; // no existe ese recurso
   }
+  // recurso.cantidades[estadoOrigen] = "el cajón del estado de origen".
+  // Los corchetes con una variable adentro sirven para elegir el cajón
+  // según lo que diga la variable (ej: si estadoOrigen es 'danado',
+  // es lo mismo que escribir recurso.cantidades.danado).
   if (cantidad < 1 || cantidad > recurso.cantidades[estadoOrigen]) {
-    return false; // cantidad inválida o no hay suficientes unidades
+    return false; // pidió 0, un negativo, o más de las que hay
   }
 
-  // Calculamos las cantidades nuevas en una COPIA ({ ...objeto } copia
-  // todos sus campos). Todavía no tocamos el recurso en memoria: primero
-  // hay que ver si Firestore acepta el cambio.
+  // Hacemos los cálculos en una COPIA. { ...objeto } = "copia todos los
+  // datos de este objeto en uno nuevo" (los "..." se llaman spread).
+  // No tocamos el recurso de verdad todavía: primero Firestore tiene que aceptar.
   const nuevasCantidades = { ...recurso.cantidades };
   nuevasCantidades[estadoOrigen] = nuevasCantidades[estadoOrigen] - cantidad;
   nuevasCantidades[estadoNuevo] = nuevasCantidades[estadoNuevo] + cantidad;
 
-  // Registro para el historial (HU-06). Se crea AQUÍ, dentro del servicio,
-  // y no en el formulario: así es imposible cambiar un estado sin que quede registrado.
+  // Preparamos la línea para el diario (historial, HU-06).
+  // Se hace AQUÍ y no en el formulario: así es IMPOSIBLE cambiar un estado
+  // sin que quede anotado.
   const registro = crearRegistroCambioEstado(
     idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario,
   );
@@ -153,14 +182,13 @@ export async function cambiarEstadoRecurso(
 }
 
 // reponerStock
-// Recibe: el id del recurso, cuántas unidades NUEVAS llegaron, el motivo
-//         (ej: "Compra orden 123") y el nombre del usuario conectado.
-// Devuelve: una Promise<boolean>: true si se guardó, false si no.
-// Ejemplo: los guantes tienen 2 cajas disponibles y llegan 10:
-//          disponible pasa de 2 a 12 y el total sube de 2 a 12.
-// A diferencia de cambiarEstadoRecurso, aquí el total SÍ cambia, porque
-// entran unidades que antes no estaban en el inventario. Esto es lo que
-// resuelve una alerta de reposición (HU-09).
+// Suma unidades NUEVAS que llegaron (ej: se compraron guantes).
+// Ejemplo: hay 2 cajas de guantes y llegan 10 -> disponible pasa de 2 a 12.
+// A diferencia de cambiarEstadoRecurso, aquí el total SÍ sube, porque
+// entran pelotas nuevas a la caja. Esto es lo que apaga una alerta de reposición.
+// Recibe: el id del recurso, cuántas llegaron, el motivo (ej: "Compra orden 123")
+//         y el nombre de quien lo hace.
+// Devuelve: una promesa de true (se guardó) o false (no se guardó).
 export async function reponerStock(
   idRecurso: number,
   cantidad: number,
@@ -170,7 +198,7 @@ export async function reponerStock(
   const recurso = obtenerRecursoPorId(idRecurso);
 
   if (recurso === undefined) {
-    return false; // no existe un recurso con ese id
+    return false; // no existe ese recurso
   }
   if (cantidad < 1) {
     return false; // no se puede reponer 0 ni un número negativo
@@ -179,59 +207,59 @@ export async function reponerStock(
   const nuevasCantidades = { ...recurso.cantidades };
   nuevasCantidades.disponible = nuevasCantidades.disponible + cantidad;
 
-  // Igual que en los cambios de estado, la reposición queda registrada
-  // en el historial desde el servicio (RNF-06).
+  // También queda anotado en el diario, desde aquí (RNF-06).
   const registro = crearRegistroReposicion(idRecurso, cantidad, motivo, nombreUsuario);
 
   return guardarCambioConHistorial(recurso, nuevasCantidades, registro);
 }
 
 // guardarCambioConHistorial
-// Recibe: el recurso, sus cantidades nuevas y el registro del historial.
-// Devuelve: una Promise<boolean>: true si se guardó, false si Firestore falló.
-// La usan cambiarEstadoRecurso y reponerStock, que guardan lo mismo:
-// las cantidades del recurso + un registro del historial.
+// Ayudante que comparten cambiarEstadoRecurso y reponerStock, porque los dos
+// guardan lo mismo: las cantidades nuevas + una línea en el diario.
+// Recibe: el recurso, sus cantidades nuevas y la línea del diario.
+// Devuelve: una promesa de true (se guardó) o false (Firestore falló).
+// No lleva "export": es un ayudante privado de este archivo.
 async function guardarCambioConHistorial(
   recurso: Recurso,
   nuevasCantidades: CantidadesPorEstado,
   registro: CambioEstado,
 ): Promise<boolean> {
-  // writeBatch ("lote"): las dos escrituras se envían juntas y Firestore
-  // guarda LAS DOS o NINGUNA. Así nunca queda un cambio de cantidades sin
-  // su registro en el historial, ni un registro sin su cambio.
+  // Un lote con DOS escrituras que se guardan juntas: las dos o ninguna.
+  // Así nunca queda un número cambiado sin su línea en el diario, ni al revés.
   const lote = writeBatch(baseDatos);
-  // update cambia solo el campo "cantidades" del documento del recurso
+  // update = cambia SOLO el dato "cantidades" de la hoja del recurso.
   lote.update(doc(baseDatos, 'recursos', String(recurso.id)), { cantidades: nuevasCantidades });
   agregarRegistroAlLote(lote, registro);
 
   try {
-    await lote.commit(); // aquí se envía todo a Firestore
+    await lote.commit(); // aquí se manda todo a Firestore
   } catch (error) {
     console.error('Error al guardar en Firestore:', error);
-    return false; // no se guardó nada: la memoria queda como estaba
+    return false; // no se guardó nada, y la copia queda como estaba
   }
 
-  // Firestore aceptó el cambio: recién ahora actualizamos la copia en memoria.
-  // Como "recurso" apunta al MISMO objeto que está en listaRecursos, todas
-  // las páginas que lean del servicio verán el cambio.
+  // Firestore dijo "ok": recién ahora cambiamos la copia en memoria.
+  // "recurso" es el MISMO objeto que está dentro de listaRecursos (no una copia),
+  // así que al cambiarlo aquí, cambia en la lista, y todas las pantallas lo ven.
   recurso.cantidades = nuevasCantidades;
   agregarRegistroEnMemoria(registro);
   return true;
 }
 
 // agregarRecurso
-// Recibe: los datos del formulario "Agregar recurso" (ya validados con
-//         validarNuevoRecurso) y el nombre del usuario conectado.
-// Devuelve: una Promise con el recurso creado, o null si Firestore falló.
-// Guarda en un solo lote el recurso nuevo y su registro de "alta" en el
-// historial: se guardan los dos o ninguno (igual que guardarCambioConHistorial).
+// Crea un recurso nuevo en el inventario (botón "+ Agregar recurso").
+// Recibe: lo que se escribió en el formulario (ya revisado con
+//         validarNuevoRecurso) y el nombre de quien lo agrega.
+// Devuelve: una promesa con el recurso creado, o null (= nada) si falló.
+// Guarda en un solo lote el recurso + su línea de "alta" en el diario.
 export async function agregarRecurso(
   datos: DatosNuevoRecurso,
   nombreUsuario: string,
 ): Promise<Recurso | null> {
-  // El id nuevo es el mayor que exista + 1. Si dos personas agregan al mismo
-  // tiempo con el mismo id, las reglas de Firestore rechazan al segundo
-  // (sería modificar un recurso existente, y eso no está permitido).
+  // ¿Qué número le toca? El más grande que exista + 1.
+  // "let" = una caja cuyo contenido SÍ puede cambiar (a diferencia de const).
+  // Si dos personas agregan a la vez con el mismo número, las reglas de
+  // Firestore rechazan al segundo (no se puede pisar un recurso que ya existe).
   let mayorId = 0;
   for (const recurso of listaRecursos) {
     if (recurso.id > mayorId) {
@@ -239,6 +267,7 @@ export async function agregarRecurso(
     }
   }
 
+  // armarRecurso convierte los textos del formulario en un Recurso de verdad.
   const recursoNuevo = armarRecurso(datos, mayorId + 1);
   const registro = crearRegistroAlta(
     recursoNuevo.id,
@@ -247,6 +276,7 @@ export async function agregarRecurso(
   );
 
   const lote = writeBatch(baseDatos);
+  // set = escribe una hoja NUEVA completa.
   lote.set(doc(baseDatos, 'recursos', String(recursoNuevo.id)), recursoNuevo);
   agregarRegistroAlLote(lote, registro);
 
@@ -257,8 +287,8 @@ export async function agregarRecurso(
     return null; // no se guardó nada
   }
 
-  // Firestore aceptó: recién ahora lo agregamos a la copia en memoria.
-  // Como los ids van en aumento, queda al final y la lista sigue ordenada.
+  // Firestore dijo "ok": lo agregamos a la copia.
+  // Como su número es el más grande, va al final y la lista sigue ordenada.
   listaRecursos.push(recursoNuevo);
   agregarRegistroEnMemoria(registro);
   return recursoNuevo;
