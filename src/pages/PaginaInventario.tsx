@@ -3,14 +3,17 @@
 // para que el docente sepa qué hay y en qué cantidad operativa.
 // Se puede filtrar por nombre, categoría, laboratorio y estado.
 // Si ningún recurso cumple los filtros, muestra un mensaje para limpiarlos.
-// Al hacer clic en una tarjeta, muestra la ficha completa del recurso.
-// El encargado también puede agregar recursos nuevos ("+ Agregar recurso").
+// Tiene sus propias rutas (React Router), dentro de /inventario:
+//   /inventario         -> el listado con filtros
+//   /inventario/nuevo   -> el formulario "Agregar recurso" (solo encargado)
+//   /inventario/:id     -> la ficha completa de un recurso (ej: /inventario/3)
 // Cubre: HU-01, HU-02, RF-02, RF-08, RNF-03
 
 import { useState } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 // La página pide los recursos al SERVICIO, no directamente a src/data/.
 // Así no le importa de dónde vienen los datos (ver recursosService.ts).
-import { obtenerRecursos, obtenerRecursoPorId } from '../services/recursosService';
+import { obtenerRecursos } from '../services/recursosService';
 import {
   filtrarRecursos,
   hayFiltrosActivos,
@@ -19,11 +22,11 @@ import {
 } from '../utils/filtrosInventario';
 import FiltrosInventario from '../components/FiltrosInventario';
 import GrillaRecursos from '../components/GrillaRecursos';
-import FichaRecurso from '../components/FichaRecurso';
+import FichaSegunRuta from '../components/FichaSegunRuta';
 import FormularioNuevoRecurso from '../components/FormularioNuevoRecurso';
 import EncabezadoInventario from '../components/EncabezadoInventario';
 import ContadorInventario from '../components/ContadorInventario';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeAgregarRecurso } from '../utils/permisos';
 import './PaginaInventario.css';
 
@@ -31,33 +34,28 @@ interface PropsPaginaInventario {
   // Viene de App. Se llama cuando se guarda un cambio de estado, para que
   // App recalcule las alertas del menú y redibuje la página (HU-02, HU-05).
   onInventarioCambiado: () => void;
-  // Usuario conectado: decide si se ve el botón "+ Agregar recurso" y la
-  // ficha lo usa para decidir si muestra sus formularios (RNF-03).
-  usuario: Usuario;
 }
 
 // Componente PaginaInventario
-// Recibe: la función para avisar a App que el inventario cambió y el usuario conectado.
-// Devuelve: el contenido de la página de inventario.
+// Recibe: la función para avisar a App que el inventario cambió.
+// Devuelve: el listado, la ficha o el formulario, según la ruta.
 function PaginaInventario(props: PropsPaginaInventario) {
+  // El usuario conectado viene del contexto: decide si se ve el botón
+  // "+ Agregar recurso" (RNF-03).
+  const usuario = useUsuario();
+
+  // Función de React Router para cambiar de ruta desde el código.
+  const navegar = useNavigate();
+
   // Un useState por cada filtro. Cada uno guarda lo que el usuario eligió.
   // Cuando cualquiera cambia, React vuelve a ejecutar esta función completa
   // y la lista filtrada de abajo se recalcula sola.
+  // Como esta página sigue en pantalla mientras se mira una ficha (la ficha
+  // es una ruta de ADENTRO de /inventario), los filtros no se pierden al volver.
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [categoria, setCategoria] = useState(SIN_FILTRO);
   const [laboratorio, setLaboratorio] = useState(SIN_FILTRO);
   const [estado, setEstado] = useState(SIN_FILTRO);
-
-  // Id del recurso cuya ficha está abierta.
-  // "number | null" significa que puede ser un número o null.
-  // null = no hay ninguna ficha abierta (se muestra el listado).
-  // Guardamos el ID y no el recurso completo: así, cuando el recurso cambie
-  // (por ejemplo, al cambiar su estado en J10), lo volvemos a buscar con
-  // su id y la ficha siempre muestra los datos actualizados.
-  const [idRecursoSeleccionado, setIdRecursoSeleccionado] = useState<number | null>(null);
-
-  // true mientras se muestra el formulario "Agregar recurso" (en vez del listado)
-  const [agregandoRecurso, setAgregandoRecurso] = useState(false);
 
   const listaRecursos = obtenerRecursos();
   const laboratoriosDisponibles = obtenerLaboratorios(listaRecursos);
@@ -86,68 +84,45 @@ function PaginaInventario(props: PropsPaginaInventario) {
 
   // abrirFicha
   // Recibe: el id del recurso en que el usuario hizo clic. No devuelve nada.
+  // Cambia la URL a /inventario/<id>; la ruta de abajo dibuja la ficha.
   function abrirFicha(idRecurso: number) {
-    setIdRecursoSeleccionado(idRecurso);
+    navegar('/inventario/' + idRecurso);
     // Subimos al inicio de la página, por si el usuario estaba más abajo
     window.scrollTo(0, 0);
   }
 
   // volverAlListado
-  // No recibe ni devuelve nada: cierra la ficha y vuelve a mostrar el listado.
-  // Los filtros NO se pierden, porque sus useState siguen guardados aquí.
+  // No recibe ni devuelve nada: vuelve a /inventario (el listado).
   function volverAlListado() {
-    setIdRecursoSeleccionado(null);
+    navegar('/inventario');
   }
 
   // recursoAgregado
   // Recibe: el id del recurso que se acaba de agregar. No devuelve nada.
-  // Cierra el formulario, avisa a App (para recalcular las alertas, por
-  // si el recurso nuevo ya está bajo su stock mínimo) y abre su ficha.
+  // Avisa a App (para recalcular las alertas, por si el recurso nuevo ya
+  // está bajo su stock mínimo) y abre su ficha.
   function recursoAgregado(idRecurso: number) {
-    setAgregandoRecurso(false);
     props.onInventarioCambiado();
     abrirFicha(idRecurso);
   }
 
-  // Formulario "Agregar recurso": se muestra en vez del listado
-  if (agregandoRecurso) {
-    return (
-      <section className="contenido-pagina">
-        <FormularioNuevoRecurso
-          usuario={props.usuario}
-          onGuardado={recursoAgregado}
-          onCancelar={() => setAgregandoRecurso(false)}
-        />
-      </section>
+  // Lo que se ve en /inventario/nuevo: el formulario solo para quien puede
+  // agregar recursos. Si otro rol escribe la URL a mano, vuelve al listado.
+  let contenidoNuevoRecurso = <Navigate to="/inventario" replace />;
+  if (puedeAgregarRecurso(usuario.rol)) {
+    contenidoNuevoRecurso = (
+      <FormularioNuevoRecurso onGuardado={recursoAgregado} onCancelar={volverAlListado} />
     );
   }
 
-  // Si hay una ficha abierta, mostramos SOLO la ficha (en vez del listado).
-  // Buscamos el recurso por su id; si por algún motivo no existe
-  // (undefined), no entramos al if y se muestra el listado normal.
-  if (idRecursoSeleccionado !== null) {
-    const recursoSeleccionado = obtenerRecursoPorId(idRecursoSeleccionado);
-    if (recursoSeleccionado) {
-      return (
-        <section className="contenido-pagina">
-          <FichaRecurso
-            recurso={recursoSeleccionado}
-            onVolver={volverAlListado}
-            onEstadoCambiado={props.onInventarioCambiado}
-            usuario={props.usuario}
-          />
-        </section>
-      );
-    }
-  }
-
-  return (
-    <section className="contenido-pagina">
+  // Lo que se ve en /inventario: el listado con filtros
+  const contenidoListado = (
+    <>
       {/* Encabezado de página (D17): título, descripción y el botón
           "+ Agregar recurso", que solo ve el encargado (RNF-03) */}
       <EncabezadoInventario
-        mostrarBotonAgregar={puedeAgregarRecurso(props.usuario.rol)}
-        onAgregar={() => setAgregandoRecurso(true)}
+        mostrarBotonAgregar={puedeAgregarRecurso(usuario.rol)}
+        onAgregar={() => navegar('/inventario/nuevo')}
       />
 
       {/* Le pasamos a FiltrosInventario los valores actuales y las funciones
@@ -178,6 +153,28 @@ function PaginaInventario(props: PropsPaginaInventario) {
         onSeleccionarRecurso={abrirFicha}
         onLimpiarFiltros={limpiarFiltros}
       />
+    </>
+  );
+
+  return (
+    <section className="contenido-pagina">
+      {/* Rutas de ADENTRO de /inventario. Los path son relativos:
+          - index      = /inventario (exacto)
+          - "nuevo"    = /inventario/nuevo
+          - ":idRecurso" = /inventario/3, /inventario/7... El ":" significa
+            "esta parte cambia"; FichaSegunRuta la lee con useParams.
+          React Router prefiere "nuevo" antes que ":idRecurso", porque un
+          texto fijo le gana a uno que cambia. */}
+      <Routes>
+        <Route index element={contenidoListado} />
+        <Route path="nuevo" element={contenidoNuevoRecurso} />
+        <Route
+          path=":idRecurso"
+          element={
+            <FichaSegunRuta onVolver={volverAlListado} onEstadoCambiado={props.onInventarioCambiado} />
+          }
+        />
+      </Routes>
     </section>
   );
 }

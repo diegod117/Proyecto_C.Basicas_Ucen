@@ -131,6 +131,8 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
+  /* Ahora son enlaces (<a> de NavLink), no botones: sin subrayado */
+  text-decoration: none;
   transition: background-color 0.15s ease, border-color 0.15s ease,
               color 0.15s ease;
 }

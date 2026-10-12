@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { DatosNuevoRecurso, CategoriaRecurso } from '../types/Recurso';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { listaCategoriasRecurso, textoCategoria } from '../utils/inventario';
 import { datosVaciosNuevoRecurso, usaStockMinimo, validarNuevoRecurso } from '../utils/nuevoRecurso';
 import { agregarRecurso, obtenerRecursos } from '../services/recursosService';
@@ -20,8 +20,6 @@ import CamposDetalleRecurso from './CamposDetalleRecurso';
 import './FormularioNuevoRecurso.css';
 
 interface PropsFormularioNuevoRecurso {
-  // Usuario conectado: su nombre queda en el registro de "alta" del historial
-  usuario: Usuario;
   // Se llama después de guardar, con el id del recurso nuevo
   // (la página lo usa para abrir su ficha)
   onGuardado: (idRecurso: number) => void;
@@ -30,9 +28,12 @@ interface PropsFormularioNuevoRecurso {
 }
 
 // Componente FormularioNuevoRecurso
-// Recibe: el usuario, la función que avisa que se guardó y la de cancelar.
+// Recibe: la función que avisa que se guardó y la de cancelar.
+// El usuario conectado (su nombre queda en el "alta" del historial) lo lee con useUsuario().
 // Devuelve: el formulario completo.
 function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // Todos los campos del formulario en un solo objeto (ver DatosNuevoRecurso).
   // Para cambiar un campo se usa { ...datos, campo: valor }: copia el objeto
   // completo y cambia solo ese campo. Así React detecta el cambio.
@@ -64,7 +65,7 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
 
     setMensajeError('');
     setGuardando(true);
-    const recursoNuevo = await agregarRecurso(datos, props.usuario.nombre);
+    const recursoNuevo = await agregarRecurso(datos, usuario.nombre);
     setGuardando(false);
 
     if (recursoNuevo === null) {

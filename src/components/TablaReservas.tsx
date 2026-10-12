@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { obtenerReservasVisibles, cancelarReserva } from '../services/reservasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeCancelarReserva, puedeVerTodasLasReservas } from '../utils/permisos';
 import './TablaReservas.css';
 
@@ -17,13 +17,15 @@ interface TablaReservasProps {
   version?: number;
   // Callback opcional para avisar al padre cuando cambian las reservas.
   onReservaModificada?: () => void;
-  // Usuario conectado: decide qué reservas se ven y cuáles se pueden cancelar (RNF-03)
-  usuario: Usuario;
 }
 
 // Componente TablaReservas
 // Renderiza una tabla HTML con las reservas ordenadas y opción de cancelación.
-function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasProps) {
+// El usuario conectado (decide qué reservas se ven y cuáles se pueden cancelar,
+// RNF-03) lo lee con useUsuario().
+function TablaReservas({ version, onReservaModificada }: TablaReservasProps) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // Estado local para refrescar la tabla apenas se cancela una reserva.
   const [actualizacionInterna, setActualizacionInterna] = useState(0);
 

@@ -9,28 +9,25 @@ import { useState } from 'react';
 import FormularioReserva from '../components/FormularioReserva';
 import TablaReservas from '../components/TablaReservas';
 import { obtenerReservasVisibles } from '../services/reservasService';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeReservar, puedeVerTodasLasReservas } from '../utils/permisos';
 import './PaginaReservas.css';
 
-// Props que recibe la página desde App
-interface PropsPaginaReservas {
-  // Usuario conectado: decide si se muestra el formulario (RNF-03)
-  usuario: Usuario;
-}
-
 // Componente PaginaReservas
 // Renderiza el encabezado del módulo, el formulario y la tabla de reservas.
-// Recibe el usuario conectado. El formulario solo aparece si su rol puede reservar.
-function PaginaReservas(props: PropsPaginaReservas) {
+// No recibe props: el usuario conectado lo lee con useUsuario().
+// El formulario solo aparece si su rol puede reservar.
+function PaginaReservas() {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   const [actualizaciones, setActualizaciones] = useState(0);
 
   // Mismas reservas que muestra la tabla: todas, o solo las del docente (RNF-03)
-  const listaReservas = obtenerReservasVisibles(props.usuario);
+  const listaReservas = obtenerReservasVisibles(usuario);
 
   // Texto del contador según el rol
   let textoContador = 'Reservas registradas';
-  if (!puedeVerTodasLasReservas(props.usuario.rol)) {
+  if (!puedeVerTodasLasReservas(usuario.rol)) {
     textoContador = 'Mis reservas';
   }
 
@@ -57,10 +54,10 @@ function PaginaReservas(props: PropsPaginaReservas) {
         {/* Formulario para registrar una nueva reserva.
             Solo se dibuja si el rol puede reservar (RNF-03);
             si no, se muestra un aviso en su lugar. */}
-        {puedeReservar(props.usuario.rol) && (
-          <FormularioReserva onReservaCreada={refrescarDatos} usuario={props.usuario} />
+        {puedeReservar(usuario.rol) && (
+          <FormularioReserva onReservaCreada={refrescarDatos} />
         )}
-        {!puedeReservar(props.usuario.rol) && (
+        {!puedeReservar(usuario.rol) && (
           <p className="texto-secundario">
             Tu rol solo permite consultar las reservas. Para reservar, inicia sesión como
             docente o encargado.
@@ -71,7 +68,6 @@ function PaginaReservas(props: PropsPaginaReservas) {
         <TablaReservas
           version={actualizaciones}
           onReservaModificada={refrescarDatos}
-          usuario={props.usuario}
         />
       </div>
     </section>

@@ -14,7 +14,7 @@ import {
   textoResumenCambio,
 } from '../utils/cambioEstado';
 import { cambiarEstadoRecurso } from '../services/recursosService';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import './FormularioCambioEstado.css';
 
 interface PropsFormularioCambioEstado {
@@ -22,15 +22,15 @@ interface PropsFormularioCambioEstado {
   // Se llama después de guardar, para avisarle a la página que los datos
   // cambiaron y que tiene que volver a dibujarse con los números nuevos.
   onEstadoCambiado: () => void;
-  // Usuario conectado: su nombre queda en el historial (HU-06)
-  usuario: Usuario;
 }
 
 // Componente FormularioCambioEstado
 // Recibe: el recurso, la función para avisar que se guardó un cambio
-// y el usuario conectado.
+// El usuario conectado (su nombre queda en el historial, HU-06) lo lee con useUsuario().
 // Devuelve: el formulario "Cambiar estado".
 function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   const recurso = props.recurso;
 
   // Un useState por cada campo del formulario ("inputs controlados").
@@ -88,7 +88,7 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       estadoNuevo,
       cantidad,
       motivo,
-      props.usuario.nombre,
+      usuario.nombre,
     );
     setGuardando(false);
     if (seGuardo) {

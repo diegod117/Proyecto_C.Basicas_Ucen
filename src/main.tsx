@@ -5,6 +5,7 @@
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import './styles/global.css';
 import App from './App.tsx';
 
@@ -17,9 +18,15 @@ if (elementoRaiz) {
   // StrictMode es una ayuda de React solo para desarrollo:
   // revisa el código y muestra advertencias en la consola si algo está mal.
   // No cambia cómo se ve la página.
+  // BrowserRouter (React Router) conecta la app con la URL del navegador:
+  // así cada página tiene su propia dirección (/inventario, /reservas...)
+  // y funcionan los botones "Atrás" y "Adelante". Envuelve a App para que
+  // App y todos sus componentes puedan usar Routes, NavLink y useNavigate.
   createRoot(elementoRaiz).render(
     <StrictMode>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </StrictMode>,
   );
 }

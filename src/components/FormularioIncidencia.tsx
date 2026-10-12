@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { obtenerRecursos } from '../services/recursosService';
 import { agregarIncidencia } from '../services/incidenciasService';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import './FormularioIncidencia.css';
 
 // Props que recibe el formulario desde la página.
@@ -17,15 +17,15 @@ import './FormularioIncidencia.css';
 // para que la página pueda mostrar un mensaje o actualizar la vista.
 interface PropsFormularioIncidencia {
   onIncidenciaRegistrada: () => void;
-  // Usuario conectado: su nombre queda como "registrada por" (HU-10)
-  usuario: Usuario;
 }
 
 // Componente FormularioIncidencia
 // Recibe: onIncidenciaRegistrada (función que avisa a la página que se registró)
-// y el usuario conectado.
+// El usuario conectado (queda como "registrada por", HU-10) lo lee con useUsuario().
 // Devuelve: el formulario con los campos de la incidencia.
 function FormularioIncidencia(props: PropsFormularioIncidencia) {
+  // El usuario conectado viene del contexto (ver context/ContextoUsuario.ts)
+  const usuario = useUsuario();
   // Obtenemos la lista de recursos para llenar el <select>.
   // Viene del servicio de Johann (recursosService).
   const recursos = obtenerRecursos();
@@ -74,6 +74,12 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       setMensajeError('Debe escribir una descripción de lo ocurrido.');
       return;
     }
+    // Si se marcó que hubo personas afectadas, el detalle es obligatorio:
+    // sin él, la incidencia quedaría registrada sin saber qué les pasó (RF-05).
+    if (hayPersonasAfectadas && detalleAfectacion.trim() === '') {
+      setMensajeError('Debe describir cómo fueron afectadas las personas.');
+      return;
+    }
 
     // Si llegamos aquí, todo está bien. Limpiamos el error y activamos "guardando".
     setMensajeError('');
@@ -90,7 +96,7 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         hayPersonasAfectadas,
         detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
         // Antes era un texto fijo; ahora es el nombre de quien inició sesión
-        registradaPor: props.usuario.nombre,
+        registradaPor: usuario.nombre,
       });
 
       // Limpiamos todos los campos para que el formulario quede listo
