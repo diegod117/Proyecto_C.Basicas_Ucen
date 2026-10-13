@@ -11,6 +11,7 @@ Cubre **todo** lo que está en `main` para la segunda presentación: React Route
 3. Prueba cada cosa en el navegador. Cambiar algo y ver qué pasa es la mejor forma de aprender.
 4. Al final de cada paso hay preguntas para revisar si entendiste.
 5. ¿Poco tiempo? Lee primero el **[paso 14](#paso-14--la-rúbrica-la-demo-y-las-preguntas)**: dice dónde está cada cosa que pide la rúbrica y qué te pueden preguntar.
+6. ¿Quieres estudiar **solo los 5 pedidos del profesor**, con más código y recetas para cambiarlos? Lee **[guia-pedidos-profesor.md](guia-pedidos-profesor.md)**.
 
 | Paso | Tema |
 |---|---|

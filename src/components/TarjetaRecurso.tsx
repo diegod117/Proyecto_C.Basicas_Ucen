@@ -62,7 +62,7 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
   // Gramática: "1 disponible" pero "12 disponibles".
   let textoDisponibles = 'disponibles';
   if (cantidadDisponible === 1) {
-    textoDisponibles = 'disponible';
+    textoDisponibles = 'Hola';
   }
 
   return (
