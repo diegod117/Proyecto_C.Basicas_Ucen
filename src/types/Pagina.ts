@@ -8,8 +8,10 @@
 // En la guía: paso 2 (tipo unión) y paso 9 (cómo agregar una página nueva).
 // Cubre: navegación base y HU-05 (la página de alertas)
 
-// Pagina solo puede ser uno de estos cuatro textos. Si mañana quisieras
+// Pagina solo puede ser uno de estos cinco textos. Si mañana quisieras
 // una pantalla nueva (ej: 'reportes'), el PRIMER paso es agregarla aquí.
 // Al hacerlo, TypeScript te va a ir mostrando en rojo los lugares
 // que todavía no saben qué hacer con ella. ¡Es como una lista de tareas gratis!
-export type Pagina = 'inventario' | 'reservas' | 'incidencias' | 'alertas';
+// (Ver guía, paso 13: cómo se agregó 'configuracion'.)
+// Cubre: HU-05 (la página de alertas) y RNF-05 (la de configuración)
+export type Pagina = 'inventario' | 'reservas' | 'incidencias' | 'alertas' | 'configuracion';

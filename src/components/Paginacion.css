@@ -1,0 +1,67 @@
+/* Paginacion.css
+   ¿QUÉ ES ESTE ARCHIVO?
+   Los estilos de la fila de botones de páginas del inventario
+   ("← Anterior  1  2  Siguiente →").
+   Todos los colores vienen de las variables de global.css (var(--...)),
+   así si cambia el azul de la app, estos botones cambian solos.
+   En la guía: paso 7 (CSS) y paso 11 (paginación). */
+
+/* La fila de botones, centrada.
+   flex-wrap: wrap = si no caben en una línea (celular), los que sobran
+   bajan a la línea siguiente, como las palabras de un párrafo. */
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* centrados de izquierda a derecha */
+  align-items: center;
+  gap: var(--espacio-xs); /* espacio entre botón y botón */
+  margin: var(--espacio-lg) 0 var(--espacio-md);
+}
+
+/* Cada botón: blanco con letras azules y un borde gris. */
+.paginacion-boton {
+  min-width: 40px; /* nunca más angosto que 40px (para que el "1" no quede flaquito) */
+  padding: var(--espacio-sm) 12px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-principal);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  cursor: pointer; /* la manito al pasar el mouse */
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Con el mouse encima: azul clarito.
+   :not(:disabled) = "solo si NO está apagado" (un botón apagado no reacciona). */
+.paginacion-boton:hover:not(:disabled) {
+  background-color: var(--color-principal-claro);
+  border-color: var(--color-principal);
+}
+
+/* Botón apagado ("Anterior" en la primera página y "Siguiente" en la
+   última): gris, medio transparente y con el cursor de "prohibido". */
+.paginacion-boton:disabled {
+  color: var(--color-texto-secundario);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* El botón de la página que se está viendo: relleno azul con letras blancas.
+   La coma = "esta regla es para los dos selectores", así el azul no
+   cambia cuando le pasas el mouse encima. */
+.paginacion-actual,
+.paginacion-actual:hover:not(:disabled) {
+  color: var(--color-blanco);
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+/* En el celular: botones de al menos 44px de alto, el tamaño mínimo
+   para tocarlos cómodo con el dedo. */
+@media (max-width: 768px) {
+  .paginacion-boton {
+    min-height: 44px;
+  }
+}

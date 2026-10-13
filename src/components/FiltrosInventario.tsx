@@ -5,12 +5,9 @@
 // En la guía: paso 4 (formularios controlados) y paso 3 (props con funciones).
 // Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-08
 
-import {
-  listaCategoriasRecurso,
-  listaEstadosRecurso,
-  textoCategoria,
-  textoEstado,
-} from '../utils/inventario';
+import { listaEstadosRecurso, textoEstado } from '../utils/inventario';
+// Las categorías ahora se piden al servicio de configuración (Firestore).
+import { obtenerCategorias } from '../services/configuracionService';
 import { SIN_FILTRO } from '../utils/filtrosInventario';
 import './FiltrosInventario.css';
 
@@ -70,11 +67,15 @@ function FiltrosInventario(props: PropsFiltrosInventario) {
           {/* La primera opción: "Todas" = sin filtro. */}
           <option value={SIN_FILTRO}>Todas</option>
           {/* Una <option> por cada categoría, fabricadas con .map().
-              value = lo que se guarda por dentro ('instalacion').
-              El texto entre las etiquetas = lo que ve la persona ("Instalación"). */}
-          {listaCategoriasRecurso.map((categoria) => (
-            <option key={categoria} value={categoria}>
-              {textoCategoria(categoria)}
+              Las categorías ya no están escritas a mano: las pedimos a
+              obtenerCategorias() (configuracionService), así una categoría
+              nueva creada en "Configuración" aparece aquí sola.
+              Cada categoría es un objeto { clave, nombre, usaStockMinimo }:
+              value = la clave que se guarda por dentro ('instalacion').
+              El texto entre las etiquetas = el nombre que ve la persona ("Instalación"). */}
+          {obtenerCategorias().map((categoria) => (
+            <option key={categoria.clave} value={categoria.clave}>
+              {categoria.nombre}
             </option>
           ))}
         </select>

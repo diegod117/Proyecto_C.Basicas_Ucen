@@ -71,6 +71,24 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // CONFIGURACIÓN (RF-08, RF-10, RNF-05): categorías, torres y salas que
+    // el encargado agrega desde la página "Configuración".
+    // Solo se agregan: no se modifican ni se borran, porque un recurso o
+    // una reserva podría estar usándolas. Si alguien intenta agregar una
+    // que ya existe (mismo nombre de documento), sería un "update" y se rechaza.
+    match /categorias/{id} {
+      allow read, create: if conSesion();
+      allow update, delete: if false;
+    }
+    match /torres/{id} {
+      allow read, create: if conSesion();
+      allow update, delete: if false;
+    }
+    match /salas/{id} {
+      allow read, create: if conSesion();
+      allow update, delete: if false;
+    }
+
     // Cualquier otra colección que no esté arriba queda bloqueada,
     // porque Firestore rechaza todo lo que no se permite explícitamente.
   }

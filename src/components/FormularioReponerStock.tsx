@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Recurso } from '../types/Recurso';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { reponerStock } from '../services/recursosService';
 import { validarReposicion, textoResumenReposicion } from '../utils/reposicion';
 import './FormularioReponerStock.css';
@@ -22,14 +22,16 @@ interface PropsFormularioReponerStock {
   // Se llama después de guardar, para que App redibuje todo
   // (así la alerta de reposición desaparece si ya hay suficientes).
   onStockRepuesto: () => void;
-  // La persona conectada: su nombre queda en el historial.
-  usuario: Usuario;
 }
 
 // Componente FormularioReponerStock
-// Recibe: el recurso, la función para avisar y la persona conectada.
+// Recibe: el recurso y la función para avisar que se guardó.
+// ¿Y la persona conectada? La sacamos con useUsuario() (guía, paso 6).
+// Su nombre queda en el historial.
 // Devuelve: el formulario "Reponer stock".
 function FormularioReponerStock(props: PropsFormularioReponerStock) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   const recurso = props.recurso;
 
   // La memoria del formulario: una por cajita, más los mensajes.
@@ -57,7 +59,7 @@ function FormularioReponerStock(props: PropsFormularioReponerStock) {
     // 2. Guardar (y esperar a Firestore).
     const cantidad = Number(cantidadTexto);
     setGuardando(true);
-    const seGuardo = await reponerStock(recurso.id, cantidad, motivo, props.usuario.nombre);
+    const seGuardo = await reponerStock(recurso.id, cantidad, motivo, usuario.nombre);
     setGuardando(false);
 
     // 3. Contar cómo nos fue.

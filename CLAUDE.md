@@ -10,8 +10,9 @@ Los requerimientos completos (RF, RNF e historias de usuario) están en `docs/re
 **Lee ese archivo antes de empezar cualquier tarea** y respeta los IDs (RF-01, HU-03, etc.).
 
 Stack: **React + TypeScript con Vite**.
-El backend todavía no está definido: mientras tanto se usan datos de prueba en `src/data/`.
-No agregues un backend, base de datos ni librerías nuevas sin preguntar primero.
+Los datos se guardan en **Firebase** (Authentication + Firestore); `src/data/` solo tiene los datos de prueba que se suben la primera vez.
+La navegación usa **React Router** (`react-router-dom`), porque lo exige la rúbrica de la EVA1.
+No agregues otro backend, base de datos ni librerías nuevas sin preguntar primero.
 
 ---
 
@@ -22,8 +23,9 @@ El código tiene que verse como lo escribiría un estudiante que está aprendien
 
 - Escribe código **simple y fácil de leer**, aunque sea un poco más largo.
 - Usa solo lo básico de React: componentes de función, `useState`, `useEffect`, props y eventos (`onClick`, `onChange`).
+- La rúbrica de la EVA1 pide además React Router y `useContext`: el usuario conectado se comparte con `ContextoUsuario` y el hook personalizado `useUsuario()` (`src/context/`). Usa `useContext` solo para eso, no para reemplazar las props de siempre.
 - Usa TypeScript de forma básica: `interface` o `type` para los datos, tipos en props y en funciones. Nada de genéricos complicados, tipos utilitarios avanzados ni `any`.
-- **No uses** (salvo que te lo pidamos): Redux, Zustand, React Query, `useReducer`, `useContext`, `useMemo`, `useCallback`, custom hooks complejos, HOCs, patrones de diseño avanzados ni librerías de UI.
+- **No uses** (salvo que te lo pidamos): Redux, Zustand, React Query, `useReducer`, `useMemo`, `useCallback`, custom hooks complejos, HOCs, patrones de diseño avanzados ni librerías de UI.
 - Prefiere `if/else` y bucles claros antes que one-liners, operadores ternarios anidados o cadenas largas de `.map().filter().reduce()`.
 - Nombres de variables, funciones y componentes **en español** y descriptivos (`listaRecursos`, `cambiarEstado`, `FormularioReserva`).
 - Un componente por archivo. Si un archivo pasa de ~150 líneas, divídelo.
@@ -68,6 +70,8 @@ inventario-cs-basicas/
     ├── components/            # Componentes reutilizables (Boton, TablaRecursos...)
     ├── pages/                 # Pantallas completas (Inventario, Reservas, Incidencias...)
     ├── services/              # Funciones que leen/guardan datos
+    ├── context/               # Contexto del usuario conectado (useContext + useUsuario)
+    ├── hooks/                 # Hooks personalizados (ej: useFiltrosInventario)
     ├── utils/                 # Funciones de ayuda (formatear fechas, calcular disponibilidad...)
     └── styles/                # Estilos globales
 ```

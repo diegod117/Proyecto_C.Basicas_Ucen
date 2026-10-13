@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import { obtenerRecursos } from '../services/recursosService';
 import { agregarIncidencia } from '../services/incidenciasService';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import './FormularioIncidencia.css';
 
 // Las props que le pasa PaginaIncidencias.
@@ -21,14 +21,16 @@ interface PropsFormularioIncidencia {
   // Se llama cuando la incidencia se guardó bien, para que la página
   // muestre el mensaje verde y actualice la tabla.
   onIncidenciaRegistrada: () => void;
-  // La persona conectada: su nombre queda como "registrada por" (HU-10).
-  usuario: Usuario;
 }
 
 // Componente FormularioIncidencia
-// Recibe: la función de "listo" y la persona conectada.
+// Recibe: la función de "listo" (onIncidenciaRegistrada).
+// ¿Y la persona conectada? La sacamos con useUsuario() (guía, paso 6).
+// Su nombre queda como "registrada por" (HU-10).
 // Devuelve: el formulario de la incidencia.
 function FormularioIncidencia(props: PropsFormularioIncidencia) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   // Los recursos, para las opciones del menú "Recurso afectado".
   const recursos = obtenerRecursos();
 
@@ -78,6 +80,13 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       setMensajeError('Debe escribir una descripción de lo ocurrido.');
       return;
     }
+    // Si marcaron "hubo personas afectadas", el detalle es OBLIGATORIO:
+    // si no, quedaría anotado que alguien se lastimó, pero no cómo (RF-05).
+    // && = "y": las DOS cosas tienen que ser verdad para mostrar el error.
+    if (hayPersonasAfectadas && detalleAfectacion.trim() === '') {
+      setMensajeError('Debe describir cómo fueron afectadas las personas.');
+      return;
+    }
 
     // Todo bien: borramos el error y prendemos "guardando".
     setMensajeError('');
@@ -95,8 +104,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         hayPersonasAfectadas,
         // Ternario: si está marcado, mandamos el detalle; si no, undefined (nada).
         detalleAfectacion: hayPersonasAfectadas ? detalleAfectacion.trim() : undefined,
-        // El nombre de quien está conectado.
-        registradaPor: props.usuario.nombre,
+        // El nombre de quien está conectado (lo dio useUsuario, arriba).
+        registradaPor: usuario.nombre,
       });
 
       // Dejamos todas las cajitas vacías para la próxima incidencia.

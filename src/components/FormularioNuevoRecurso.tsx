@@ -13,9 +13,9 @@
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { DatosNuevoRecurso, CategoriaRecurso } from '../types/Recurso';
-import type { Usuario } from '../types/Usuario';
-import { listaCategoriasRecurso, textoCategoria } from '../utils/inventario';
+import type { DatosNuevoRecurso } from '../types/Recurso';
+import { useUsuario } from '../context/ContextoUsuario';
+import { obtenerCategorias } from '../services/configuracionService';
 import { datosVaciosNuevoRecurso, usaStockMinimo, validarNuevoRecurso } from '../utils/nuevoRecurso';
 import { agregarRecurso, obtenerRecursos } from '../services/recursosService';
 import CamposUbicacionRecurso from './CamposUbicacionRecurso';
@@ -24,8 +24,6 @@ import './FormularioNuevoRecurso.css';
 
 // Las props que le pasa PaginaInventario.
 interface PropsFormularioNuevoRecurso {
-  // La persona conectada: su nombre queda en la línea de "alta" del historial.
-  usuario: Usuario;
   // Se llama después de guardar, con el número del recurso nuevo
   // (la página lo usa para abrir su ficha).
   onGuardado: (idRecurso: number) => void;
@@ -34,9 +32,13 @@ interface PropsFormularioNuevoRecurso {
 }
 
 // Componente FormularioNuevoRecurso
-// Recibe: la persona, la función de "listo" y la de "cancelar".
+// Recibe: la función de "listo" y la de "cancelar".
+// ¿Y la persona conectada? La sacamos con useUsuario() (guía, paso 6).
+// Su nombre queda en la línea de "alta" del historial.
 // Devuelve: el formulario completo.
 function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   // UN SOLO useState para TODAS las cajitas: un objeto con 12 datos
   // (ver DatosNuevoRecurso en types/Recurso.ts). Es como una mochila con
   // 12 bolsillos, en vez de 12 mochilas separadas.
@@ -76,7 +78,7 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
     // 2. Guardar y esperar a Firestore.
     setMensajeError('');
     setGuardando(true);
-    const recursoNuevo = await agregarRecurso(datos, props.usuario.nombre);
+    const recursoNuevo = await agregarRecurso(datos, usuario.nombre);
     setGuardando(false);
 
     // 3. ¿Cómo nos fue? agregarRecurso devuelve null si falló.
@@ -119,14 +121,17 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
             <select
               value={datos.categoria}
               onChange={(evento) =>
-                cambiarDatos({ ...datos, categoria: evento.target.value as CategoriaRecurso })
+                cambiarDatos({ ...datos, categoria: evento.target.value })
               }
             >
               {/* value="" = todavía no se elige nada. */}
               <option value="">Elige una categoría</option>
-              {listaCategoriasRecurso.map((categoria) => (
-                <option key={categoria} value={categoria}>
-                  {textoCategoria(categoria)}
+              {/* Las categorías vienen de Firestore (obtenerCategorias):
+                  así aparecen también las que el encargado agregó en
+                  "Configuración", sin tocar este archivo. */}
+              {obtenerCategorias().map((categoria) => (
+                <option key={categoria.clave} value={categoria.clave}>
+                  {categoria.nombre}
                 </option>
               ))}
             </select>

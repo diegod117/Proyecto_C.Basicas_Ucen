@@ -24,6 +24,15 @@ import type { Pagina } from '../types/Pagina';
 // Inventario y Reservas las ven todos. Incidencias y Alertas NO las ve el
 // docente, porque son tareas del encargado y del departamento (RF-04, RF-05).
 export function puedeVerPagina(rol: RolUsuario, pagina: Pagina): boolean {
+  // Configuración (agregar categorías, torres y salas) es SOLO del encargado.
+  // Es la llave de la bodega: no se le pasa a cualquiera.
+  if (pagina === 'configuracion') {
+    if (rol === 'encargado') {
+      return true;
+    } else {
+      return false;
+    }
+  }
   // || se lee "o": "si la página es incidencias O alertas..."
   if (pagina === 'incidencias' || pagina === 'alertas') {
     if (rol === 'docente') {

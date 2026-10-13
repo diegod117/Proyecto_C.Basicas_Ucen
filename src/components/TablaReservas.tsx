@@ -1,58 +1,91 @@
 // TablaReservas.tsx
 // ¿QUÉ ES ESTE ARCHIVO?
-// La tabla con las RESERVAS, ordenadas por fecha y hora (la más próxima arriba).
-// Cada fila tiene un botón "Cancelar" (si tienes permiso).
+// La tabla con las RESERVAS, ordenadas por fecha y hora.
+// Se usa DOS VECES en la página de reservas (pedido del profesor). La prop
+// "modo" le dice cuál de las dos ser:
+//   - 'activas':   las reservas programadas y en curso (se pueden cancelar)
+//   - 'historial': las reservas ya realizadas (solo se miran)
+// Una reserva se cambia SOLA de la tabla 'activas' a 'historial' cuando
+// termina su hora: nadie la mueve a mano (ver utils/estadoReserva.ts y
+// guía, paso 12). Cada fila se dibuja con FilaReserva.tsx.
 //   - Encargado: ve todas y cancela cualquiera.
 //   - Docente: ve solo las suyas ("Mis reservas") y cancela las suyas.
 //   - Departamento: ve todas, pero no puede cancelar.
-// En la guía: paso 3 (tablas y .map) y paso 8 (reservas).
+// En la guía: paso 3 (tablas y .map), paso 8 (reservas) y paso 12.
 // Cubre: RF-03 (listado, ordenamiento y cancelación de reservas) y RNF-03
 
 import { useState } from 'react';
 import { obtenerReservasVisibles, cancelarReserva } from '../services/reservasService';
-import { obtenerRecursoPorId } from '../services/recursosService';
-import type { Usuario } from '../types/Usuario';
+import type { Reserva } from '../types/Reserva';
+import { obtenerEstadoReserva } from '../utils/estadoReserva';
+import FilaReserva from './FilaReserva';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeCancelarReserva, puedeVerTodasLasReservas } from '../utils/permisos';
 import './TablaReservas.css';
 
 // Las props que le pasa PaginaReservas.
 interface TablaReservasProps {
+  // Qué reservas muestra. Solo puede ser uno de estos dos textos
+  // (un "tipo unión", ver guía, paso 2).
+  modo: 'activas' | 'historial';
   // Un número que el papá sube cuando las reservas cambian, para que la
   // tabla se vuelva a dibujar. Opcional ("?").
   version?: number;
   // Una función opcional para avisarle al papá que se canceló una reserva.
   onReservaModificada?: () => void;
-  // La persona conectada: decide qué reservas se ven y cuáles se pueden cancelar.
-  usuario: Usuario;
 }
 
 // Componente TablaReservas
 // OJO, aquí las props se reciben de OTRA forma:
-//   function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasProps)
+//   function TablaReservas({ modo, version, onReservaModificada }: TablaReservasProps)
 // Las llaves { } "desarman" el objeto props y sacan cada dato a su propia
-// variable. Así se escribe "usuario" en vez de "props.usuario".
+// variable. Así se escribe "modo" en vez de "props.modo".
 // Es lo mismo que recibir props, solo que más corto. (Se llama "desestructurar".)
+// ¿Y la persona conectada? La sacamos con useUsuario() (guía, paso 6): decide
+// qué reservas se ven y cuáles se pueden cancelar (RNF-03).
 // Devuelve: la tabla de reservas, o un mensaje si no hay ninguna.
-function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasProps) {
+function TablaReservas({ modo, version, onReservaModificada }: TablaReservasProps) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   // Un contador propio, para redibujar la tabla apenas se cancela una reserva.
   const [actualizacionInterna, setActualizacionInterna] = useState(0);
 
-  // Una COPIA de las reservas que esta persona puede ver ([...lista] = copia).
-  // Copiamos porque más abajo las ordenamos, y sort() cambia la lista que
-  // ordena: así no desordenamos la lista original del servicio.
-  const reservas = [...obtenerReservasVisibles(usuario)];
-
-  // Los textos cambian según el rol.
-  let titulo = 'Reservas programadas';
-  let textoSinReservas = 'No hay reservas registradas en este momento.';
-  if (!puedeVerTodasLasReservas(usuario.rol)) {
-    titulo = 'Mis reservas';
-    textoSinReservas = 'No tienes reservas registradas.';
+  // ¿Qué reservas van en ESTA tabla?
+  // Partimos con una lista vacía y metemos (push) solo las que tocan.
+  // Es una lista NUEVA: así, cuando la ordenemos más abajo, no
+  // desordenamos la lista original del servicio.
+  // "Reserva[]" = una lista de reservas (le decimos el tipo porque parte vacía
+  // y TypeScript no podría adivinar qué va a tener).
+  const reservas: Reserva[] = [];
+  for (const reserva of obtenerReservasVisibles(usuario)) {
+    // ¿Ya terminó? Le preguntamos al reloj (estadoReserva.ts).
+    const realizada = obtenerEstadoReserva(reserva) === 'realizada';
+    // Se lee: "si soy el historial y está realizada, O si soy la de
+    // activas y NO está realizada, entonces va en mi tabla".
+    if ((modo === 'historial' && realizada) || (modo === 'activas' && !realizada)) {
+      reservas.push(reserva);
+    }
   }
 
-  // La columna "Acción" solo existe si el rol puede cancelar al menos SUS
-  // reservas (encargado y docente). El departamento no la ve.
-  const mostrarAcciones = puedeCancelarReserva(usuario.rol, true);
+  // Los títulos cambian según el modo y el rol (el docente ve solo las suyas).
+  // Partimos con los de "activas" y los vamos cambiando con if.
+  const veTodas = puedeVerTodasLasReservas(usuario.rol);
+  let titulo = 'Próximas reservas y en curso';
+  let textoSinReservas = 'No hay reservas próximas.';
+  if (modo === 'historial') {
+    titulo = 'Historial de reservas (realizadas)';
+    textoSinReservas = 'Todavía no hay reservas realizadas.';
+  }
+  if (!veTodas && modo === 'activas') {
+    titulo = 'Mis próximas reservas y en curso';
+  } else if (!veTodas && modo === 'historial') {
+    titulo = 'Mi historial de reservas (realizadas)';
+  }
+
+  // La columna "Acción" (el botón Cancelar) solo existe en la tabla de
+  // activas, y si el rol puede cancelar al menos SUS reservas (encargado y
+  // docente). Una reserva realizada ya pasó: no tiene sentido cancelarla.
+  const mostrarAcciones = modo === 'activas' && puedeCancelarReserva(usuario.rol, true);
 
   // Ordenamos por fecha y, si es el mismo día, por hora de inicio.
   // sort compara dos reservas (a y b):
@@ -75,9 +108,17 @@ function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasP
     return 0;
   });
 
+  // En el historial conviene ver lo MÁS RECIENTE arriba, así que damos
+  // vuelta la lista (reverse = de atrás para adelante).
+  if (modo === 'historial') {
+    reservas.reverse();
+  }
+
   // manejarCancelar
   // Recibe: el número de la reserva y algunos datos para la pregunta.
   // No devuelve nada. Pregunta "¿estás seguro?" y, si dicen que sí, la cancela.
+  // Se la pasamos a cada FilaReserva por props: el botón está en la fila,
+  // pero la acción vive aquí.
   async function manejarCancelar(id: number, nombreRecurso: string, fecha: string, horario: string) {
     // Un template string (comillas invertidas): ${...} mete variables en el texto.
     // \n = salto de línea dentro del texto.
@@ -108,7 +149,7 @@ function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasP
 
   return (
     // key: cuando cambia "version" o "actualizacionInterna", la key cambia y
-    // React vuelve a crear la tabla desde cero (el mismo truco que en App.tsx).
+    // React vuelve a crear la tabla desde cero (el truco de la "camiseta").
     <div className="tabla-reservas-contenedor" key={`${version}-${actualizacionInterna}`}>
       <h3>{titulo}</h3>
 
@@ -129,58 +170,27 @@ function TablaReservas({ version, onReservaModificada, usuario }: TablaReservasP
                 <th>Cant.</th>
                 <th>Asignatura</th>
                 <th>Sala</th>
+                <th>Estado</th>
                 {mostrarAcciones && <th>Acción</th>}
               </tr>
             </thead>
             <tbody>
               {/* Una fila por cada reserva. Aquí .map usa una función normal
-                  (function) en vez de una flecha; hacen lo mismo. Como hay
-                  cálculos antes de dibujar la fila, la función tiene llaves { }
-                  y un return. */}
+                  (function) en vez de una flecha; hacen lo mismo.
+                  Cada fila es un componente FilaReserva (un archivo aparte,
+                  para que este no quede tan largo). Le pasamos por props
+                  todo lo que necesita para dibujarse. */}
               {reservas.map(function (reserva) {
-                // Buscamos el recurso para mostrar su nombre (la reserva solo guarda su número).
-                const recurso = obtenerRecursoPorId(reserva.recursoId);
-                // Ternario: si encontramos el recurso, "Nombre (código)";
-                // si no, "Recurso #5".
-                const nombreRecurso = recurso
-                  ? `${recurso.nombre} (${recurso.ubicacion.codigo})`
-                  : `Recurso #${reserva.recursoId}`;
-                const horarioTexto = `${reserva.horaInicio} - ${reserva.horaFin}`;
-
                 // ¿Esta reserva es de la persona conectada? (RNF-03)
                 const esReservaPropia = reserva.docente === usuario.nombre;
-                const sePuedeCancelar = puedeCancelarReserva(usuario.rol, esReservaPropia);
-
                 return (
-                  <tr key={reserva.id}>
-                    <td>
-                      <strong>{nombreRecurso}</strong>
-                    </td>
-                    <td>{reserva.docente}</td>
-                    <td>{reserva.fecha}</td>
-                    <td>{horarioTexto}</td>
-                    <td>{reserva.cantidad}</td>
-                    <td>{reserva.asignatura}</td>
-                    <td>{reserva.sala}</td>
-                    {mostrarAcciones && (
-                      <td>
-                        {/* El botón solo aparece si ESTA reserva se puede cancelar.
-                            Si no, se ve una rayita "—". */}
-                        {sePuedeCancelar && (
-                          <button
-                            type="button"
-                            className="boton-cancelar-reserva"
-                            onClick={function () {
-                              manejarCancelar(reserva.id, nombreRecurso, reserva.fecha, horarioTexto);
-                            }}
-                          >
-                            Cancelar
-                          </button>
-                        )}
-                        {!sePuedeCancelar && <span>—</span>}
-                      </td>
-                    )}
-                  </tr>
+                  <FilaReserva
+                    key={reserva.id}
+                    reserva={reserva}
+                    mostrarAcciones={mostrarAcciones}
+                    sePuedeCancelar={puedeCancelarReserva(usuario.rol, esReservaPropia)}
+                    onCancelar={manejarCancelar}
+                  />
                 );
               })}
             </tbody>

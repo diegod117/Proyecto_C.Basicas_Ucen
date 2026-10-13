@@ -13,19 +13,18 @@
 import { useState } from 'react';
 import FormularioIncidencia from '../components/FormularioIncidencia';
 import TablaIncidencias from '../components/TablaIncidencias';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeGestionarIncidencias } from '../utils/permisos';
 import './PaginaIncidencias.css';
 
-// Las props que le pasa App.
-interface PropsPaginaIncidencias {
-  // La persona conectada: decide si se ve el formulario (RNF-03).
-  usuario: Usuario;
-}
-
 // Componente PaginaIncidencias
-// Recibe: la persona conectada. Devuelve: la página completa.
-function PaginaIncidencias(props: PropsPaginaIncidencias) {
+// No recibe props: ya no hace falta que App le pase la persona conectada,
+// porque la sacamos con useUsuario() (ver guía, paso 6).
+// Devuelve: la página completa.
+function PaginaIncidencias() {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  // Con su rol decidimos si se ve el formulario (RNF-03).
+  const usuario = useUsuario();
   // ¿Se muestra el mensaje verde? Parte en false (no se ve).
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
@@ -63,13 +62,12 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
 
       {/* El formulario: solo lo ve el encargado (RNF-03).
           Los demás (departamento) ven un aviso en su lugar. */}
-      {puedeGestionarIncidencias(props.usuario.rol) && (
+      {puedeGestionarIncidencias(usuario.rol) && (
         <FormularioIncidencia
           onIncidenciaRegistrada={alRegistrarIncidencia}
-          usuario={props.usuario}
         />
       )}
-      {!puedeGestionarIncidencias(props.usuario.rol) && (
+      {!puedeGestionarIncidencias(usuario.rol) && (
         <p className="texto-secundario">
           Tu rol solo permite consultar las incidencias. Para registrar una, avisa al
           encargado de laboratorio.
@@ -78,8 +76,9 @@ function PaginaIncidencias(props: PropsPaginaIncidencias) {
 
       {/* La tabla con todas las incidencias (HU-10).
           key={contador}: cada vez que se registra una, la tabla se crea de nuevo
-          y muestra la incidencia recién agregada. */}
-      <TablaIncidencias key={contador} usuario={props.usuario} />
+          y muestra la incidencia recién agregada.
+          Fíjate que ya no le pasamos "usuario": la tabla lo saca sola con useUsuario(). */}
+      <TablaIncidencias key={contador} />
     </section>
   );
 }

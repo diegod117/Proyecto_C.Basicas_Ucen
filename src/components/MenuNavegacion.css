@@ -147,6 +147,10 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
+  /* Desde que usamos React Router, los botones del menú son ENLACES
+     (<a>, los dibuja NavLink). Los enlaces vienen subrayados de fábrica,
+     como en Wikipedia; con "none" les quitamos esa rayita de abajo. */
+  text-decoration: none;
   transition: background-color 0.15s ease, border-color 0.15s ease,
               color 0.15s ease;
 }

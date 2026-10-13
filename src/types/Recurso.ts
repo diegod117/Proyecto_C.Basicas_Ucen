@@ -18,18 +18,15 @@
 // ------------------------------------------------------------------
 // ¿Qué clase de recurso es? (RF-08)
 // ------------------------------------------------------------------
-// Un tipo unión: la categoría solo puede ser UNO de estos textos.
-// Las rayitas "|" se leen "o". Se pueden escribir una por línea, como aquí,
-// para que se lean más fácil cuando son muchas.
-// ¿Quieres una categoría nueva? Agrégala aquí (RNF-05) y después dale
-// su nombre bonito en utils/inventario.ts (ver guía, paso 9).
-export type CategoriaRecurso =
-  | 'instrumento'
-  | 'insumo'
-  | 'equipo'
-  | 'reactivo'
-  | 'mobiliario'
-  | 'instalacion';
+// La categoría del recurso (instrumento, insumo...).
+// ANTES era una lista fija de 6 textos escrita aquí (un "tipo unión").
+// AHORA las categorías viven en Firestore, y el encargado puede agregar
+// nuevas desde la página "Configuración" (RNF-05, escalabilidad).
+// Como TypeScript no puede saber de antemano qué categorías va a inventar
+// el encargado, la categoría pasa a ser un texto cualquiera (string):
+// la CLAVE de una categoría (ej: 'instrumento'). La lista de verdad está
+// en services/configuracionService.ts. Ver guía, paso 13.
+export type CategoriaRecurso = string;
 
 // ------------------------------------------------------------------
 // ¿Cómo está cada unidad? (RF-01)
@@ -50,8 +47,11 @@ export type EstadoRecurso =
 // ------------------------------------------------------------------
 // ¿En qué edificio está?
 // ------------------------------------------------------------------
-// Los laboratorios están en la torre B o en la torre C. Solo esas dos.
-export type Torre = 'B' | 'C';
+// La torre del edificio (una letra). Los laboratorios partieron en las
+// torres B y C (sección 1.1 de los requerimientos), pero ahora el encargado
+// puede agregar torres nuevas en "Configuración". Por eso ya no es 'B' | 'C'
+// sino un texto cualquiera (string), igual que la categoría.
+export type Torre = string;
 
 // ------------------------------------------------------------------
 // ¿Dónde está guardado exactamente? (RF-10, HU-11)
@@ -61,7 +61,7 @@ export type Torre = 'B' | 'C';
 // Ejemplo: torre "B" + sala "307" = laboratorio B307.
 // Se guardan separados para poder filtrar por torre o por sala.
 export interface Ubicacion {
-  torre: Torre; // "B" o "C"
+  torre: Torre; // una letra, ej: "B"
   sala: string; // ej: "307"
   bodega: string; // ej: "Bodega 1"
   mueble: string; // ej: "Mueble 2"

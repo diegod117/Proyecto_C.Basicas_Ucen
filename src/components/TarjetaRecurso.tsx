@@ -16,6 +16,7 @@ import {
   calcularCantidadTotal,
   obtenerEstadosConUnidades,
 } from '../utils/inventario';
+import { calcularUnidadesEnReservaAhora } from '../utils/estadoReserva';
 import './TarjetaRecurso.css';
 
 // Las props de la tarjeta.
@@ -40,7 +41,19 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
   // Los cálculos se hacen ANTES del return, con las herramientas de utils.
   // Así el JSX de abajo queda limpio: solo muestra resultados.
   const cantidadTotal = calcularCantidadTotal(recurso);
-  const cantidadDisponible = recurso.cantidades.disponible;
+  // Las unidades que están en una reserva EN CURSO (la clase está pasando
+  // ahora) no están en el laboratorio: están en la sala del profesor.
+  // Por eso las restamos de las disponibles. Cuando la clase termina,
+  // este número vuelve a 0 y las unidades "vuelven" solas, sin que nadie
+  // toque nada (ver utils/estadoReserva.ts y guía, paso 12).
+  // "let" (y no "const") porque abajo lo podemos cambiar.
+  const enReservaAhora = calcularUnidadesEnReservaAhora(recurso.id);
+  let cantidadDisponible = recurso.cantidades.disponible - enReservaAhora;
+  // Protección: nunca mostrar números negativos (ej: si alguien dañó
+  // unidades que estaban reservadas).
+  if (cantidadDisponible < 0) {
+    cantidadDisponible = 0;
+  }
   const estadosConUnidades = obtenerEstadosConUnidades(recurso);
 
   // El laboratorio escrito bonito, ej: "Torre B · Sala 307".
@@ -67,7 +80,8 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
         <h3 className="tarjeta-nombre">{recurso.nombre}</h3>
         <p className="tarjeta-laboratorio">{textoLaboratorio}</p>
         <p className="tarjeta-cantidad">
-          Cantidad: {cantidadTotal} ({cantidadDisponible} {textoDisponibles})
+          Cantidad: {cantidadTotal} ({cantidadDisponible} {textoDisponibles}
+          {enReservaAhora > 0 && ' · ' + enReservaAhora + ' en reserva ahora'})
         </p>
 
         <div className="tarjeta-etiquetas">

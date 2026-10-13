@@ -9,7 +9,8 @@
 // En la guía: paso 4 (formularios) y paso 9 (agregar un dato nuevo a la ficha).
 // Cubre: RF-01, RF-08 (categoría) y RF-10, HU-11 (ubicación obligatoria)
 
-import type { Recurso, DatosNuevoRecurso, Ubicacion, CategoriaRecurso } from '../types/Recurso';
+import type { Recurso, DatosNuevoRecurso, Ubicacion } from '../types/Recurso';
+import { obtenerCategoriaPorClave } from '../services/configuracionService';
 import { generarCodigoUbicacion, validarUbicacion } from './ubicacion';
 
 // datosVaciosNuevoRecurso
@@ -32,11 +33,18 @@ export const datosVaciosNuevoRecurso: DatosNuevoRecurso = {
 
 // usaStockMinimo
 // Recibe: lo que se lleva escrito en el formulario.
-// Devuelve: true si la categoría elegida es insumo o reactivo (las únicas
-// que se gastan y hay que volver a comprar, HU-09). El formulario solo
-// muestra el campo "Stock mínimo" en ese caso.
+// Devuelve: true si la categoría elegida usa "stock mínimo" (las cosas que
+// se gastan y hay que volver a comprar, como insumos y reactivos, HU-09).
+// El formulario solo muestra el campo "Stock mínimo" en ese caso.
+// Antes estaba escrito a mano ("si es insumo o reactivo"). Ahora CADA
+// categoría trae un sí/no llamado usaStockMinimo (ver types/Configuracion.ts),
+// así una categoría nueva también puede tenerlo.
 export function usaStockMinimo(datos: DatosNuevoRecurso): boolean {
-  if (datos.categoria === 'insumo' || datos.categoria === 'reactivo') {
+  // Buscamos la categoría elegida en la lista de configuración.
+  const categoria = obtenerCategoriaPorClave(datos.categoria);
+  // "Si la encontré Y dice que usa stock mínimo". Primero revisamos que
+  // no sea undefined (= no encontrada), porque si no, no tiene datos que leer.
+  if (categoria !== undefined && categoria.usaStockMinimo) {
     return true;
   } else {
     return false;
@@ -95,6 +103,12 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
     }
   }
 
+  // La sala se elige de un menú (ver CamposUbicacionRecurso). Si quedó en
+  // "Elige la sala" (valor ''), avisamos.
+  if (datos.sala === '') {
+    return 'Elige la sala donde queda el recurso.';
+  }
+
   // La ubicación es obligatoria (HU-11). Reutilizamos la herramienta de
   // ubicacion.ts en vez de escribir las mismas revisiones otra vez.
   // Si hay problemas, mostramos el primero ([0]).
@@ -137,10 +151,9 @@ export function armarRecurso(datos: DatosNuevoRecurso, id: number): Recurso {
   const recurso: Recurso = {
     id: id,
     nombre: datos.nombre.trim(),
-    // "as CategoriaRecurso": TypeScript cree que todavía podría ser '' (vacío),
-    // pero validarNuevoRecurso ya revisó que no lo es. Con "as" le decimos
-    // "tranquilo, aquí ya es una categoría de verdad".
-    categoria: datos.categoria as CategoriaRecurso,
+    // Aquí ya sabemos que la categoría no está vacía:
+    // validarNuevoRecurso lo revisó antes de llegar aquí.
+    categoria: datos.categoria,
     ubicacion: armarUbicacion(datos),
     cantidades: {
       // Number('3') convierte el texto '3' en el número 3.

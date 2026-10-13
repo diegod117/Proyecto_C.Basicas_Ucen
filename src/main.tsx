@@ -12,6 +12,9 @@
 // Las llaves { } = de todo lo que tiene 'react', solo queremos StrictMode.
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// BrowserRouter viene de la librería React Router (react-router-dom).
+// Es la que hace que cada página tenga su propia dirección (URL). Ver guía, paso 10.
+import { BrowserRouter } from 'react-router-dom';
 // Importar un .css así lo aplica a TODA la app (colores, letras, etc.).
 import './styles/global.css';
 // Sin llaves = traemos lo que el archivo exporta "por defecto" (export default).
@@ -31,9 +34,15 @@ if (elementoRaiz) {
   // StrictMode es un ayudante de React que solo funciona mientras
   // programamos: revisa el código y avisa en la consola si algo anda raro.
   // No cambia cómo se ve la página.
+  // BrowserRouter (React Router) conecta la app con la URL del navegador:
+  // así cada página tiene su propia dirección (/inventario, /reservas...)
+  // y funcionan los botones "Atrás" y "Adelante". Envuelve a App para que
+  // App y todos sus componentes puedan usar Routes, NavLink y useNavigate.
   createRoot(elementoRaiz).render(
     <StrictMode>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </StrictMode>,
   );
 }

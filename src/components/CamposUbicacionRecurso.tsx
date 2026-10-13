@@ -4,12 +4,16 @@
 // (torre, sala, bodega y mueble). Abajo muestra el código de ubicación que
 // se arma SOLO mientras escribes (ej: "B307-B1-M2"), así nadie tiene que
 // inventarlo ni escribirlo.
+// La torre y la sala ya no se escriben: se ELIGEN de menús. Esas listas
+// vienen de la página "Configuración" (colecciones "torres" y "salas" de
+// Firestore). Si el encargado agrega una torre o sala nueva, aparece aquí sola.
 // Usa los estilos de FormularioNuevoRecurso.css.
 // En la guía: paso 4 (props con la "mochila" de datos).
 // Cubre: RF-10, HU-11 (ubicación obligatoria con código)
 
-import type { DatosNuevoRecurso, Torre } from '../types/Recurso';
+import type { DatosNuevoRecurso } from '../types/Recurso';
 import { armarUbicacion } from '../utils/nuevoRecurso';
+import { obtenerTorres, obtenerSalasDeTorre } from '../services/configuracionService';
 
 interface PropsCamposUbicacionRecurso {
   // La "mochila" completa del formulario (este componente solo usa los
@@ -28,6 +32,10 @@ interface PropsCamposUbicacionRecurso {
 function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
   const datos = props.datos;
 
+  // Solo las salas de la torre elegida. Si elegiste la torre C, no tiene
+  // sentido ofrecerte la sala B307.
+  const salasDeLaTorre = obtenerSalasDeTorre(datos.torre);
+
   // El código solo se puede armar cuando ya están la sala y la bodega.
   // Mientras tanto mostramos un texto de ayuda.
   let codigo = 'Se genera al completar la ubicación';
@@ -42,26 +50,44 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
       <div className="nuevo-recurso-fila">
         <label className="nuevo-recurso-campo">
           Torre
-          {/* "as Torre": el <select> entrega texto; le aseguramos a TypeScript
-              que es 'B' o 'C' (las únicas opciones que hay). */}
+          {/* Las opciones salen de obtenerTorres() con .map(): una <option>
+              por torre. Al cambiar de torre BORRAMOS la sala elegida
+              (sala: ''), porque las salas de la torre anterior ya no sirven.
+              { ...datos, torre: ..., sala: '' } = copia la mochila entera y
+              cambia esos dos bolsillos. */}
           <select
             value={datos.torre}
-            onChange={(evento) => props.onCambiar({ ...datos, torre: evento.target.value as Torre })}
+            onChange={(evento) => props.onCambiar({ ...datos, torre: evento.target.value, sala: '' })}
           >
-            <option value="B">Torre B</option>
-            <option value="C">Torre C</option>
+            {obtenerTorres().map((torre) => (
+              <option key={torre.letra} value={torre.letra}>
+                Torre {torre.letra}
+              </option>
+            ))}
           </select>
         </label>
         <label className="nuevo-recurso-campo">
           Sala
-          {/* inputMode="numeric" = en el celular aparece el teclado de números. */}
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="Ej: 307"
+          {/* Un menú con las salas de la torre elegida.
+              En "value" va solo el número ('307'), que es lo que se guarda
+              en la ubicación; la torre ya está en su propio bolsillo. */}
+          <select
             value={datos.sala}
             onChange={(evento) => props.onCambiar({ ...datos, sala: evento.target.value })}
-          />
+          >
+            <option value="">Elige una sala</option>
+            {salasDeLaTorre.map((sala) => (
+              <option key={sala.codigo} value={sala.numero}>
+                Sala {sala.numero}
+              </option>
+            ))}
+          </select>
+          {/* Si la torre todavía no tiene salas, le explicamos dónde agregarlas. */}
+          {salasDeLaTorre.length === 0 && (
+            <span className="texto-secundario">
+              Esta torre no tiene salas. Agrégalas en "Configuración".
+            </span>
+          )}
         </label>
       </div>
 

@@ -3,24 +3,32 @@
 // Dibuja las dos partes del menú que siempre se ven:
 //   1. La BARRA AZUL de arriba (header): el título de la app a la izquierda,
 //      y a la derecha TU NOMBRE, TU ROL y el botón "Cerrar sesión".
-//   2. El MENÚ GRIS de la izquierda (sidebar): los botones Inventario,
-//      Reservas, Incidencias y Alertas (solo los que tu rol puede ver).
+//   2. El MENÚ GRIS de la izquierda (sidebar): los enlaces Inventario,
+//      Reservas, Incidencias, Alertas y Configuración (solo los que tu rol
+//      puede ver).
+// Cada opción del menú es un ENLACE de React Router (NavLink) a su dirección
+// (/inventario, /reservas...). Ver guía, paso 10.
 // En celular, el menú gris se convierte en una fila de botones (ver MenuNavegacion.css).
 //
 // *** ¿CÓMO CAMBIO LO QUE DICE ARRIBA A LA DERECHA? (ver guía, paso 9) ***
-//   - El NOMBRE ("Pedro Soto") NO está escrito aquí: viene de props.usuario.nombre,
-//     y ese nombre está en src/data/usuarios.ts. Cámbialo allá.
+//   - El NOMBRE ("Pedro Soto") NO está escrito aquí: viene de usuario.nombre,
+//     que sacamos del parlante con useUsuario(). Ese nombre está en
+//     src/data/usuarios.ts. Cámbialo allá.
 //   - El ROL ("Encargado de laboratorio") SÍ está escrito aquí, en la
 //     función nombreDelRol de más abajo. Cambia el texto entre comillas.
 //   - El TÍTULO ("UCEN — Gestión de Inventario") está aquí, en el <h1>.
 //   - Los COLORES y TAMAÑOS están en MenuNavegacion.css.
 //
-// En la guía: paso 3 (props y JSX).
-// Cubre: navegación base, inicio de sesión con roles (sección 3.4 de requerimientos) y RNF-03.
+// En la guía: paso 3 (props y JSX), paso 6 (useUsuario) y paso 10 (NavLink).
+// Cubre: navegación con React Router, inicio de sesión con roles
+//        (sección 3.4 de requerimientos) y RNF-03.
 
-import type { Pagina } from '../types/Pagina';
-import type { Usuario, RolUsuario } from '../types/Usuario';
+// NavLink = un enlace de React Router que SABE si es la página actual.
+import { NavLink } from 'react-router-dom';
+import type { RolUsuario } from '../types/Usuario';
 import { puedeVerPagina } from '../utils/permisos';
+// useUsuario = nuestro hook para saber quién está conectado (guía, paso 6).
+import { useUsuario } from '../context/ContextoUsuario';
 // Importar el .css de este componente aplica sus estilos.
 import './MenuNavegacion.css';
 
@@ -30,19 +38,16 @@ import './MenuNavegacion.css';
 // no decides qué comprar, usas lo que te dieron en la lista.
 // Esta interface es esa "lista": qué datos llegan y de qué tipo es cada uno.
 // Si App se olvida de pasar uno obligatorio, TypeScript lo marca en rojo.
+//
+// Antes esta lista era más larga (paginaActual, onCambiarPagina, usuario).
+// Ahora:
+//   - la persona conectada la escuchamos del parlante con useUsuario(),
+//   - y qué página se está mirando lo sabe la dirección (URL): los NavLink
+//     se dan cuenta solos.
 interface PropsMenuNavegacion {
-  // La página que se está mirando, para pintar su botón como "elegido".
-  paginaActual: Pagina;
-  // Una FUNCIÓN que viene de App. El menú NO cambia la página él solo:
-  // solo AVISA a App qué botón se apretó, y App decide (porque App es
-  // quien tiene paginaActual en su useState).
-  // "(pagina: Pagina) => void" = una función que recibe una Pagina y no devuelve nada.
-  onCambiarPagina: (pagina: Pagina) => void;
   // Cuántas alertas hay, para el numerito rojo (HU-05).
   // El "?" = opcional: si no llega, no se dibuja el numerito.
   cantidadAlertas?: number;
-  // La persona conectada: de aquí sale el nombre y el rol que se ven arriba.
-  usuario: Usuario;
   // Una FUNCIÓN de App que cierra la sesión. "() => void" = no recibe nada
   // y no devuelve nada.
   onCerrarSesion: () => void;
@@ -65,30 +70,38 @@ function nombreDelRol(rol: RolUsuario): string {
   }
 }
 
+// obtenerClaseEnlace
+// Recibe: un objeto que nos entrega NavLink, con un dato "isActive":
+//   true si la dirección actual es la de ese enlace, false si no.
+// Devuelve: la clase CSS del enlace. Si es la página que se está mirando,
+// le agrega "boton-menu-activo" (el CSS la pinta de azul clarito con una
+// rayita a la izquierda).
+// Ejemplo: en /inventario/3 (la ficha de un recurso) el enlace "Inventario"
+// sigue pintado, porque la dirección EMPIEZA con /inventario.
+// "{ isActive: boolean }" = un objeto con un solo dato, de tipo true/false.
+function obtenerClaseEnlace(estado: { isActive: boolean }): string {
+  if (estado.isActive) {
+    return 'boton-menu boton-menu-activo';
+  } else {
+    return 'boton-menu';
+  }
+}
+
 // Componente MenuNavegacion
-// Recibe: las props de la lista de arriba (paginaActual, onCambiarPagina,
-// cantidadAlertas, usuario y onCerrarSesion).
+// Recibe: las props de la lista de arriba (cantidadAlertas y onCerrarSesion).
 // Devuelve: la barra azul y el menú gris.
 // (El <main> con el contenido de cada página está en App.tsx, no aquí.)
 // "props: PropsMenuNavegacion" = las props llegan todas juntas en un objeto
 // llamado props, y tienen la forma de la interface de arriba.
 function MenuNavegacion(props: PropsMenuNavegacion) {
-  // obtenerClaseBoton
-  // Recibe: una página. Devuelve: la clase CSS que debe tener su botón.
-  // Si es la página que se está mirando, le agrega "boton-menu-activo"
-  // (el CSS la pinta de azul clarito con una rayita a la izquierda).
-  // Una función DENTRO de otra función: puede leer las props del componente.
-  function obtenerClaseBoton(pagina: Pagina): string {
-    if (pagina === props.paginaActual) {
-      return 'boton-menu boton-menu-activo';
-    } else {
-      return 'boton-menu';
-    }
-  }
+  // useUsuario() = "¿quién está conectado?". Lo responde el parlante
+  // (ContextoUsuario) que App pone alrededor de todo. Ver guía, paso 6.
+  // De aquí salen tu nombre y tu rol.
+  const usuario = useUsuario();
 
   // Lo que se dibuja. Esto es JSX: parece HTML, pero vive dentro de TypeScript.
   // Diferencias con HTML: se escribe className (no class), y lo que va
-  // entre llaves { } es código (ej: {props.usuario.nombre} = "escribe aquí
+  // entre llaves { } es código (ej: {usuario.nombre} = "escribe aquí
   // el nombre de la persona").
   return (
     // <> ... </> es un "fragmento": una caja invisible. Un componente tiene
@@ -104,12 +117,12 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
         {/* La parte derecha: tus datos + el botón para salir */}
         <div className="app-header-usuario">
           <div className="app-header-usuario-datos">
-            {/* TU NOMBRE. {props.usuario.nombre} = "el nombre de la persona
-                que me pasó App". Viene de src/data/usuarios.ts. */}
-            <span className="app-header-usuario-nombre">{props.usuario.nombre}</span>
+            {/* TU NOMBRE. {usuario.nombre} = "el nombre de la persona
+                conectada". Viene de src/data/usuarios.ts. */}
+            <span className="app-header-usuario-nombre">{usuario.nombre}</span>
             {/* TU ROL. Llamamos a nombreDelRol (arriba) para traducir
                 'encargado' -> "Encargado de laboratorio". */}
-            <span className="app-header-usuario-rol">{nombreDelRol(props.usuario.rol)}</span>
+            <span className="app-header-usuario-rol">{nombreDelRol(usuario.rol)}</span>
           </div>
           {/* onClick = "cuando hagan clic, ejecuta esta función".
               Le pasamos la función de App DIRECTO (sin paréntesis): si
@@ -123,49 +136,47 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
 
       {/* ── MENÚ GRIS de la izquierda (en celular se vuelve una fila, ver el .css) ── */}
       <nav className="app-sidebar">
-        {/* Cada botón se dibuja SOLO si tu rol puede ver esa página (RNF-03).
+        {/* Cada enlace se dibuja SOLO si tu rol puede ver esa página (RNF-03).
             "condicion && ( ... )" = si la condición es true, dibuja lo de la
             derecha; si es false, no dibuja nada. Es un "si... entonces" cortito.
-            onClick={() => props.onCambiarPagina('inventario')}: aquí SÍ hay que
-            escribir "() =>" (una función flecha), porque necesitamos pasarle un
-            dato ('inventario'). La flecha hace que se ejecute SOLO al hacer clic,
-            y no apenas se dibuja el botón. */}
-        {puedeVerPagina(props.usuario.rol, 'inventario') && (
-          <button
-            className={obtenerClaseBoton('inventario')}
-            onClick={() => props.onCambiarPagina('inventario')}
-          >
+
+            <NavLink to="/reservas"> es un enlace de React Router (paso 10):
+            al hacer clic cambia la dirección a /reservas SIN recargar la
+            página, y el <Routes> de App.tsx dibuja la página nueva.
+            className={obtenerClaseEnlace}: le pasamos una FUNCIÓN (sin
+            paréntesis). NavLink la llama solo, contándole si el enlace
+            está activo, y usa la clase que le devolvemos. */}
+        {puedeVerPagina(usuario.rol, 'inventario') && (
+          <NavLink to="/inventario" className={obtenerClaseEnlace}>
             Inventario
-          </button>
+          </NavLink>
         )}
-        {puedeVerPagina(props.usuario.rol, 'reservas') && (
-          <button
-            className={obtenerClaseBoton('reservas')}
-            onClick={() => props.onCambiarPagina('reservas')}
-          >
+        {puedeVerPagina(usuario.rol, 'reservas') && (
+          <NavLink to="/reservas" className={obtenerClaseEnlace}>
             Reservas
-          </button>
+          </NavLink>
         )}
-        {puedeVerPagina(props.usuario.rol, 'incidencias') && (
-          <button
-            className={obtenerClaseBoton('incidencias')}
-            onClick={() => props.onCambiarPagina('incidencias')}
-          >
+        {puedeVerPagina(usuario.rol, 'incidencias') && (
+          <NavLink to="/incidencias" className={obtenerClaseEnlace}>
             Incidencias
-          </button>
+          </NavLink>
         )}
-        {puedeVerPagina(props.usuario.rol, 'alertas') && (
-          <button
-            className={obtenerClaseBoton('alertas')}
-            onClick={() => props.onCambiarPagina('alertas')}
-          >
+        {puedeVerPagina(usuario.rol, 'alertas') && (
+          <NavLink to="/alertas" className={obtenerClaseEnlace}>
             <span>Alertas</span>
             {/* El numerito rojo: solo si llegó cantidadAlertas (no es undefined)
                 Y es mayor que 0. Con 0 alertas no se dibuja. */}
             {props.cantidadAlertas !== undefined && props.cantidadAlertas > 0 && (
               <span className="badge-alertas-menu">{props.cantidadAlertas}</span>
             )}
-          </button>
+          </NavLink>
+        )}
+        {/* Configuración: solo la ve el encargado (lo dice permisos.ts).
+            Ahí se agregan categorías, torres y salas (guía, paso 13). */}
+        {puedeVerPagina(usuario.rol, 'configuracion') && (
+          <NavLink to="/configuracion" className={obtenerClaseEnlace}>
+            Configuración
+          </NavLink>
         )}
       </nav>
     </>

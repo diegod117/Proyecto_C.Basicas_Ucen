@@ -17,7 +17,8 @@ import {
   textoResumenCambio,
 } from '../utils/cambioEstado';
 import { cambiarEstadoRecurso } from '../services/recursosService';
-import type { Usuario } from '../types/Usuario';
+// useUsuario es NUESTRO hook para saber quién está conectado (guía, paso 6).
+import { useUsuario } from '../context/ContextoUsuario';
 import './FormularioCambioEstado.css';
 
 // Las props que le pasa FichaRecurso.
@@ -26,14 +27,17 @@ interface PropsFormularioCambioEstado {
   // Se llama después de guardar, para avisar hacia arriba que los números
   // cambiaron y hay que volver a dibujar todo.
   onEstadoCambiado: () => void;
-  // La persona conectada: su nombre queda anotado en el historial (HU-06).
-  usuario: Usuario;
 }
 
 // Componente FormularioCambioEstado
-// Recibe: el recurso, la función para avisar y la persona conectada.
+// Recibe: el recurso y la función para avisar que se guardó un cambio.
+// ¿Y la persona conectada? Ya NO llega por props: la sacamos del
+// "parlante" con useUsuario() (ver context/ContextoUsuario.ts y guía, paso 6).
+// Su nombre queda anotado en el historial (HU-06).
 // Devuelve: el formulario "Cambiar estado".
 function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   const recurso = props.recurso;
 
   // ---------------------------------------------------------------
@@ -98,7 +102,7 @@ function FormularioCambioEstado(props: PropsFormularioCambioEstado) {
       estadoNuevo,
       cantidad,
       motivo,
-      props.usuario.nombre,
+      usuario.nombre,
     );
     setGuardando(false);
 

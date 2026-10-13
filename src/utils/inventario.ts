@@ -15,6 +15,7 @@
 // ¿Quieres que en pantalla diga "Roto" en vez de "Dañado"? Se cambia aquí.
 
 import type { Recurso, EstadoRecurso, CategoriaRecurso } from '../types/Recurso';
+import { obtenerCategoriaPorClave } from '../services/configuracionService';
 
 // Los 5 estados en el orden en que se muestran en pantalla.
 // Sirve para recorrerlos todos con un for (por ejemplo, para dibujar las
@@ -26,18 +27,6 @@ export const listaEstadosRecurso: EstadoRecurso[] = [
   'danado',
   'en_mantencion',
   'dado_de_baja',
-];
-
-// Las 6 categorías (RF-08), para las opciones de los menús desplegables.
-// Si agregas una categoría nueva (RNF-05), súmala aquí Y en el tipo
-// CategoriaRecurso (types/Recurso.ts) Y en textoCategoria (más abajo).
-export const listaCategoriasRecurso: CategoriaRecurso[] = [
-  'instrumento',
-  'insumo',
-  'equipo',
-  'reactivo',
-  'mobiliario',
-  'instalacion',
 ];
 
 // textoEstado
@@ -61,23 +50,21 @@ export function textoEstado(estado: EstadoRecurso): string {
 }
 
 // textoCategoria
-// Recibe: una categoría "fea", ej: 'instalacion'.
-// Devuelve: el texto bonito, ej: "Instalación".
+// Recibe: la CLAVE de una categoría, ej: 'instalacion'.
+// Devuelve: su nombre bonito para la pantalla, ej: "Instalación".
+// Antes esto era una escalera de if/else con las 6 categorías escritas a
+// mano. Ahora los nombres viven en Firestore (colección "categorias"), así
+// que solo BUSCAMOS la categoría y devolvemos su nombre. Ventaja: una
+// categoría nueva creada en "Configuración" también se ve bonita, sin
+// tocar el código.
 export function textoCategoria(categoria: CategoriaRecurso): string {
-  if (categoria === 'instrumento') {
-    return 'Instrumento';
-  } else if (categoria === 'insumo') {
-    return 'Insumo';
-  } else if (categoria === 'equipo') {
-    return 'Equipo';
-  } else if (categoria === 'reactivo') {
-    return 'Reactivo';
-  } else if (categoria === 'mobiliario') {
-    return 'Mobiliario';
-  } else {
-    // La única que queda es 'instalacion'.
-    return 'Instalación';
+  const encontrada = obtenerCategoriaPorClave(categoria);
+  // undefined = "no la encontré". No debería pasar, pero por si acaso
+  // mostramos la clave tal cual, en vez de que la app se caiga.
+  if (encontrada === undefined) {
+    return categoria;
   }
+  return encontrada.nombre;
 }
 
 // calcularCantidadTotal

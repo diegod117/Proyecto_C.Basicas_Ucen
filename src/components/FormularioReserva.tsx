@@ -2,9 +2,11 @@
 // ¿QUÉ ES ESTE ARCHIVO?
 // El formulario "Nueva reserva" de la página de Reservas.
 // Un profesor (o el encargado) elige qué recurso quiere, para qué día, a qué
-// hora y cuántas unidades. Mientras llena el formulario, la app le va
-// diciendo cuántas unidades quedan libres a esa hora (HU-07), y si no
-// alcanzan, apaga el botón (HU-08).
+// hora, cuántas unidades y en qué SALA las va a usar. Mientras llena el
+// formulario, la app le va diciendo cuántas unidades quedan libres a esa
+// hora (HU-07), y si no alcanzan, apaga el botón (HU-08).
+// La sala se elige de un menú que muestra SOLO las salas libres en ese
+// horario (pedido del profesor). Ver guía, paso 12.
 // Es un "formulario controlado": cada cajita guarda lo que escribes en un
 // useState (ver guía, paso 4).
 // Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (desactivar botón por falta de stock)
@@ -18,8 +20,12 @@ import {
   validarCamposReserva,
   calcularUnidadesDisponibles,
   validarDisponibilidadReserva,
+  obtenerSalasLibres,
+  salaEstaLibre,
 } from '../utils/disponibilidad';
-import type { Usuario } from '../types/Usuario';
+// obtenerSalas = TODAS las salas que existen (las de "Configuración").
+import { obtenerSalas } from '../services/configuracionService';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeReservarAOtroDocente } from '../utils/permisos';
 import './FormularioReserva.css';
 
@@ -27,15 +33,17 @@ import './FormularioReserva.css';
 interface FormularioReservaProps {
   // Una función opcional ("?") para avisar que se creó una reserva.
   onReservaCreada?: () => void;
-  // La persona conectada: decide qué nombre va en la cajita "Docente" (RNF-03).
-  usuario: Usuario;
 }
 
 // Componente FormularioReserva
 // Las props se reciben "desarmadas" con llaves { } (ver TablaReservas.tsx):
-// así se escribe "usuario" en vez de "props.usuario".
+// así se escribe "onReservaCreada" en vez de "props.onReservaCreada".
+// ¿Y la persona conectada? La sacamos con useUsuario() (guía, paso 6):
+// decide qué nombre va en la cajita "Docente" (RNF-03).
 // Devuelve: el formulario completo.
-function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps) {
+function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
+  // useUsuario() = "¿quién está conectado?" (ver context/ContextoUsuario.ts).
+  const usuario = useUsuario();
   // ---------------------------------------------------------------
   // LA MEMORIA DEL FORMULARIO: un useState por cada cajita.
   // ---------------------------------------------------------------
@@ -88,6 +96,21 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
       horaInicio,
       horaFin
     );
+  }
+
+  // ---------------------------------------------------------------
+  // ¿QUÉ SALAS SE PUEDEN ELEGIR? (pedido del profesor)
+  // ---------------------------------------------------------------
+  // Mientras no esté el horario completo, mostramos TODAS las salas (para
+  // que se vea cuáles existen). Cuando ya hay fecha, hora de inicio y hora
+  // de fin (y el fin es después del inicio), mostramos solo las LIBRES:
+  // las que otro profesor no tiene reservadas a esa hora.
+  // horarioCompleto es un true/false armado con && ("y"): todo tiene que cumplirse.
+  const horarioCompleto = fecha !== '' && horaInicio !== '' && horaFin !== '' && horaFin > horaInicio;
+  // "let" porque abajo la podemos cambiar por la lista de libres.
+  let salasParaElegir = obtenerSalas();
+  if (horarioCompleto) {
+    salasParaElegir = obtenerSalasLibres(fecha, horaInicio, horaFin, docente.trim());
   }
 
   // ---------------------------------------------------------------
@@ -155,6 +178,15 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
       return;
     }
 
+    // 3. ¿La sala sigue libre? La revisamos OTRA VEZ aquí porque alguien
+    //    pudo elegir la sala y DESPUÉS cambiar la hora: la sala elegida
+    //    quizás ya no está libre en el horario nuevo.
+    //    El ! da vuelta la respuesta: "si NO está libre...".
+    if (!salaEstaLibre(sala, fecha, horaInicio, horaFin, docente.trim())) {
+      setMensajeError('La sala ' + sala + ' ya está reservada por otro docente en ese horario. Elige otra.');
+      return;
+    }
+
     setGuardando(true);
 
     // try / catch / finally:
@@ -162,7 +194,7 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
     //   catch   -> si algo explota (ej: sin internet), muestra un error
     //   finally -> esto se ejecuta SIEMPRE al final, haya salido bien o mal
     try {
-      // 3. Guardar. Le pasamos un objeto con todos los datos.
+      // 4. Guardar. Le pasamos un objeto con todos los datos.
       // "fecha," (sin ": algo") es un atajo de "fecha: fecha": cuando el dato
       // y la variable se llaman igual, basta con escribirlo una vez.
       await agregarReserva({
@@ -351,17 +383,29 @@ function FormularioReserva({ onReservaCreada, usuario }: FormularioReservaProps)
 
         <div className="campo">
           <label htmlFor="campo-sala">Sala *</label>
-          <input
+          {/* Un menú de salas (vienen de "Configuración"). Con el horario
+              completo, solo aparecen las libres (salasParaElegir, arriba).
+              .map(function (salaDeLista) {...}) = "por cada sala de la lista,
+              fabrica una <option>". Es lo mismo que una flecha =>, escrito
+              con la palabra function. */}
+          <select
             id="campo-sala"
-            type="text"
-            placeholder="Ej: B302"
             value={sala}
             onChange={function (evento) {
               setSala(evento.target.value);
               setMensajeError('');
               setMensajeExito('');
             }}
-          />
+          >
+            <option value="">Elige una sala</option>
+            {salasParaElegir.map(function (salaDeLista) {
+              return (
+                <option key={salaDeLista.codigo} value={salaDeLista.codigo}>
+                  {salaDeLista.codigo}
+                </option>
+              );
+            })}
+          </select>
         </div>
       </div>
 

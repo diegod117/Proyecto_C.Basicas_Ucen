@@ -32,3 +32,16 @@ export interface Reserva {
   asignatura: string; // para qué ramo, ej: "Física I"
   sala: string; // a qué sala se las llevan, ej: "B302"
 }
+
+// ------------------------------------------------------------------
+// ¿En qué momento va la reserva? (pedido del profesor)
+// ------------------------------------------------------------------
+// Una reserva pasa por 3 momentos, como una clase:
+//   - 'programada': todavía no empieza (la clase es más tarde)
+//   - 'en_curso':   está pasando AHORA; sus unidades están en la sala del
+//                   profesor, no en el laboratorio
+//   - 'realizada':  ya terminó; pasa al historial y las unidades vuelven
+// OJO: este estado NO se guarda en Firestore. Se CALCULA cada vez mirando
+// el reloj (ver utils/estadoReserva.ts). Si lo guardáramos, alguien tendría
+// que cambiarlo a mano cuando termina la clase, y se le podría olvidar.
+export type EstadoReserva = 'programada' | 'en_curso' | 'realizada';

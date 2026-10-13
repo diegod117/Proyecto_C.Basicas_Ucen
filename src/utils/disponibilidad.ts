@@ -11,6 +11,9 @@
 
 import { obtenerRecursoPorId } from '../services/recursosService';
 import { obtenerReservas } from '../services/reservasService';
+import { obtenerFechaHoy } from './fechas';
+import { obtenerSalas } from '../services/configuracionService';
+import type { Sala } from '../types/Configuracion';
 
 // ------------------------------------------------------------------
 // validarCamposReserva
@@ -33,6 +36,12 @@ export function validarCamposReserva(
   }
   if (fecha === '') {
     return 'Debe ingresar la fecha de la reserva.';
+  }
+  // No se puede reservar en un día que ya pasó (¡no hay máquina del tiempo!).
+  // Las fechas "AAAA-MM-DD" se pueden comparar como texto con < porque van
+  // de año a día: "2026-10-11" < "2026-10-12" es true (ver utils/fechas.ts).
+  if (fecha < obtenerFechaHoy()) {
+    return 'La fecha de la reserva no puede ser anterior a hoy.';
   }
   if (horaInicio === '') {
     return 'Debe ingresar la hora de inicio.';
@@ -171,4 +180,68 @@ export function validarDisponibilidadReserva(
   }
 
   return '';
+}
+
+
+// ------------------------------------------------------------------
+// salaEstaLibre / obtenerSalasLibres
+// ------------------------------------------------------------------
+// ¿La sala está libre? (pedido del profesor: elegir la sala de una lista)
+// Una sala está OCUPADA si OTRO docente la tiene reservada en un horario
+// que se cruza con el que quieres. Si es el MISMO docente, la sala sigue
+// libre para él: así puede reservar multímetros Y cables para su misma clase.
+// Es como una sala de estudio de la biblioteca: si ya la pidió otro grupo
+// a esa hora, no puedes; si la pediste tú, puedes llevar más cosas.
+// Recibe: el código de la sala (ej: 'B302'), la fecha, el horario y el
+//         nombre del docente que quiere reservar.
+// Devuelve: true si la sala está libre para ese docente en ese horario.
+export function salaEstaLibre(
+  codigoSala: string,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  docente: string
+): boolean {
+  // Revisamos TODAS las reservas, una por una.
+  for (const reserva of obtenerReservas()) {
+    // Solo nos importan las de ESTA sala y de OTRO profesor.
+    if (reserva.sala === codigoSala && reserva.docente !== docente) {
+      // ¿Los horarios se pisan? (seCruzanHorarios está más arriba)
+      const hayChoque = seCruzanHorarios(
+        fecha,
+        horaInicio,
+        horaFin,
+        reserva.fecha,
+        reserva.horaInicio,
+        reserva.horaFin
+      );
+      if (hayChoque) {
+        // Encontramos un choque: la sala está ocupada. return corta todo.
+        return false;
+      }
+    }
+  }
+  // Revisamos todas y ninguna chocó: la sala está libre.
+  return true;
+}
+
+// obtenerSalasLibres
+// Recibe: la fecha, el horario y el docente.
+// Devuelve: solo las salas (de "Configuración") libres en ese horario.
+// Es la lista que aparece en el menú "Sala" del formulario de reserva.
+// "Sala[]" = una lista de salas. Partimos con una lista vacía y vamos
+// metiendo (push) solo las que salaEstaLibre dice que sí.
+export function obtenerSalasLibres(
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  docente: string
+): Sala[] {
+  const salasLibres: Sala[] = [];
+  for (const sala of obtenerSalas()) {
+    if (salaEstaLibre(sala.codigo, fecha, horaInicio, horaFin, docente)) {
+      salasLibres.push(sala);
+    }
+  }
+  return salasLibres;
 }

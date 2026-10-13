@@ -15,7 +15,7 @@ import {
 } from '../services/incidenciasService';
 import { obtenerRecursoPorId } from '../services/recursosService';
 import type { EstadoIncidencia } from '../types/Incidencia';
-import type { Usuario } from '../types/Usuario';
+import { useUsuario } from '../context/ContextoUsuario';
 import { puedeGestionarIncidencias } from '../utils/permisos';
 import EtiquetaEstadoIncidencia from './EtiquetaEstadoIncidencia';
 import './TablaIncidencias.css';
@@ -35,19 +35,16 @@ function nombreDelRecurso(recursoId: number): string {
   return 'Recurso desconocido';
 }
 
-// Las props que le pasa PaginaIncidencias.
-interface PropsTablaIncidencias {
-  // La persona conectada: decide si se ven los botones de acción (RNF-03).
-  usuario: Usuario;
-}
-
 // Componente TablaIncidencias
-// Recibe: la persona conectada.
+// No recibe props: la persona conectada la sacamos con useUsuario().
 // Devuelve: la tabla con las incidencias (y los botones, si el rol puede).
-function TablaIncidencias(props: PropsTablaIncidencias) {
+function TablaIncidencias() {
+  // useUsuario() = "¿quién está conectado?". Lo responde el parlante
+  // (ContextoUsuario) que App pone alrededor de todo. Ver guía, paso 6.
+  const usuario = useUsuario();
   // ¿Esta persona puede avanzar el semáforo? Lo preguntamos UNA vez y lo
   // usamos en la cabeza de la tabla y en cada fila.
-  const mostrarAcciones = puedeGestionarIncidencias(props.usuario.rol);
+  const mostrarAcciones = puedeGestionarIncidencias(usuario.rol);
 
   // Guardamos la lista de incidencias en la memoria de React (useState).
   // Así, cuando cambiemos una etapa, le entregamos la lista nueva a React
