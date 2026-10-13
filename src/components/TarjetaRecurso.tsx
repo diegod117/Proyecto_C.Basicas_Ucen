@@ -12,6 +12,7 @@ import {
   calcularCantidadTotal,
   obtenerEstadosConUnidades,
 } from '../utils/inventario';
+import { calcularUnidadesEnReservaAhora } from '../utils/estadoReserva';
 import './TarjetaRecurso.css';
 
 // Props que recibe la tarjeta: el recurso que tiene que mostrar.
@@ -34,7 +35,14 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
   // Los cálculos se hacen ANTES del return, usando las funciones de utils.
   // Así el JSX de abajo queda simple: solo muestra los resultados.
   const cantidadTotal = calcularCantidadTotal(recurso);
-  const cantidadDisponible = recurso.cantidades.disponible;
+  // Las unidades que están en una reserva EN CURSO no están en el
+  // laboratorio: las restamos de las disponibles. Cuando la reserva
+  // termina, vuelven solas (ver utils/estadoReserva.ts).
+  const enReservaAhora = calcularUnidadesEnReservaAhora(recurso.id);
+  let cantidadDisponible = recurso.cantidades.disponible - enReservaAhora;
+  if (cantidadDisponible < 0) {
+    cantidadDisponible = 0;
+  }
   const estadosConUnidades = obtenerEstadosConUnidades(recurso);
 
   // Texto del laboratorio con el formato torre + sala, ej: "Torre B · Sala 307"
@@ -58,7 +66,8 @@ function TarjetaRecurso(props: PropsTarjetaRecurso) {
         <h3 className="tarjeta-nombre">{recurso.nombre}</h3>
         <p className="tarjeta-laboratorio">{textoLaboratorio}</p>
         <p className="tarjeta-cantidad">
-          Cantidad: {cantidadTotal} ({cantidadDisponible} {textoDisponibles})
+          Cantidad: {cantidadTotal} ({cantidadDisponible} {textoDisponibles}
+          {enReservaAhora > 0 && ' · ' + enReservaAhora + ' en reserva ahora'})
         </p>
 
         <div className="tarjeta-etiquetas">

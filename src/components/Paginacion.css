@@ -1,0 +1,54 @@
+/* Paginacion.css
+   Estilos de la fila de botones de páginas del inventario.
+   Todos los colores vienen de las variables de global.css. */
+
+/* Fila centrada; flex-wrap: si no caben (celular), bajan a otra línea */
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--espacio-xs);
+  margin: var(--espacio-lg) 0 var(--espacio-md);
+}
+
+.paginacion-boton {
+  min-width: 40px;
+  padding: var(--espacio-sm) 12px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-principal);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.paginacion-boton:hover:not(:disabled) {
+  background-color: var(--color-principal-claro);
+  border-color: var(--color-principal);
+}
+
+/* "Anterior" en la primera página y "Siguiente" en la última */
+.paginacion-boton:disabled {
+  color: var(--color-texto-secundario);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* La página que se está viendo: azul relleno */
+.paginacion-actual,
+.paginacion-actual:hover:not(:disabled) {
+  color: var(--color-blanco);
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+/* Celular: botones más altos para tocarlos con el dedo (44px) */
+@media (max-width: 768px) {
+  .paginacion-boton {
+    min-height: 44px;
+  }
+}

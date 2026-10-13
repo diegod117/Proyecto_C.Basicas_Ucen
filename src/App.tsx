@@ -4,7 +4,7 @@
 // Si hay sesión, primero descarga los datos desde Firestore (CargadorDatos)
 // y luego muestra el menú y la página que corresponde a la ruta (URL):
 //   /inventario (y /inventario/nuevo, /inventario/:id), /reservas,
-//   /incidencias y /alertas.
+//   /incidencias, /alertas y /configuracion.
 // El usuario conectado se comparte con toda la app con ContextoUsuario.
 // Cubre: navegación base con React Router, inicio de sesión con roles
 //        (sección 3.4 de requerimientos), RNF-03 y RNF-06 (datos de Firestore)
@@ -20,6 +20,7 @@ import PaginaReservas from './pages/PaginaReservas';
 import PaginaIncidencias from './pages/PaginaIncidencias';
 import PaginaAlertas from './pages/PaginaAlertas';
 import PaginaLogin from './pages/PaginaLogin';
+import PaginaConfiguracion from './pages/PaginaConfiguracion';
 import CargadorDatos from './components/CargadorDatos';
 import { ContextoUsuario } from './context/ContextoUsuario';
 import { generarAlertas } from './utils/alertas';
@@ -60,6 +61,10 @@ function App() {
   // aunque el usuario ya estuviera conectado.
   const [revisandoSesion, setRevisandoSesion] = useState(true);
 
+  // Minutos desde que se abrió la app. No se muestra en pantalla: solo
+  // sirve para que App se vuelva a dibujar cada minuto (ver useEffect de abajo).
+  const [, setMinutosTranscurridos] = useState(0);
+
   // useNavigate es un hook de React Router: devuelve una función para
   // cambiar de ruta desde el código (por ejemplo, después de cerrar sesión).
   const navegar = useNavigate();
@@ -77,6 +82,20 @@ function App() {
     // Lo que devuelve un useEffect se ejecuta cuando el componente se
     // quita de la pantalla. Así dejamos de escuchar y no queda "colgado".
     return dejarDeEscuchar;
+  }, []);
+
+  // Cada minuto volvemos a dibujar la app. Los estados de las reservas
+  // (Programada / En curso / Realizada) se calculan con la hora actual:
+  // así, cuando termina la hora de una reserva, pasa sola al historial y
+  // sus unidades vuelven a contar como disponibles, sin recargar la página.
+  // setInterval repite una función cada cierto tiempo (60000 ms = 1 minuto).
+  // Lo que devuelve el useEffect (clearInterval) detiene la repetición si
+  // App desaparece, para que no quede corriendo.
+  useEffect(() => {
+    const repeticion = setInterval(() => {
+      setMinutosTranscurridos((valorAnterior) => valorAnterior + 1);
+    }, 60000);
+    return () => clearInterval(repeticion);
   }, []);
 
   // registrarCambioInventario
@@ -154,6 +173,10 @@ function App() {
               <Route
                 path="/alertas"
                 element={paginaSiPuede(usuarioActual, 'alertas', <PaginaAlertas />)}
+              />
+              <Route
+                path="/configuracion"
+                element={paginaSiPuede(usuarioActual, 'configuracion', <PaginaConfiguracion />)}
               />
               <Route path="*" element={<Navigate to="/inventario" replace />} />
             </Routes>

@@ -1,32 +1,25 @@
 // PaginaInventario.tsx
 // Página del inventario: muestra los recursos en una grilla de tarjetas,
 // para que el docente sepa qué hay y en qué cantidad operativa.
-// Se puede filtrar por nombre, categoría, laboratorio y estado.
+// Se puede filtrar por nombre, categoría, laboratorio y estado, y el
+// listado se muestra de 9 en 9 (paginación).
 // Si ningún recurso cumple los filtros, muestra un mensaje para limpiarlos.
 // Tiene sus propias rutas (React Router), dentro de /inventario:
-//   /inventario         -> el listado con filtros
+//   /inventario         -> el listado con filtros y paginación
 //   /inventario/nuevo   -> el formulario "Agregar recurso" (solo encargado)
 //   /inventario/:id     -> la ficha completa de un recurso (ej: /inventario/3)
 // Cubre: HU-01, HU-02, RF-02, RF-08, RNF-03
 
-import { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-// La página pide los recursos al SERVICIO, no directamente a src/data/.
-// Así no le importa de dónde vienen los datos (ver recursosService.ts).
-import { obtenerRecursos } from '../services/recursosService';
-import {
-  filtrarRecursos,
-  hayFiltrosActivos,
-  obtenerLaboratorios,
-  SIN_FILTRO,
-} from '../utils/filtrosInventario';
 import FiltrosInventario from '../components/FiltrosInventario';
 import GrillaRecursos from '../components/GrillaRecursos';
+import Paginacion from '../components/Paginacion';
 import FichaSegunRuta from '../components/FichaSegunRuta';
 import FormularioNuevoRecurso from '../components/FormularioNuevoRecurso';
 import EncabezadoInventario from '../components/EncabezadoInventario';
 import ContadorInventario from '../components/ContadorInventario';
 import { useUsuario } from '../context/ContextoUsuario';
+import { useFiltrosInventario } from '../hooks/useFiltrosInventario';
 import { puedeAgregarRecurso } from '../utils/permisos';
 import './PaginaInventario.css';
 
@@ -47,40 +40,12 @@ function PaginaInventario(props: PropsPaginaInventario) {
   // Función de React Router para cambiar de ruta desde el código.
   const navegar = useNavigate();
 
-  // Un useState por cada filtro. Cada uno guarda lo que el usuario eligió.
-  // Cuando cualquiera cambia, React vuelve a ejecutar esta función completa
-  // y la lista filtrada de abajo se recalcula sola.
-  // Como esta página sigue en pantalla mientras se mira una ficha (la ficha
-  // es una ruta de ADENTRO de /inventario), los filtros no se pierden al volver.
-  const [textoBusqueda, setTextoBusqueda] = useState('');
-  const [categoria, setCategoria] = useState(SIN_FILTRO);
-  const [laboratorio, setLaboratorio] = useState(SIN_FILTRO);
-  const [estado, setEstado] = useState(SIN_FILTRO);
-
-  const listaRecursos = obtenerRecursos();
-  const laboratoriosDisponibles = obtenerLaboratorios(listaRecursos);
-
-  // El filtrado lo hace una función de utils, no el JSX.
-  // Le pasamos la lista completa y los 4 filtros elegidos.
-  const recursosFiltrados = filtrarRecursos(
-    listaRecursos,
-    textoBusqueda,
-    categoria,
-    laboratorio,
-    estado,
-  );
-
-  const filtrosActivos = hayFiltrosActivos(textoBusqueda, categoria, laboratorio, estado);
-
-  // limpiarFiltros
-  // No recibe nada ni devuelve nada: vuelve los 4 filtros a su valor inicial.
-  // Al cambiar los estados, React redibuja la página con todos los recursos.
-  function limpiarFiltros() {
-    setTextoBusqueda('');
-    setCategoria(SIN_FILTRO);
-    setLaboratorio(SIN_FILTRO);
-    setEstado(SIN_FILTRO);
-  }
+  // Hook personalizado con los filtros, la paginación y la lista filtrada
+  // (ver hooks/useFiltrosInventario.ts). Sus useState viven en ESTA página,
+  // que sigue en pantalla mientras se mira una ficha (la ficha es una ruta
+  // de ADENTRO de /inventario): por eso los filtros y la página no se
+  // pierden al volver.
+  const filtros = useFiltrosInventario();
 
   // abrirFicha
   // Recibe: el id del recurso en que el usuario hizo clic. No devuelve nada.
@@ -115,7 +80,7 @@ function PaginaInventario(props: PropsPaginaInventario) {
     );
   }
 
-  // Lo que se ve en /inventario: el listado con filtros
+  // Lo que se ve en /inventario: el listado con filtros y paginación
   const contenidoListado = (
     <>
       {/* Encabezado de página (D17): título, descripción y el botón
@@ -126,32 +91,39 @@ function PaginaInventario(props: PropsPaginaInventario) {
       />
 
       {/* Le pasamos a FiltrosInventario los valores actuales y las funciones
-          "set" de cada useState. Cuando el usuario cambia un filtro, el
-          componente llama a la función y el estado de ESTA página cambia. */}
+          para cambiarlos. Cuando el usuario cambia un filtro, el componente
+          llama a la función y el estado de ESTA página cambia. */}
       <FiltrosInventario
-        textoBusqueda={textoBusqueda}
-        categoria={categoria}
-        laboratorio={laboratorio}
-        estado={estado}
-        laboratoriosDisponibles={laboratoriosDisponibles}
-        onCambiarTexto={setTextoBusqueda}
-        onCambiarCategoria={setCategoria}
-        onCambiarLaboratorio={setLaboratorio}
-        onCambiarEstado={setEstado}
+        textoBusqueda={filtros.textoBusqueda}
+        categoria={filtros.categoria}
+        laboratorio={filtros.laboratorio}
+        estado={filtros.estado}
+        laboratoriosDisponibles={filtros.laboratoriosDisponibles}
+        onCambiarTexto={filtros.cambiarTexto}
+        onCambiarCategoria={filtros.cambiarCategoria}
+        onCambiarLaboratorio={filtros.cambiarLaboratorio}
+        onCambiarEstado={filtros.cambiarEstado}
       />
 
       <ContadorInventario
-        cantidadMostrada={recursosFiltrados.length}
-        cantidadTotal={listaRecursos.length}
-        hayFiltrosActivos={filtrosActivos}
-        onLimpiarFiltros={limpiarFiltros}
+        cantidadMostrada={filtros.cantidadFiltrada}
+        cantidadTotal={filtros.cantidadTotal}
+        hayFiltrosActivos={filtros.hayFiltrosActivos}
+        onLimpiarFiltros={filtros.limpiarFiltros}
       />
 
-      {/* La grilla decide sola si muestra las tarjetas o el mensaje vacío */}
+      {/* La grilla decide sola si muestra las tarjetas o el mensaje vacío.
+          Recibe solo los recursos de la página actual. */}
       <GrillaRecursos
-        recursos={recursosFiltrados}
+        recursos={filtros.recursosDeLaPagina}
         onSeleccionarRecurso={abrirFicha}
-        onLimpiarFiltros={limpiarFiltros}
+        onLimpiarFiltros={filtros.limpiarFiltros}
+      />
+
+      <Paginacion
+        paginaActual={filtros.paginaActual}
+        totalPaginas={filtros.totalPaginas}
+        onCambiarPagina={filtros.cambiarPagina}
       />
     </>
   );

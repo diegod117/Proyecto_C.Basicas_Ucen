@@ -3,7 +3,8 @@
 // escribió el encargado y convertirlo en un Recurso listo para guardar.
 // Cubre: RF-01, RF-08 (categoría) y RF-10, HU-11 (ubicación obligatoria)
 
-import type { Recurso, DatosNuevoRecurso, Ubicacion, CategoriaRecurso } from '../types/Recurso';
+import type { Recurso, DatosNuevoRecurso, Ubicacion } from '../types/Recurso';
+import { obtenerCategoriaPorClave } from '../services/configuracionService';
 import { generarCodigoUbicacion, validarUbicacion } from './ubicacion';
 
 // datosVaciosNuevoRecurso
@@ -25,10 +26,13 @@ export const datosVaciosNuevoRecurso: DatosNuevoRecurso = {
 
 // usaStockMinimo
 // Recibe: los datos del formulario.
-// Devuelve: true si la categoría elegida usa stock mínimo (insumos y
+// Devuelve: true si la categoría elegida usa stock mínimo (como insumos y
 // reactivos, ver HU-09). El formulario solo muestra ese campo en ese caso.
+// Cada categoría dice si lo usa (ver Configuracion.ts), así una categoría
+// nueva también puede tener stock mínimo.
 export function usaStockMinimo(datos: DatosNuevoRecurso): boolean {
-  if (datos.categoria === 'insumo' || datos.categoria === 'reactivo') {
+  const categoria = obtenerCategoriaPorClave(datos.categoria);
+  if (categoria !== undefined && categoria.usaStockMinimo) {
     return true;
   } else {
     return false;
@@ -80,6 +84,11 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
     }
   }
 
+  // La sala ahora se elige de una lista (ver CamposUbicacionRecurso)
+  if (datos.sala === '') {
+    return 'Elige la sala donde queda el recurso.';
+  }
+
   // Ubicación obligatoria (HU-11): reutilizamos la validación de J13
   const problemasUbicacion = validarUbicacion(armarUbicacion(datos));
   if (problemasUbicacion.length > 0) {
@@ -118,8 +127,8 @@ export function armarRecurso(datos: DatosNuevoRecurso, id: number): Recurso {
   const recurso: Recurso = {
     id: id,
     nombre: datos.nombre.trim(),
-    // "as" porque validarNuevoRecurso ya revisó que no esté vacía
-    categoria: datos.categoria as CategoriaRecurso,
+    // validarNuevoRecurso ya revisó que no esté vacía
+    categoria: datos.categoria,
     ubicacion: armarUbicacion(datos),
     cantidades: {
       disponible: Number(datos.cantidadTexto),

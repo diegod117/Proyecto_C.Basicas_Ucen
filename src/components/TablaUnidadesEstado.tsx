@@ -7,6 +7,7 @@
 
 import type { Recurso } from '../types/Recurso';
 import { textoEstado, calcularCantidadTotal, listaEstadosRecurso } from '../utils/inventario';
+import { calcularUnidadesEnReservaAhora } from '../utils/estadoReserva';
 import './TablaUnidadesEstado.css';
 
 interface PropsTablaUnidadesEstado {
@@ -18,6 +19,9 @@ interface PropsTablaUnidadesEstado {
 // Devuelve: el subtítulo y la tabla con las unidades por estado.
 function TablaUnidadesEstado(props: PropsTablaUnidadesEstado) {
   const recurso = props.recurso;
+
+  // Unidades en una reserva en curso (ver utils/estadoReserva.ts)
+  const enReservaAhora = calcularUnidadesEnReservaAhora(recurso.id);
 
   return (
     // "<> ... </>" (Fragment) agrupa el subtítulo y la tabla sin agregar
@@ -42,6 +46,14 @@ function TablaUnidadesEstado(props: PropsTablaUnidadesEstado) {
           </tr>
         </tbody>
       </table>
+      {/* Aviso si hay unidades en una reserva que está pasando ahora: siguen
+          contando como "Disponible", pero están en la clase del profesor y
+          vuelven cuando termina la reserva. */}
+      {enReservaAhora > 0 && (
+        <p className="ficha-en-reserva">
+          {enReservaAhora} de las unidades disponibles están en una reserva en curso ahora.
+        </p>
+      )}
     </>
   );
 }

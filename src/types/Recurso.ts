@@ -12,16 +12,11 @@
 // ------------------------------------------------------------------
 // Categoría del recurso (RF-08)
 // ------------------------------------------------------------------
-// Esto es un "tipo unión" (union type): la variable solo puede tener
-// UNO de estos textos exactos. Si escribimos otro texto, TypeScript marca error.
-// Para agregar una categoría nueva basta con sumarla aquí (RNF-05).
-export type CategoriaRecurso =
-  | 'instrumento'
-  | 'insumo'
-  | 'equipo'
-  | 'reactivo'
-  | 'mobiliario'
-  | 'instalacion';
+// Antes era una lista fija de 6 textos (un "tipo unión"). Ahora las
+// categorías se guardan en Firestore y el encargado agrega nuevas desde la
+// página "Configuración" (RNF-05), así que la categoría es un texto: la
+// CLAVE de una categoría de configuracionService (ej: 'instrumento').
+export type CategoriaRecurso = string;
 
 // ------------------------------------------------------------------
 // Estado operativo (RF-01)
@@ -40,9 +35,10 @@ export type EstadoRecurso =
 // ------------------------------------------------------------------
 // Torre donde está el laboratorio
 // ------------------------------------------------------------------
-// Los laboratorios del departamento están en los edificios (torres) B y C
-// (ver sección 1.1 de los requerimientos).
-export type Torre = 'B' | 'C';
+// Los laboratorios del departamento empezaron en las torres B y C
+// (sección 1.1 de los requerimientos). Ahora el encargado puede agregar
+// torres nuevas en "Configuración", así que la torre es un texto (una letra).
+export type Torre = string;
 
 // ------------------------------------------------------------------
 // Ubicación física (RF-10, HU-11)

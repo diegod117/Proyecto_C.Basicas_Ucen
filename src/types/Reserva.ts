@@ -32,3 +32,13 @@ export interface Reserva {
   asignatura: string; // ej: "Física I"
   sala: string; // ej: "B302"
 }
+
+// ------------------------------------------------------------------
+// Estado de una reserva según la hora
+// ------------------------------------------------------------------
+// No se guarda en Firestore: se calcula cada vez comparando la fecha y
+// las horas de la reserva con la hora actual (ver utils/estadoReserva.ts).
+//   - 'programada': todavía no empieza
+//   - 'en_curso':   está pasando ahora; sus unidades no están en el laboratorio
+//   - 'realizada':  ya terminó; queda en el historial y las unidades vuelven
+export type EstadoReserva = 'programada' | 'en_curso' | 'realizada';

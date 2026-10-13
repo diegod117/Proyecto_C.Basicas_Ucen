@@ -3,12 +3,8 @@
 // desplegables para categoría, laboratorio y estado.
 // Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-08
 
-import {
-  listaCategoriasRecurso,
-  listaEstadosRecurso,
-  textoCategoria,
-  textoEstado,
-} from '../utils/inventario';
+import { listaEstadosRecurso, textoEstado } from '../utils/inventario';
+import { obtenerCategorias } from '../services/configuracionService';
 import { SIN_FILTRO } from '../utils/filtrosInventario';
 import './FiltrosInventario.css';
 
@@ -62,9 +58,9 @@ function FiltrosInventario(props: PropsFiltrosInventario) {
           <option value={SIN_FILTRO}>Todas</option>
           {/* Una <option> por cada categoría. El "value" es lo que se guarda
               ('instalacion') y el texto es lo que ve el usuario ("Instalación") */}
-          {listaCategoriasRecurso.map((categoria) => (
-            <option key={categoria} value={categoria}>
-              {textoCategoria(categoria)}
+          {obtenerCategorias().map((categoria) => (
+            <option key={categoria.clave} value={categoria.clave}>
+              {categoria.nombre}
             </option>
           ))}
         </select>

@@ -1,6 +1,7 @@
 // FormularioReserva.tsx
 // Componente de formulario para reservar recursos del laboratorio.
 // Implementa el patrón de "formulario controlado" con React useState.
+// La sala se elige de una lista con solo las salas libres en ese horario.
 // Cubre: HU-03 (reserva básica), HU-07 (cálculo disponibilidad), HU-08 (desactivar botón por falta de stock)
 // y RNF-03 (el docente reserva siempre a su propio nombre)
 
@@ -12,7 +13,10 @@ import {
   validarCamposReserva,
   calcularUnidadesDisponibles,
   validarDisponibilidadReserva,
+  obtenerSalasLibres,
+  salaEstaLibre,
 } from '../utils/disponibilidad';
+import { obtenerSalas } from '../services/configuracionService';
 import { useUsuario } from '../context/ContextoUsuario';
 import { puedeReservarAOtroDocente } from '../utils/permisos';
 import './FormularioReserva.css';
@@ -74,6 +78,16 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
     );
   }
 
+  // --- Salas para elegir ---
+  // Con la fecha y el horario completos, mostramos solo las salas LIBRES
+  // (que otro docente no tenga reservadas a esa hora). Antes de eso se ven
+  // todas, para que el usuario sepa cuáles existen.
+  const horarioCompleto = fecha !== '' && horaInicio !== '' && horaFin !== '' && horaFin > horaInicio;
+  let salasParaElegir = obtenerSalas();
+  if (horarioCompleto) {
+    salasParaElegir = obtenerSalasLibres(fecha, horaInicio, horaFin, docente.trim());
+  }
+
   // --- Validación reactiva para el botón (HU-08) ---
   // El botón se bloquea si se comprobó que no quedan unidades o la cantidad pedida supera las disponibles
   const bloqueoPorDisponibilidad =
@@ -130,6 +144,13 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
 
     if (errorDisponibilidad !== '') {
       setMensajeError(errorDisponibilidad);
+      return;
+    }
+
+    // 3. La sala no puede estar reservada por otro docente en ese horario.
+    //    (Puede pasar si se eligió la sala y después se cambió el horario.)
+    if (!salaEstaLibre(sala, fecha, horaInicio, horaFin, docente.trim())) {
+      setMensajeError('La sala ' + sala + ' ya está reservada por otro docente en ese horario. Elige otra.');
       return;
     }
 
@@ -312,17 +333,26 @@ function FormularioReserva({ onReservaCreada }: FormularioReservaProps) {
 
         <div className="campo">
           <label htmlFor="campo-sala">Sala *</label>
-          <input
+          {/* Lista de salas (vienen de "Configuración"). Con el horario
+              elegido, solo aparecen las libres. */}
+          <select
             id="campo-sala"
-            type="text"
-            placeholder="Ej: B302"
             value={sala}
             onChange={function (evento) {
               setSala(evento.target.value);
               setMensajeError('');
               setMensajeExito('');
             }}
-          />
+          >
+            <option value="">Elige una sala</option>
+            {salasParaElegir.map(function (salaDeLista) {
+              return (
+                <option key={salaDeLista.codigo} value={salaDeLista.codigo}>
+                  {salaDeLista.codigo}
+                </option>
+              );
+            })}
+          </select>
         </div>
       </div>
 

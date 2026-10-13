@@ -2,11 +2,14 @@
 // Parte del formulario "Agregar recurso" con la ubicación física:
 // torre, sala, bodega y mueble. Muestra el código de ubicación que se
 // genera solo (ej: "B307-B1-M2"), así nadie tiene que escribirlo.
+// La torre y la sala se eligen de listas que vienen de la página
+// "Configuración" (colecciones "torres" y "salas" de Firestore).
 // Usa los estilos de FormularioNuevoRecurso.css.
 // Cubre: RF-10, HU-11 (ubicación obligatoria con código)
 
-import type { DatosNuevoRecurso, Torre } from '../types/Recurso';
+import type { DatosNuevoRecurso } from '../types/Recurso';
 import { armarUbicacion } from '../utils/nuevoRecurso';
+import { obtenerTorres, obtenerSalasDeTorre } from '../services/configuracionService';
 
 interface PropsCamposUbicacionRecurso {
   // Todos los datos del formulario (este componente usa solo los de ubicación)
@@ -23,6 +26,9 @@ interface PropsCamposUbicacionRecurso {
 function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
   const datos = props.datos;
 
+  // Solo las salas de la torre elegida
+  const salasDeLaTorre = obtenerSalasDeTorre(datos.torre);
+
   // El código solo se puede generar cuando la sala y la bodega están escritas
   let codigo = 'Se genera al completar la ubicación';
   if (datos.sala.trim() !== '' && datos.bodega.trim() !== '') {
@@ -36,23 +42,38 @@ function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
       <div className="nuevo-recurso-fila">
         <label className="nuevo-recurso-campo">
           Torre
+          {/* Al cambiar de torre se borra la sala elegida (sala: ''),
+              porque las salas de otra torre ya no sirven */}
           <select
             value={datos.torre}
-            onChange={(evento) => props.onCambiar({ ...datos, torre: evento.target.value as Torre })}
+            onChange={(evento) => props.onCambiar({ ...datos, torre: evento.target.value, sala: '' })}
           >
-            <option value="B">Torre B</option>
-            <option value="C">Torre C</option>
+            {obtenerTorres().map((torre) => (
+              <option key={torre.letra} value={torre.letra}>
+                Torre {torre.letra}
+              </option>
+            ))}
           </select>
         </label>
         <label className="nuevo-recurso-campo">
           Sala
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="Ej: 307"
+          {/* En "value" va el número ('307'), que es lo que se guarda en la ubicación */}
+          <select
             value={datos.sala}
             onChange={(evento) => props.onCambiar({ ...datos, sala: evento.target.value })}
-          />
+          >
+            <option value="">Elige una sala</option>
+            {salasDeLaTorre.map((sala) => (
+              <option key={sala.codigo} value={sala.numero}>
+                Sala {sala.numero}
+              </option>
+            ))}
+          </select>
+          {salasDeLaTorre.length === 0 && (
+            <span className="texto-secundario">
+              Esta torre no tiene salas. Agrégalas en "Configuración".
+            </span>
+          )}
         </label>
       </div>
 

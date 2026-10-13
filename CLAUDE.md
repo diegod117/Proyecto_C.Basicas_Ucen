@@ -71,6 +71,7 @@ inventario-cs-basicas/
     ├── pages/                 # Pantallas completas (Inventario, Reservas, Incidencias...)
     ├── services/              # Funciones que leen/guardan datos
     ├── context/               # Contexto del usuario conectado (useContext + useUsuario)
+    ├── hooks/                 # Hooks personalizados (ej: useFiltrosInventario)
     ├── utils/                 # Funciones de ayuda (formatear fechas, calcular disponibilidad...)
     └── styles/                # Estilos globales
 ```

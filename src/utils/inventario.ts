@@ -11,6 +11,7 @@
 // Estas funciones hacen esa "traducción" en un solo lugar.
 
 import type { Recurso, EstadoRecurso, CategoriaRecurso } from '../types/Recurso';
+import { obtenerCategoriaPorClave } from '../services/configuracionService';
 
 // Lista con los 5 estados, en el orden en que queremos mostrarlos.
 // Sirve para recorrer todos los estados con un for (por ejemplo, para
@@ -21,18 +22,6 @@ export const listaEstadosRecurso: EstadoRecurso[] = [
   'danado',
   'en_mantencion',
   'dado_de_baja',
-];
-
-// Lista con las 6 categorías (RF-08). Se usa para las opciones del filtro
-// por categoría. Si se agrega una categoría nueva (RNF-05), se suma aquí
-// y en el tipo CategoriaRecurso.
-export const listaCategoriasRecurso: CategoriaRecurso[] = [
-  'instrumento',
-  'insumo',
-  'equipo',
-  'reactivo',
-  'mobiliario',
-  'instalacion',
 ];
 
 // textoEstado
@@ -55,23 +44,17 @@ export function textoEstado(estado: EstadoRecurso): string {
 }
 
 // textoCategoria
-// Recibe: una categoría, por ejemplo 'instalacion'.
-// Devuelve: el texto para mostrar en pantalla, por ejemplo "Instalación".
+// Recibe: la clave de una categoría, por ejemplo 'instalacion'.
+// Devuelve: su nombre para mostrar en pantalla, por ejemplo "Instalación".
+// Los nombres vienen de la colección "categorias" (configuracionService),
+// así las categorías nuevas que agrega el encargado también se ven bien.
 export function textoCategoria(categoria: CategoriaRecurso): string {
-  if (categoria === 'instrumento') {
-    return 'Instrumento';
-  } else if (categoria === 'insumo') {
-    return 'Insumo';
-  } else if (categoria === 'equipo') {
-    return 'Equipo';
-  } else if (categoria === 'reactivo') {
-    return 'Reactivo';
-  } else if (categoria === 'mobiliario') {
-    return 'Mobiliario';
-  } else {
-    // El único valor que queda es 'instalacion'
-    return 'Instalación';
+  const encontrada = obtenerCategoriaPorClave(categoria);
+  if (encontrada === undefined) {
+    // No debería pasar, pero si la categoría no existe mostramos su clave
+    return categoria;
   }
+  return encontrada.nombre;
 }
 
 // calcularCantidadTotal
