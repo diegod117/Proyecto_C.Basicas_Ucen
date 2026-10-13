@@ -111,6 +111,11 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
             )}
           </NavLink>
         )}
+        {puedeVerPagina(usuario.rol, 'configuracion') && (
+          <NavLink to="/configuracion" className={obtenerClaseEnlace}>
+            Configuración
+          </NavLink>
+        )}
       </nav>
     </>
   );

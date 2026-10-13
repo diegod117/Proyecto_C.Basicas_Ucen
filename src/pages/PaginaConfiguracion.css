@@ -1,0 +1,137 @@
+/* PaginaConfiguracion.css
+   Estilos de la página "Configuración" y de sus tres secciones
+   (SeccionCategorias, SeccionTorres y SeccionSalas).
+   El encabezado usa las clases .encabezado-pagina-* de PaginaInventario.css.
+   Todos los colores vienen de las variables de global.css. */
+
+/* Las tres tarjetas, una debajo de la otra */
+.configuracion-secciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-lg);
+}
+
+/* Tarjeta blanca de cada sección */
+.configuracion-tarjeta {
+  background-color: var(--color-blanco);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--espacio-lg);
+}
+
+.configuracion-titulo {
+  margin: 0 0 var(--espacio-md) 0;
+  padding-bottom: var(--espacio-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Lista de categorías/torres/salas como "pastillas" en fila.
+   list-style: none quita los puntos de la lista. */
+.configuracion-lista {
+  list-style: none;
+  margin: 0 0 var(--espacio-md) 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-sm);
+}
+
+.configuracion-item {
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-principal);
+  background-color: var(--color-principal-claro);
+  border-radius: var(--radio-pildora);
+}
+
+.configuracion-nota {
+  font-weight: 400;
+  color: var(--color-texto-secundario);
+}
+
+/* Formulario en una fila: campos y botón alineados abajo.
+   flex-wrap: si no caben (celular), bajan a la línea siguiente. */
+.configuracion-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--espacio-md);
+}
+
+.configuracion-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+}
+
+.configuracion-campo input,
+.configuracion-campo select {
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+}
+
+.configuracion-campo input:focus,
+.configuracion-campo select:focus {
+  outline: none;
+  border-color: var(--color-principal);
+  background-color: var(--color-blanco);
+  box-shadow: 0 0 0 3px var(--color-principal-claro);
+}
+
+/* Checkbox con su texto en la misma línea */
+.configuracion-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-sm);
+  font-size: 13px;
+  color: var(--color-texto);
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+.configuracion-error,
+.configuracion-exito {
+  margin: var(--espacio-md) 0 0 0;
+  padding: var(--espacio-sm) 10px;
+  font-size: 13px;
+  border-radius: var(--radio-borde-sm);
+}
+
+.configuracion-error {
+  color: var(--color-danado);
+  background-color: #fee2e2;
+}
+
+.configuracion-exito {
+  color: var(--color-disponible);
+  background-color: #dcfce7;
+}
+
+/* Celular (RNF-01): campos a todo el ancho y letra de 16px para que el
+   iPhone no haga zoom al tocarlos */
+@media (max-width: 768px) {
+  .configuracion-tarjeta {
+    padding: var(--espacio-md);
+  }
+
+  .configuracion-campo {
+    width: 100%;
+  }
+
+  .configuracion-campo input,
+  .configuracion-campo select {
+    font-size: 16px;
+  }
+}

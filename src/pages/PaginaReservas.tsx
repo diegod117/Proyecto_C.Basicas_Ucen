@@ -64,11 +64,15 @@ function PaginaReservas() {
           </p>
         )}
 
-        {/* Tabla con el historial de reservas y botón de cancelación */}
+        {/* Reservas programadas y en curso, con el botón para cancelar */}
         <TablaReservas
+          modo="activas"
           version={actualizaciones}
           onReservaModificada={refrescarDatos}
         />
+
+        {/* Historial: las reservas que ya terminaron pasan aquí solas */}
+        <TablaReservas modo="historial" version={actualizaciones} />
       </div>
     </section>
   );

@@ -31,3 +31,13 @@
     min-width: 0;
   }
 }
+
+/* Aviso "N de las unidades disponibles están en una reserva en curso" */
+.ficha-en-reserva {
+  margin: var(--espacio-sm) 0 0 0;
+  padding: var(--espacio-sm) 10px;
+  font-size: 13px;
+  color: var(--color-mantencion);
+  background-color: #fef9c3;
+  border-radius: var(--radio-borde-sm);
+}

@@ -10,9 +10,9 @@
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { DatosNuevoRecurso, CategoriaRecurso } from '../types/Recurso';
+import type { DatosNuevoRecurso } from '../types/Recurso';
 import { useUsuario } from '../context/ContextoUsuario';
-import { listaCategoriasRecurso, textoCategoria } from '../utils/inventario';
+import { obtenerCategorias } from '../services/configuracionService';
 import { datosVaciosNuevoRecurso, usaStockMinimo, validarNuevoRecurso } from '../utils/nuevoRecurso';
 import { agregarRecurso, obtenerRecursos } from '../services/recursosService';
 import CamposUbicacionRecurso from './CamposUbicacionRecurso';
@@ -101,13 +101,15 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
             <select
               value={datos.categoria}
               onChange={(evento) =>
-                cambiarDatos({ ...datos, categoria: evento.target.value as CategoriaRecurso })
+                cambiarDatos({ ...datos, categoria: evento.target.value })
               }
             >
               <option value="">Elige una categoría</option>
-              {listaCategoriasRecurso.map((categoria) => (
-                <option key={categoria} value={categoria}>
-                  {textoCategoria(categoria)}
+              {/* Las categorías vienen de Firestore: aparecen también las
+                  que el encargado agregó en "Configuración" */}
+              {obtenerCategorias().map((categoria) => (
+                <option key={categoria.clave} value={categoria.clave}>
+                  {categoria.nombre}
                 </option>
               ))}
             </select>

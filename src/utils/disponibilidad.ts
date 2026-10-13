@@ -6,6 +6,8 @@
 import { obtenerRecursoPorId } from '../services/recursosService';
 import { obtenerReservas } from '../services/reservasService';
 import { obtenerFechaHoy } from './fechas';
+import { obtenerSalas } from '../services/configuracionService';
+import type { Sala } from '../types/Configuracion';
 
 // ------------------------------------------------------------------
 // validarCamposReserva
@@ -154,4 +156,56 @@ export function validarDisponibilidadReserva(
   }
 
   return '';
+}
+
+
+// ------------------------------------------------------------------
+// salaEstaLibre / obtenerSalasLibres
+// ------------------------------------------------------------------
+// Una sala está OCUPADA si OTRO docente la tiene reservada en un horario
+// que se cruza. Si es el mismo docente, la sala sigue libre para él: así
+// puede reservar varios materiales distintos para su misma clase.
+// Recibe: el código de la sala (ej: 'B302'), la fecha, el horario y el
+//         nombre del docente que quiere reservar.
+// Devuelve: true si la sala está libre para ese docente en ese horario.
+export function salaEstaLibre(
+  codigoSala: string,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  docente: string
+): boolean {
+  for (const reserva of obtenerReservas()) {
+    if (reserva.sala === codigoSala && reserva.docente !== docente) {
+      const hayChoque = seCruzanHorarios(
+        fecha,
+        horaInicio,
+        horaFin,
+        reserva.fecha,
+        reserva.horaInicio,
+        reserva.horaFin
+      );
+      if (hayChoque) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Recibe: la fecha, el horario y el docente.
+// Devuelve: solo las salas (de "Configuración") libres en ese horario.
+export function obtenerSalasLibres(
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+  docente: string
+): Sala[] {
+  const salasLibres: Sala[] = [];
+  for (const sala of obtenerSalas()) {
+    if (salaEstaLibre(sala.codigo, fecha, horaInicio, horaFin, docente)) {
+      salasLibres.push(sala);
+    }
+  }
+  return salasLibres;
 }
