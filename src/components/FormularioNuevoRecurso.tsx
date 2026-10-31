@@ -6,7 +6,8 @@
 // La ubicación y los datos opcionales van en componentes aparte
 // (CamposUbicacionRecurso y CamposDetalleRecurso) para que este archivo
 // no crezca demasiado.
-// Cubre: RF-01, RF-08 (categoría), RF-10 y HU-11 (ubicación), RF-11 y HU-12 (números de serie), RNF-03
+// Cubre: RF-01, RF-08 (categoría), RF-10 y HU-11 (ubicación), RF-11 y HU-12 (números de serie),
+//        RF-12 y HU-13 (fecha de adquisición), RNF-03
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -18,6 +19,7 @@ import { agregarRecurso, obtenerRecursos } from '../services/recursosService';
 import CamposUbicacionRecurso from './CamposUbicacionRecurso';
 import CamposDetalleRecurso from './CamposDetalleRecurso';
 import CamposNumerosSerie from './CamposNumerosSerie';
+import CampoFechaAdquisicion from './CampoFechaAdquisicion';
 import { categoriaUsaNumeroSerie } from '../utils/unidades';
 import './FormularioNuevoRecurso.css';
 
@@ -135,6 +137,12 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
             />
           </label>
         </div>
+
+        {/* Fecha de adquisición, obligatoria y no futura (HU-13) */}
+        <CampoFechaAdquisicion
+          fecha={datos.fechaAdquisicion}
+          onCambiar={(fecha) => cambiarDatos({ ...datos, fechaAdquisicion: fecha })}
+        />
 
         {/* Equipos e instrumentos: un número de serie por cada unidad (HU-12) */}
         {categoriaUsaNumeroSerie(datos.categoria) && (

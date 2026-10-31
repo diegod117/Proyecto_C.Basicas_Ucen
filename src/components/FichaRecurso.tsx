@@ -8,7 +8,7 @@
 // Los formularios solo los ve el encargado; los demás roles ven un aviso.
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
 //        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03,
-//        RF-04 y RF-13 (entradas y salidas)
+//        RF-04 y RF-13 (entradas y salidas), RF-12 y HU-13 (fecha y antigüedad)
 
 import type { Recurso } from '../types/Recurso';
 import { useUsuario } from '../context/ContextoUsuario';
@@ -20,6 +20,7 @@ import TablaUnidadesEstado from './TablaUnidadesEstado';
 import TablaUnidadesSerie from './TablaUnidadesSerie';
 import TablaHistorial from './TablaHistorial';
 import AvisoUbicacion from './AvisoUbicacion';
+import DatosAntiguedadRecurso from './DatosAntiguedadRecurso';
 import './FichaRecurso.css';
 
 interface PropsFichaRecurso {
@@ -100,6 +101,8 @@ function FichaRecurso(props: PropsFichaRecurso) {
               <dd>{textoCampoOpcional(recurso.proveedor)}</dd>
               <dt>Observación</dt>
               <dd>{textoCampoOpcional(recurso.observacion)}</dd>
+              {/* Fecha de adquisición y antigüedad (HU-13) */}
+              <DatosAntiguedadRecurso fechaAdquisicion={recurso.fechaAdquisicion} />
               {/* El stock mínimo solo se muestra si el recurso lo tiene
                   (normalmente insumos y reactivos, ver HU-09).
                   "<> ... </>" se llama Fragment: agrupa dos elementos (dt y dd)

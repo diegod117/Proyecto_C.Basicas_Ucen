@@ -1,11 +1,13 @@
 // FiltrosInventario.tsx
 // Barra de filtros del inventario: buscador por nombre y listas
-// desplegables para categoría, laboratorio y estado.
-// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-08
+// desplegables para categoría, laboratorio, estado y antigüedad.
+// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-08,
+//        RF-12 y HU-13 (filtro por antigüedad)
 
 import { listaEstadosRecurso, textoEstado } from '../utils/inventario';
 import { obtenerCategorias } from '../services/configuracionService';
 import { SIN_FILTRO } from '../utils/filtrosInventario';
+import { opcionesAntiguedad } from '../utils/antiguedad';
 import './FiltrosInventario.css';
 
 // Este componente NO guarda los filtros: los guarda la página (con useState).
@@ -18,6 +20,7 @@ interface PropsFiltrosInventario {
   categoria: string;
   laboratorio: string;
   estado: string;
+  antiguedad: string;
   // Laboratorios que existen (ej: ["B307", "B308", "C210"]), para las opciones
   laboratoriosDisponibles: string[];
   // Funciones para avisarle a la página que un filtro cambió
@@ -25,11 +28,12 @@ interface PropsFiltrosInventario {
   onCambiarCategoria: (categoria: string) => void;
   onCambiarLaboratorio: (laboratorio: string) => void;
   onCambiarEstado: (estado: string) => void;
+  onCambiarAntiguedad: (antiguedad: string) => void;
 }
 
 // Componente FiltrosInventario
 // Recibe: los valores de los filtros, los laboratorios y las funciones de cambio.
-// Devuelve: la barra con los 4 filtros.
+// Devuelve: la barra con los 5 filtros.
 function FiltrosInventario(props: PropsFiltrosInventario) {
   return (
     <div className="filtros-inventario">
@@ -93,6 +97,23 @@ function FiltrosInventario(props: PropsFiltrosInventario) {
           {listaEstadosRecurso.map((estado) => (
             <option key={estado} value={estado}>
               {textoEstado(estado)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="campo-filtro">
+        <label htmlFor="filtro-antiguedad">Antigüedad</label>
+        {/* Las opciones salen de utils/antiguedad.ts (HU-13) */}
+        <select
+          id="filtro-antiguedad"
+          value={props.antiguedad}
+          onChange={(evento) => props.onCambiarAntiguedad(evento.target.value)}
+        >
+          <option value={SIN_FILTRO}>Todas</option>
+          {opcionesAntiguedad.map((opcion) => (
+            <option key={opcion.valor} value={opcion.valor}>
+              {opcion.texto}
             </option>
           ))}
         </select>

@@ -4,11 +4,11 @@
    Todos los colores, sombras y radios vienen de global.css. */
 
 /* Franja blanca: fondo, esquinas redondeadas y sombra suave, igual que
-   las tarjetas. El buscador ocupa más espacio que los 3 select.
+   las tarjetas. El buscador ocupa más espacio que los 4 select.
    En pantallas angostas (celular) cada filtro ocupa una fila completa. */
 .filtros-inventario {
   display: grid;
-  grid-template-columns: 2.4fr 1fr 1fr 1fr;
+  grid-template-columns: 2.4fr 1fr 1fr 1fr 1fr;
   gap: var(--espacio-md);
   padding: var(--espacio-md) var(--espacio-lg);
   margin-bottom: var(--espacio-lg);

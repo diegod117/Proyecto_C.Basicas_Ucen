@@ -5,7 +5,9 @@
 //   - los 5 estados operativos (RF-01)
 //   - 3 laboratorios en 2 torres: B307, B308 y C210 (RF-10)
 //   - un insumo bajo su stock mínimo, para probar las alertas (HU-05, HU-09)
-// Cubre: datos de apoyo para HU-01, HU-02, HU-05 y HU-09
+//   - fechas de adquisición de distintas antigüedades; los recursos 7 a 10
+//     no la tienen, para probar "Sin fecha" (HU-13)
+// Cubre: datos de apoyo para HU-01, HU-02, HU-05, HU-09 y HU-13
 
 // "import type" trae solo el tipo (el molde), no código que se ejecute.
 import type { Recurso } from '../types/Recurso';
@@ -16,6 +18,7 @@ import type { Recurso } from '../types/Recurso';
 export const listaRecursosPrueba: Recurso[] = [
   {
     id: 1,
+    fechaAdquisicion: '2022-03-15',
     nombre: 'Multímetro Fluke 87V',
     categoria: 'instrumento',
     ubicacion: { torre: 'B', sala: '307', bodega: 'Bodega 1', mueble: 'Mueble 2', codigo: 'B307-B1-M2' },
@@ -28,6 +31,7 @@ export const listaRecursosPrueba: Recurso[] = [
   },
   {
     id: 2,
+    fechaAdquisicion: '2025-05-20',
     nombre: 'Osciloscopio Rigol DS1054Z',
     categoria: 'equipo',
     ubicacion: { torre: 'B', sala: '307', bodega: 'Bodega 1', mueble: 'Mueble 1', codigo: 'B307-B1-M1' },
@@ -37,6 +41,7 @@ export const listaRecursosPrueba: Recurso[] = [
   },
   {
     id: 3,
+    fechaAdquisicion: '2026-04-10',
     nombre: 'Soldador Weller WE1010',
     categoria: 'equipo',
     ubicacion: { torre: 'B', sala: '308', bodega: 'Bodega 1', mueble: 'Mueble 3', codigo: 'B308-B1-M3' },
@@ -45,6 +50,7 @@ export const listaRecursosPrueba: Recurso[] = [
   },
   {
     id: 4,
+    fechaAdquisicion: '2024-11-05',
     nombre: 'Arduino Uno R3',
     categoria: 'equipo',
     ubicacion: { torre: 'B', sala: '308', bodega: 'Bodega 2', mueble: 'Mueble 1', codigo: 'B308-B2-M1' },
@@ -54,6 +60,7 @@ export const listaRecursosPrueba: Recurso[] = [
   },
   {
     id: 5,
+    fechaAdquisicion: '2023-08-30',
     nombre: 'Fuente de poder GW Instek GPS-3303',
     categoria: 'equipo',
     ubicacion: { torre: 'B', sala: '307', bodega: 'Bodega 2', mueble: 'Mueble 2', codigo: 'B307-B2-M2' },
@@ -65,6 +72,7 @@ export const listaRecursosPrueba: Recurso[] = [
   },
   {
     id: 6,
+    fechaAdquisicion: '2026-08-01',
     nombre: 'Termómetro digital',
     categoria: 'instrumento',
     ubicacion: { torre: 'C', sala: '210', bodega: 'Bodega 1', mueble: 'Mueble 1', codigo: 'C210-B1-M1' },

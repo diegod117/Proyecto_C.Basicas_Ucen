@@ -1,14 +1,14 @@
 // PaginaInventario.tsx
 // Página del inventario: muestra los recursos en una grilla de tarjetas,
 // para que el docente sepa qué hay y en qué cantidad operativa.
-// Se puede filtrar por nombre, categoría, laboratorio y estado, y el
+// Se puede filtrar por nombre, categoría, laboratorio, estado y antigüedad, y el
 // listado se muestra de 9 en 9 (paginación).
 // Si ningún recurso cumple los filtros, muestra un mensaje para limpiarlos.
 // Tiene sus propias rutas (React Router), dentro de /inventario:
 //   /inventario         -> el listado con filtros y paginación
 //   /inventario/nuevo   -> el formulario "Agregar recurso" (solo encargado)
 //   /inventario/:id     -> la ficha completa de un recurso (ej: /inventario/3)
-// Cubre: HU-01, HU-02, RF-02, RF-08, RNF-03
+// Cubre: HU-01, HU-02, HU-13, RF-02, RF-08, RF-12, RNF-03
 
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import FiltrosInventario from '../components/FiltrosInventario';
@@ -98,11 +98,13 @@ function PaginaInventario(props: PropsPaginaInventario) {
         categoria={filtros.categoria}
         laboratorio={filtros.laboratorio}
         estado={filtros.estado}
+        antiguedad={filtros.antiguedad}
         laboratoriosDisponibles={filtros.laboratoriosDisponibles}
         onCambiarTexto={filtros.cambiarTexto}
         onCambiarCategoria={filtros.cambiarCategoria}
         onCambiarLaboratorio={filtros.cambiarLaboratorio}
         onCambiarEstado={filtros.cambiarEstado}
+        onCambiarAntiguedad={filtros.cambiarAntiguedad}
       />
 
       <ContadorInventario

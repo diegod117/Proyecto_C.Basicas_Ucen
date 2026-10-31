@@ -7,7 +7,8 @@
 // Un hook personalizado es una función que empieza con "use" y usa otros
 // hooks adentro (aquí, useState). La memoria (los useState) queda en el
 // componente que lo llama, igual que si estuvieran escritos ahí.
-// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado, y paginación)
+// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado, y paginación),
+//        RF-12 y HU-13 (filtro por antigüedad)
 
 import { useState } from 'react';
 import type { Recurso } from '../types/Recurso';
@@ -26,6 +27,7 @@ export interface DatosFiltrosInventario {
   categoria: string;
   laboratorio: string;
   estado: string;
+  antiguedad: string;
   laboratoriosDisponibles: string[]; // opciones del filtro "Laboratorio"
   cantidadTotal: number; // todos los recursos del inventario
   cantidadFiltrada: number; // los que cumplen los filtros
@@ -37,6 +39,7 @@ export interface DatosFiltrosInventario {
   cambiarCategoria: (valor: string) => void;
   cambiarLaboratorio: (valor: string) => void;
   cambiarEstado: (valor: string) => void;
+  cambiarAntiguedad: (valor: string) => void;
   cambiarPagina: (pagina: number) => void;
   limpiarFiltros: () => void;
 }
@@ -50,12 +53,13 @@ export function useFiltrosInventario(): DatosFiltrosInventario {
   const [categoria, setCategoria] = useState(SIN_FILTRO);
   const [laboratorio, setLaboratorio] = useState(SIN_FILTRO);
   const [estado, setEstado] = useState(SIN_FILTRO);
+  const [antiguedad, setAntiguedad] = useState(SIN_FILTRO);
   const [paginaActual, setPaginaActual] = useState(1);
 
   const listaRecursos = obtenerRecursos();
 
-  // El filtrado lo hace una función de utils: lista completa + 4 filtros
-  const recursosFiltrados = filtrarRecursos(listaRecursos, textoBusqueda, categoria, laboratorio, estado);
+  // El filtrado lo hace una función de utils: lista completa + 5 filtros
+  const recursosFiltrados = filtrarRecursos(listaRecursos, textoBusqueda, categoria, laboratorio, estado, antiguedad);
 
   // Paginación: de los recursos filtrados mostramos solo los de la página
   // actual. Si la página quedó fuera de rango (ej: había 2 páginas y
@@ -85,18 +89,24 @@ export function useFiltrosInventario(): DatosFiltrosInventario {
     setPaginaActual(1);
   }
 
+  function cambiarAntiguedad(valor: string) {
+    setAntiguedad(valor);
+    setPaginaActual(1);
+  }
+
   // cambiarPagina: muestra otra página y sube al inicio para ver la grilla
   function cambiarPagina(pagina: number) {
     setPaginaActual(pagina);
     window.scrollTo(0, 0);
   }
 
-  // limpiarFiltros: vuelve los 4 filtros y la página a su valor inicial
+  // limpiarFiltros: vuelve los 5 filtros y la página a su valor inicial
   function limpiarFiltros() {
     setTextoBusqueda('');
     setCategoria(SIN_FILTRO);
     setLaboratorio(SIN_FILTRO);
     setEstado(SIN_FILTRO);
+    setAntiguedad(SIN_FILTRO);
     setPaginaActual(1);
   }
 
@@ -105,10 +115,11 @@ export function useFiltrosInventario(): DatosFiltrosInventario {
     categoria: categoria,
     laboratorio: laboratorio,
     estado: estado,
+    antiguedad: antiguedad,
     laboratoriosDisponibles: obtenerLaboratorios(listaRecursos),
     cantidadTotal: listaRecursos.length,
     cantidadFiltrada: recursosFiltrados.length,
-    hayFiltrosActivos: hayFiltrosActivos(textoBusqueda, categoria, laboratorio, estado),
+    hayFiltrosActivos: hayFiltrosActivos(textoBusqueda, categoria, laboratorio, estado, antiguedad),
     recursosDeLaPagina: obtenerRecursosDePagina(recursosFiltrados, paginaMostrada, RECURSOS_POR_PAGINA),
     paginaActual: paginaMostrada,
     totalPaginas: totalPaginas,
@@ -116,6 +127,7 @@ export function useFiltrosInventario(): DatosFiltrosInventario {
     cambiarCategoria: cambiarCategoria,
     cambiarLaboratorio: cambiarLaboratorio,
     cambiarEstado: cambiarEstado,
+    cambiarAntiguedad: cambiarAntiguedad,
     cambiarPagina: cambiarPagina,
     limpiarFiltros: limpiarFiltros,
   };

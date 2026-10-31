@@ -1,7 +1,8 @@
 // Recurso.ts
 // Define cómo es un "recurso" del laboratorio: un instrumento, equipo, insumo, etc.
 // Cubre: RF-01 (estado operativo), RF-02 (cantidad operativa), RF-08 (categoría),
-//        RF-10 y HU-11 (ubicación física), HU-09 (stock mínimo de insumos)
+//        RF-10 y HU-11 (ubicación física), HU-09 (stock mínimo de insumos),
+//        RF-12 y HU-13 (fecha de adquisición)
 
 // ¿Qué es este archivo?
 // Aquí NO hay lógica ni pantallas, solo "moldes" de datos.
@@ -125,6 +126,10 @@ export interface Recurso {
   // Solo tiene sentido para insumos y reactivos: si la cantidad disponible
   // baja de este número, el sistema debería avisar para reponer (HU-09).
   stockMinimo?: number;
+  // Fecha en que se adquirió, como texto "AAAA-MM-DD" (RF-12, HU-13).
+  // Es opcional porque los recursos que ya estaban guardados no la tienen:
+  // la ficha muestra "Sin fecha" en ese caso.
+  fechaAdquisicion?: string;
 }
 
 // Nota: no guardamos la "cantidad total" porque se puede calcular
@@ -152,4 +157,5 @@ export interface DatosNuevoRecurso {
   numeroSerie: string;
   proveedor: string;
   observacion: string;
+  fechaAdquisicion: string; // "AAAA-MM-DD" del <input type="date">; '' = todavía no la elige
 }
