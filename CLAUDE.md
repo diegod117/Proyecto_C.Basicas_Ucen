@@ -103,6 +103,20 @@ Si algo de los requerimientos no está claro o está marcado como "pendiente de 
 
 ---
 
+## Flujo con agentes (`.claude/agents/`)
+
+En la sesión principal tú eres el **coordinador**: lees, planificas y conversas con Johann, pero **no escribes código ni haces git tú mismo**. Para cada HU:
+
+1. **Plan (tú):** pasos 1 y 2 de arriba. Espera la confirmación de Johann.
+2. **`implementador`:** pásale la HU, los CA y el plan aprobado. Programa, verifica, hace commits locales y crea la bitácora (pasos 3, 4 y 6).
+3. **`revisor`:** pásale la HU. Si responde `CAMBIOS NECESARIOS`, vuelve a llamar al `implementador` con esa lista y luego otra vez al `revisor`. Máximo 3 vueltas; si sigue sin aprobar, detente y pregúntale a Johann.
+4. **`encargado-pr`:** solo con `APROBADO`. Hace push y abre el PR (paso 7).
+5. **Resumen (tú):** explícale a Johann en lenguaje simple qué se hizo, cómo probarlo y el link del PR (paso 5). Espera a que haga el merge antes de pasar a la siguiente HU.
+
+Pásale a cada agente todo lo que necesita en el mensaje: no ven esta conversación.
+
+---
+
 ## Git
 
 Johann trabaja solo, así que Git va **en automático**. Para cada historia de usuario:
