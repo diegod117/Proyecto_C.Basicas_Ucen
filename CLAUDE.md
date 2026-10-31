@@ -6,8 +6,12 @@ Proyecto de la asignatura **Programación de Aplicaciones** (Universidad Central
 Equipo: Johann Cortés, Martín Zepeda Puelles y Diego Cortés.
 
 Es un sistema web de gestión de inventario para los laboratorios del Departamento de Ciencias Básicas.
-Los requerimientos completos (RF, RNF e historias de usuario) están en `docs/requerimientos.md`.
-**Lee ese archivo antes de empezar cualquier tarea** y respeta los IDs (RF-01, HU-03, etc.).
+Los requerimientos vigentes están en **`docs/linea-base-v1.md`** (línea base v1.0, después de la validación con el stakeholder del 14-10-2026).
+`docs/requerimientos.md` es la versión anterior: cuando se contradicen, manda la línea base.
+**Lee la línea base antes de empezar cualquier tarea** y respeta los IDs (RF-01, HU-12, CA-12.1, etc.).
+El plan de esta etapa está en `docs/plan-fase-4.md`.
+
+Desde la fase 4, **Johann trabaja solo** en el repositorio (Diego y Martín no están haciendo cambios por ahora).
 
 Stack: **React + TypeScript con Vite**.
 Los datos se guardan en **Firebase** (Authentication + Firestore); `src/data/` solo tiene los datos de prueba que se suben la primera vez.
@@ -87,13 +91,13 @@ Reglas:
 
 Trabaja **una historia de usuario a la vez**. Para cada tarea sigue estos pasos y **no te saltes ninguno**:
 
-1. **Leer**: revisa `docs/requerimientos.md` y los archivos de `docs/avance/` para saber qué hay hecho.
+1. **Leer**: revisa `docs/linea-base-v1.md`, `docs/plan-fase-4.md` y los archivos de `docs/avance/` para saber qué hay hecho.
 2. **Planificar**: antes de escribir código, explícame en pocas líneas qué archivos vas a crear o modificar y por qué. **Espera mi confirmación.**
 3. **Implementar**: haz cambios pequeños, solo lo necesario para la historia de usuario. No refactorices otras partes sin preguntar.
 4. **Verificar**: ejecuta `npm run build` (y `npm run lint` si existe) y corrige los errores antes de decir que terminaste.
 5. **Explicar**: resume qué hiciste, en lenguaje simple, como si se lo explicaras a un compañero. Indica cómo probarlo en el navegador.
 6. **Registrar**: crea un archivo nuevo en `docs/avance/` (nombre y plantilla en `docs/avance.md`) con la fecha, la HU trabajada y los archivos tocados. Nunca agregues entradas al final de `docs/avance.md`: eso causaba conflictos.
-7. **Commit**: propón el mensaje de commit, pero **no hagas commit ni push sin que te lo pida**.
+7. **Git (automático)**: cuando el build y el lint pasen, haz commit, push y abre el PR **sin pedir permiso**, siguiendo la sección "Git" de abajo.
 
 Si algo de los requerimientos no está claro o está marcado como "pendiente de confirmar", **pregunta** en vez de inventar.
 
@@ -101,12 +105,24 @@ Si algo de los requerimientos no está claro o está marcado como "pendiente de 
 
 ## Git
 
-- Trabajamos 3 personas en el mismo repositorio.
-- Cada historia de usuario en su propia rama: `feature/hu-01-listado-inventario`, `feature/hu-03-reservas`, etc.
-- Mensajes de commit en español, cortos y en presente:
-  `feat(HU-01): agrega listado de inventario con filtros`
-  `fix(HU-03): valida que la cantidad reservada no supere la disponible`
-- Nunca hagas `git push --force`, ni borres ramas, ni hagas merge a `main` sin pedirlo.
+Johann trabaja solo, así que Git va **en automático**. Para cada historia de usuario:
+
+1. **Antes de empezar:** `git checkout main && git pull`, y crea la rama `feature/hu-XX-descripcion-corta` (ej.: `feature/hu-12-unidades-serie`).
+2. **Mientras trabajas:** haz commits pequeños **sin preguntar**, cada vez que una parte quede funcionando y `npm run build` pase. Mensajes en español, cortos y en presente:
+   `feat(HU-12): agrega tabla de unidades con número de serie`
+   `fix(HU-03): valida que la cantidad reservada no supere la disponible`
+   `docs: agrega avance de J29`
+3. **Push:** después de cada commit, `git push` (la primera vez, `git push -u origin <rama>`).
+4. **Pull request:** al terminar la historia (build y lint sin errores y bitácora creada), abre el PR hacia `main` con `gh pr create --base main`. Título igual al commit principal; descripción en español con: HU y RF cubiertos, criterios de aceptación cumplidos (CA-XX.X), cómo probarlo en el navegador y archivos tocados.
+5. **Después del PR:** entrega el link del PR y espera. **No hagas merge**: Johann lo revisa y lo aprueba. Si te pide un cambio, haz commit y push en la misma rama (el PR se actualiza solo).
+6. **Siguiente historia:** solo cuando Johann te diga que el PR ya está en `main`.
+
+Nunca:
+- `git push --force`, `git reset --hard` sobre algo ya subido, ni borrar ramas.
+- Hacer commit de `.env`, claves de Firebase de servicio ni archivos de `node_modules`/`dist`.
+- Hacer commit con el build roto.
+
+Los IDs de la bitácora siguen con la letra **J** desde **J29** (el último fue J28).
 
 ---
 
@@ -115,6 +131,7 @@ Si algo de los requerimientos no está claro o está marcado como "pendiente de 
 - No instalar paquetes nuevos sin preguntar.
 - No cambiar la estructura de carpetas.
 - No escribir código "de experto" que no podamos explicar.
-- No modificar `docs/requerimientos.md`.
+- No modificar `docs/requerimientos.md` ni `docs/linea-base-v1.md` (si un requisito cambia, pregúntame).
+- No implementar lo que la línea base deja fuera de la primera versión (acta de baja, permisos temporales, vista por laboratorio, login institucional, RF-06, RF-07).
 - No implementar varias historias de usuario de una sola vez.
 - No borrar código de otros integrantes sin avisar.
