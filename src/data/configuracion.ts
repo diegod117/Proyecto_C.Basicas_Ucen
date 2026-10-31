@@ -3,19 +3,56 @@
 // (si las colecciones están vacías). Después el encargado agrega más desde
 // la página "Configuración".
 // Son las mismas que usaba la app antes, cuando eran listas fijas.
-// Cubre: datos de apoyo para RF-08, RF-10 y RNF-05
+// Cubre: datos de apoyo para RF-08 (con descripción breve), RF-10 y RNF-05
 
 import type { Categoria, Torre, Sala } from '../types/Configuracion';
 
 // Las 6 categorías de RF-08. Solo insumos y reactivos usan stock mínimo (HU-09).
 // Solo equipos e instrumentos usan número de serie por unidad (HU-12).
+// Descripciones: SOLO la de "Instalación" viene de la línea base (RF-08). Las
+// otras 5 (Instrumento, Insumo, Equipo, Reactivo y Mobiliario) son una
+// propuesta nuestra: texto provisional por confirmar con el stakeholder.
+// Estos datos solo se suben a Firestore si la colección "categorias" está
+// vacía; las categorías que ya están guardadas no se modifican.
 export const listaCategoriasPrueba: Categoria[] = [
-  { clave: 'instrumento', nombre: 'Instrumento', usaStockMinimo: false, usaNumeroSerie: true },
-  { clave: 'insumo', nombre: 'Insumo', usaStockMinimo: true },
-  { clave: 'equipo', nombre: 'Equipo', usaStockMinimo: false, usaNumeroSerie: true },
-  { clave: 'reactivo', nombre: 'Reactivo', usaStockMinimo: true },
-  { clave: 'mobiliario', nombre: 'Mobiliario', usaStockMinimo: false },
-  { clave: 'instalacion', nombre: 'Instalación', usaStockMinimo: false },
+  {
+    clave: 'instrumento',
+    nombre: 'Instrumento',
+    usaStockMinimo: false,
+    usaNumeroSerie: true,
+    descripcion: 'Aparatos de medición, como multímetros o termómetros.',
+  },
+  {
+    clave: 'insumo',
+    nombre: 'Insumo',
+    usaStockMinimo: true,
+    descripcion: 'Materiales que se gastan con el uso, como guantes.',
+  },
+  {
+    clave: 'equipo',
+    nombre: 'Equipo',
+    usaStockMinimo: false,
+    usaNumeroSerie: true,
+    descripcion: 'Aparatos de laboratorio de uso general, como osciloscopios o fuentes de poder.',
+  },
+  {
+    clave: 'reactivo',
+    nombre: 'Reactivo',
+    usaStockMinimo: true,
+    descripcion: 'Sustancias químicas que se consumen en las prácticas.',
+  },
+  {
+    clave: 'mobiliario',
+    nombre: 'Mobiliario',
+    usaStockMinimo: false,
+    descripcion: 'Muebles de trabajo, como mesas y bancos.',
+  },
+  {
+    clave: 'instalacion',
+    nombre: 'Instalación',
+    usaStockMinimo: false,
+    descripcion: 'Elementos fijos como llaves de gas, data o mesones.',
+  },
 ];
 
 // Las torres B y C (sección 1.1 de requerimientos)

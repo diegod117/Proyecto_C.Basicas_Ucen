@@ -3,7 +3,7 @@
 // agregar desde la página "Configuración". Antes eran listas fijas escritas
 // en el código; ahora se guardan en Firestore, así la app crece sin tener
 // que programar (RNF-05: incorporar categorías sin cambios estructurales).
-// Cubre: RF-08 (categorías), RF-10 (ubicación: torres y salas), RNF-05
+// Cubre: RF-08 (categorías con descripción breve), RF-10 (ubicación: torres y salas), RNF-05
 
 // Categoría de un recurso. Ej: { clave: 'instrumento', nombre: 'Instrumento', usaStockMinimo: false }
 export interface Categoria {
@@ -16,6 +16,10 @@ export interface Categoria {
   // o de inventario (equipos e instrumentos, HU-12). Es opcional porque las
   // categorías guardadas antes de HU-12 no lo tienen (ver utils/unidades.ts).
   usaNumeroSerie?: boolean;
+  // Descripción breve de la categoría (RF-08), ej: "Elementos fijos como
+  // llaves de gas, data o mesones". Es opcional porque las categorías
+  // guardadas antes no la tienen: en ese caso se muestra "Sin descripción".
+  descripcion?: string;
 }
 
 // Torre (edificio) donde hay laboratorios. Ej: { letra: 'B' }

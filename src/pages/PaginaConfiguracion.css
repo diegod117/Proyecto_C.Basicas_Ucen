@@ -52,6 +52,28 @@
   color: var(--color-texto-secundario);
 }
 
+/* Ítem de la lista de categorías (RF-08): un recuadro con el nombre arriba y
+   la descripción debajo. Es una clase propia porque .configuracion-item lo
+   comparten las torres y las salas, que siguen siendo pastillas de una línea. */
+.configuracion-item-categoria {
+  max-width: 320px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-principal);
+  background-color: var(--color-principal-claro);
+  border-radius: var(--radio-borde-sm);
+}
+
+/* Texto de la descripción, en una línea aparte y más pequeño */
+.configuracion-descripcion {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--color-texto-secundario);
+}
+
 /* Formulario en una fila: campos y botón alineados abajo.
    flex-wrap: si no caben (celular), bajan a la línea siguiente. */
 .configuracion-formulario {

@@ -1,10 +1,13 @@
 // configuracion.ts
 // Funciones de ayuda para la página "Configuración": validar las categorías,
-// torres y salas nuevas antes de guardarlas.
-// Cubre: RF-08, RF-10, RNF-05
+// torres y salas nuevas antes de guardarlas, y mostrar la descripción de una categoría.
+// Cubre: RF-08 (categorías con descripción breve), RF-10, RNF-05
 
 import type { Categoria, Torre, Sala } from '../types/Configuracion';
 import { prepararTextoParaBuscar } from './filtrosInventario';
+
+// Máximo de caracteres de la descripción de una categoría: tiene que ser "breve" (RF-08)
+export const MAXIMO_DESCRIPCION_CATEGORIA = 120;
 
 // crearClaveCategoria
 // Recibe: el nombre que escribió el encargado, ej: "Material de vidrio".
@@ -15,9 +18,13 @@ export function crearClaveCategoria(nombre: string): string {
 }
 
 // validarNuevaCategoria
-// Recibe: el nombre escrito y las categorías que ya existen.
+// Recibe: el nombre escrito, la descripción breve escrita y las categorías que ya existen.
 // Devuelve: un mensaje de error, o '' (texto vacío) si se puede agregar.
-export function validarNuevaCategoria(nombre: string, existentes: Categoria[]): string {
+export function validarNuevaCategoria(
+  nombre: string,
+  descripcion: string,
+  existentes: Categoria[],
+): string {
   if (nombre.trim() === '') {
     return 'Escribe el nombre de la categoría.';
   }
@@ -27,7 +34,30 @@ export function validarNuevaCategoria(nombre: string, existentes: Categoria[]): 
       return 'Ya existe la categoría "' + categoria.nombre + '".';
     }
   }
+  // La descripción es obligatoria al crear una categoría (RF-08) y debe ser breve
+  const descripcionLimpia = descripcion.trim();
+  if (descripcionLimpia === '') {
+    return 'Escribe una descripción breve de la categoría.';
+  }
+  if (descripcionLimpia.length > MAXIMO_DESCRIPCION_CATEGORIA) {
+    return (
+      'La descripción debe tener máximo ' + MAXIMO_DESCRIPCION_CATEGORIA +
+      ' caracteres (tiene ' + descripcionLimpia.length + ').'
+    );
+  }
   return '';
+}
+
+// textoDescripcionCategoria
+// Recibe: una categoría.
+// Devuelve: su descripción breve, o "Sin descripción" si no tiene (las
+// categorías guardadas antes de RF-08 no traen el campo, o viene vacío o
+// con solo espacios).
+export function textoDescripcionCategoria(categoria: Categoria): string {
+  if (categoria.descripcion === undefined || categoria.descripcion.trim() === '') {
+    return 'Sin descripción';
+  }
+  return categoria.descripcion.trim();
 }
 
 // validarNuevaTorre
