@@ -166,7 +166,21 @@ Mientras no haya respuesta, el código no las aplica.
 
 ---
 
-## 5. Lo que no cambia
+## 5. Pensando en el backend (Firebase es temporal)
+
+El profesor indicó que Firebase/Firestore es una base **temporal** y que más adelante se migra a un backend con otra base de datos (todavía sin definir). Reglas para el código nuevo de esta fase:
+
+1. Todo acceso a datos queda en `src/services/`. Las páginas y componentes no importan `firebase`. Hoy ya se cumple.
+2. La lógica de negocio (validar, calcular, leer el Excel) va en `src/utils/` como funciones puras, sin Firebase. Así se reutiliza tal cual con el backend nuevo. Ej.: la lectura del `.xlsx` devuelve recursos y no guarda nada.
+3. Fechas como texto, ids numéricos y datos planos (sin `Timestamp` ni referencias de Firestore).
+4. Ningún tipo de Firebase en `src/types/`.
+5. Cada servicio expone las mismas funciones de siempre (`obtener…`, `agregar…`, `cambiar…`); al migrar se reescribe por dentro y el resto de la app no cambia.
+6. **Trabajo que se botaría al migrar:** las reglas de Firestore por rol y la creación de cuentas con una segunda instancia de Firebase (D4 y D6). Por eso HU-15 (J38) se hace **al final**, o después de saber el backend, y no se invierte más en reglas de las necesarias.
+7. Anotado: `recursosService` y `historialService` comparten un `writeBatch` (se pasa de uno al otro). Es interno de `services/` y se reescribe junto con ellos, así que no se toca ahora.
+
+---
+
+## 6. Lo que no cambia
 
 - Stack: React + TypeScript con Vite, Firebase (Authentication + Firestore) y React Router. **No se instala nada** sin tu aprobación (hoy, solo D8 lo necesitaría).
 - Las lecturas siguen usando la copia en memoria de cada servicio y las escrituras son `async` (ver `docs/plan-fase-3.md`, sección 1).
