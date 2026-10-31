@@ -39,13 +39,15 @@ service cloud.firestore {
     }
 
     // RECURSOS: se crean una vez (datos de prueba) y después solo cambian
-    // sus cantidades y sus unidades (cambiar estado y reponer stock).
+    // sus cantidades, sus unidades y su ubicación (cambiar estado, reponer
+    // stock y cambiar de lugar, HU-11).
     // "unidades" es la lista de equipos e instrumentos con número de serie
     // (HU-12): al cambiar el estado de una unidad (HU-02) cambia esa lista
-    // junto con las cantidades. No se borran.
+    // junto con las cantidades. "ubicacion" cambia al mover el recurso de
+    // torre, sala, bodega o mueble (HU-11). No se borran.
     match /recursos/{id} {
       allow read, create: if conSesion();
-      allow update: if conSesion() && soloCambia(['cantidades', 'unidades']);
+      allow update: if conSesion() && soloCambia(['cantidades', 'unidades', 'ubicacion']);
       allow delete: if false;
     }
 
