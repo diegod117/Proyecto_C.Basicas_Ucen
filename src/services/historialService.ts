@@ -104,32 +104,6 @@ export function crearRegistroCambioEstado(
   };
 }
 
-// crearRegistroReposicion
-// Recibe: el id del recurso, cuántas unidades nuevas llegaron, el motivo
-//         (ej: "Compra orden 123") y el nombre del usuario conectado.
-// Devuelve: el registro listo para guardar. Igual que el anterior, pero
-// con tipo 'reposicion'.
-export function crearRegistroReposicion(
-  recursoId: number,
-  cantidad: number,
-  motivo: string,
-  nombreUsuario: string,
-): CambioEstado {
-  return {
-    id: obtenerSiguienteId(),
-    tipo: 'reposicion',
-    recursoId: recursoId,
-    fecha: obtenerFechaActual(),
-    // Las unidades nuevas no vienen de ningún estado: entran a "disponible"
-    estadoAnterior: 'disponible',
-    estadoNuevo: 'disponible',
-    cantidad: cantidad,
-    motivo: motivo.trim(),
-    usuario: nombreUsuario,
-    valorNuevo: textoEstado('disponible'),
-  };
-}
-
 // crearRegistroAlta
 // Recibe: el id del recurso nuevo, sus unidades iniciales y el nombre del
 //         usuario conectado.
@@ -157,16 +131,19 @@ export function crearRegistroAlta(
 
 // crearRegistroEntrada
 // Recibe: el id del recurso, el tipo de entrada (adquisición, préstamo o
-//         reposición), cuántas unidades llegan, el motivo y el usuario.
-// Devuelve: el registro listo para guardar, con tipo 'entrada'. Lo usará
-// HU-14; los registros antiguos de reposición siguen existiendo como
-// 'reposicion' porque el historial no se puede modificar.
+//         reposición), cuántas unidades llegan, el motivo, el usuario, la
+//         fecha en que ocurrió y, si tiene número de serie, el de la unidad.
+// Devuelve: el registro listo para guardar, con tipo 'entrada' (HU-14).
+// Los registros antiguos de reposición siguen existiendo como 'reposicion'
+// porque el historial no se puede modificar.
 export function crearRegistroEntrada(
   recursoId: number,
   subtipo: TipoEntrada,
   cantidad: number,
   motivo: string,
   nombreUsuario: string,
+  fechaMovimiento: string,
+  unidad?: string,
 ): CambioEstado {
   return {
     id: obtenerSiguienteId(),
@@ -180,7 +157,9 @@ export function crearRegistroEntrada(
     motivo: motivo.trim(),
     usuario: nombreUsuario,
     valorNuevo: textoEstado('disponible'),
+    unidad: unidad,
     subtipo: subtipo,
+    fechaMovimiento: fechaMovimiento,
   };
 }
 
@@ -190,7 +169,7 @@ export function crearRegistroEntrada(
 //         el motivo, el usuario y, si se indicó, el número de serie.
 // Devuelve: el registro listo para guardar, con tipo 'salida'. El daño
 // reparable deja la unidad "en mantención" y el irreparable "dado de baja".
-// Lo usará HU-14.
+// La usa registrarSalida (movimientosService, HU-14).
 export function crearRegistroSalida(
   recursoId: number,
   subtipo: TipoSalida,
@@ -244,6 +223,17 @@ export function crearRegistroCambioUbicacion(
     valorAnterior: codigoAnterior,
     valorNuevo: codigoNuevo,
   };
+}
+
+// asignarIdsSeguidos
+// Recibe: varios registros recién creados (que todavía no están en la memoria).
+// No devuelve nada. Como todos calcularon "el mayor id + 1" sobre la misma
+// memoria, tendrían el MISMO id: cada uno toma el siguiente al del anterior
+// para que no se pisen al guardarlos juntos.
+export function asignarIdsSeguidos(registros: CambioEstado[]): void {
+  for (let i = 1; i < registros.length; i++) {
+    registros[i].id = registros[i - 1].id + 1;
+  }
 }
 
 // agregarRegistroAlLote

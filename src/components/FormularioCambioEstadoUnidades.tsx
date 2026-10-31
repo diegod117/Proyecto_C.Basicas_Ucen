@@ -3,7 +3,7 @@
 // de un equipo o instrumento, eligiéndolas por su número de serie.
 // Ej: marcar la unidad FLK-0003 y pasarla a "Dañado".
 // Para insumos y reactivos se usa FormularioCambioEstado (por cantidad).
-// Usa los estilos de FormularioCambioEstado.css y FormularioCambioEstadoUnidades.css.
+// Usa los estilos de FormularioCambioEstado.css.
 // Cubre: HU-02, RF-01 (CA-02.2 a CA-02.4), HU-12 (unidades)
 
 import { useState } from 'react';
@@ -13,8 +13,8 @@ import { listaEstadosRecurso, textoEstado } from '../utils/inventario';
 import { validarCambioEstadoUnidades, textoResumenCambioUnidades } from '../utils/cambioEstado';
 import { cambiarEstadoUnidades } from '../services/recursosService';
 import { useUsuario } from '../context/ContextoUsuario';
+import SelectorUnidades from './SelectorUnidades';
 import './FormularioCambioEstado.css';
-import './FormularioCambioEstadoUnidades.css';
 
 interface PropsFormularioCambioEstadoUnidades {
   // Un recurso que ya tiene sus unidades registradas (recurso.unidades existe)
@@ -39,17 +39,11 @@ function FormularioCambioEstadoUnidades(props: PropsFormularioCambioEstadoUnidad
   const [mensajeExito, setMensajeExito] = useState('');
   const [guardando, setGuardando] = useState(false);
 
-  // marcarUnidad
-  // Recibe: el número de serie de una unidad y si quedó marcada o no.
-  // No devuelve nada. Agrega o saca el número de la lista de marcadas.
-  function marcarUnidad(numero: string, marcada: boolean) {
-    if (marcada) {
-      // [...lista, numero] crea una lista nueva con el número al final
-      setNumerosMarcados([...numerosMarcados, numero]);
-    } else {
-      // filter deja todos los números menos el que se desmarcó
-      setNumerosMarcados(numerosMarcados.filter((n) => n !== numero));
-    }
+  // cambiarMarcadas
+  // Recibe: la lista nueva de números marcados. No devuelve nada.
+  // La llama SelectorUnidades cada vez que se marca o desmarca una unidad.
+  function cambiarMarcadas(numeros: string[]) {
+    setNumerosMarcados(numeros);
     setMensajeError('');
   }
 
@@ -107,22 +101,11 @@ function FormularioCambioEstadoUnidades(props: PropsFormularioCambioEstadoUnidad
     <form className="formulario-cambio-estado" onSubmit={guardarCambio} noValidate>
       <h3 className="formulario-cambio-titulo">Cambiar estado de unidades</h3>
 
-      <span className="formulario-unidades-etiqueta">Unidades (marca las que cambian)</span>
-      <ul className="formulario-unidades-lista">
-        {recurso.unidades.map((unidad) => (
-          <li key={unidad.numero}>
-            <label className="formulario-unidades-opcion">
-              <input
-                type="checkbox"
-                checked={numerosMarcados.includes(unidad.numero)}
-                onChange={(evento) => marcarUnidad(unidad.numero, evento.target.checked)}
-              />
-              <span className="formulario-unidades-numero">{unidad.numero}</span>
-              <span className={'etiqueta etiqueta-' + unidad.estado}>{textoEstado(unidad.estado)}</span>
-            </label>
-          </li>
-        ))}
-      </ul>
+      <SelectorUnidades
+        unidades={recurso.unidades}
+        marcados={numerosMarcados}
+        onCambiar={cambiarMarcadas}
+      />
 
       <label htmlFor="estado-nuevo-unidades">Nuevo estado</label>
       <select

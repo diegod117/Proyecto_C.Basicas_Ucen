@@ -56,11 +56,16 @@ function DetalleCambioHistorial(props: PropsDetalleCambioHistorial) {
     );
   }
 
-  // Entrada. Ej: Entrada · Préstamo +2 → [Disponible]
+  // Entrada. Ej: Entrada · Préstamo +1 → [Disponible] · unidad FLK-0004 · 2026-10-20
   if (cambio.tipo === 'entrada') {
     let nombreEntrada = 'Entrada';
     if (cambio.subtipo !== undefined) {
       nombreEntrada = 'Entrada · ' + textoSubtipo(cambio.subtipo);
+    }
+    // La fecha en que ocurrió la entrada (la escribe el encargado, CA-14.1)
+    let textoFecha = '';
+    if (cambio.fechaMovimiento !== undefined) {
+      textoFecha = ' · ' + cambio.fechaMovimiento;
     }
     return (
       <>
@@ -69,6 +74,10 @@ function DetalleCambioHistorial(props: PropsDetalleCambioHistorial) {
         </span>
         {' → '}
         {etiquetaEstado('disponible')}
+        <span className="tabla-historial-cantidad">
+          {textoUnidad}
+          {textoFecha}
+        </span>
       </>
     );
   }

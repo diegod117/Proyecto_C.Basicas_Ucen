@@ -3,7 +3,6 @@
 // obtienen los recursos del inventario.
 // Cubre: HU-01, RF-02 (consultar el inventario), HU-02, RF-01 (cambiar estados),
 //        HU-06 (cada cambio de estado queda en el historial),
-//        RF-04 (reponer stock de un recurso),
 //        RNF-06 (los recursos se cargan desde Firestore),
 //        agregar recursos nuevos desde la página de inventario,
 //        HU-02 / RF-01 (cambiar el estado de unidades específicas)
@@ -23,7 +22,6 @@ import { contarUnidadesPorEstado } from '../utils/unidades';
 import {
   crearRegistroAlta,
   crearRegistroCambioEstado,
-  crearRegistroReposicion,
   agregarRegistroAlLote,
   agregarRegistroEnMemoria,
 } from './historialService';
@@ -154,47 +152,13 @@ export async function cambiarEstadoRecurso(
   return guardarCambioConHistorial(recurso, nuevasCantidades, [registro]);
 }
 
-// reponerStock
-// Recibe: el id del recurso, cuántas unidades NUEVAS llegaron, el motivo
-//         (ej: "Compra orden 123") y el nombre del usuario conectado.
-// Devuelve: una Promise<boolean>: true si se guardó, false si no.
-// Ejemplo: los guantes tienen 2 cajas disponibles y llegan 10:
-//          disponible pasa de 2 a 12 y el total sube de 2 a 12.
-// A diferencia de cambiarEstadoRecurso, aquí el total SÍ cambia, porque
-// entran unidades que antes no estaban en el inventario. Esto es lo que
-// resuelve una alerta de reposición (HU-09).
-export async function reponerStock(
-  idRecurso: number,
-  cantidad: number,
-  motivo: string,
-  nombreUsuario: string,
-): Promise<boolean> {
-  const recurso = obtenerRecursoPorId(idRecurso);
-
-  if (recurso === undefined) {
-    return false; // no existe un recurso con ese id
-  }
-  if (cantidad < 1) {
-    return false; // no se puede reponer 0 ni un número negativo
-  }
-
-  const nuevasCantidades = { ...recurso.cantidades };
-  nuevasCantidades.disponible = nuevasCantidades.disponible + cantidad;
-
-  // Igual que en los cambios de estado, la reposición queda registrada
-  // en el historial desde el servicio (RNF-06).
-  const registro = crearRegistroReposicion(idRecurso, cantidad, motivo, nombreUsuario);
-
-  return guardarCambioConHistorial(recurso, nuevasCantidades, [registro]);
-}
-
 // guardarCambioConHistorial
 // Recibe: el recurso, sus cantidades nuevas, la lista de registros del
 //         historial y, si cambió el estado de unidades, la lista de unidades nueva.
 // Devuelve: una Promise<boolean>: true si se guardó, false si Firestore falló.
-// La usan cambiarEstadoRecurso, reponerStock y cambiarEstadoUnidades, que
-// guardan lo mismo: las cantidades del recurso + registros del historial.
-async function guardarCambioConHistorial(
+// La usan cambiarEstadoRecurso, cambiarEstadoUnidades y movimientosService
+// (entradas y salidas, HU-14), que guardan lo mismo: las cantidades del recurso + registros del historial.
+export async function guardarCambioConHistorial(
   recurso: Recurso,
   nuevasCantidades: CantidadesPorEstado,
   registros: CambioEstado[],

@@ -59,4 +59,8 @@ export interface CambioEstado {
   unidad?: string;
   // Tipo de la entrada o de la salida (solo en 'entrada' y 'salida')
   subtipo?: TipoEntrada | TipoSalida;
+  // Fecha en que ocurrió una entrada, "AAAA-MM-DD" (CA-14.1). La escribe el
+  // encargado; es distinta de "fecha", que es el momento automático en que
+  // se registró (para no perder la trazabilidad).
+  fechaMovimiento?: string;
 }

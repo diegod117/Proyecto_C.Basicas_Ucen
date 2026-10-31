@@ -129,7 +129,11 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
 
         {/* Equipos e instrumentos: un número de serie por cada unidad (HU-12) */}
         {categoriaUsaNumeroSerie(datos.categoria) && (
-          <CamposNumerosSerie datos={datos} onCambiar={cambiarDatos} />
+          <CamposNumerosSerie
+            cantidadTexto={datos.cantidadTexto}
+            numeros={datos.numerosUnidades}
+            onCambiar={(numeros) => cambiarDatos({ ...datos, numerosUnidades: numeros })}
+          />
         )}
 
         {/* El stock mínimo solo tiene sentido en insumos y reactivos (HU-09) */}

@@ -1,30 +1,31 @@
 // CamposNumerosSerie.tsx
-// Parte del formulario "Agregar recurso" para equipos e instrumentos:
-// muestra un campo de texto por cada unidad, para escribir su número de
-// serie o de inventario. Si la cantidad inicial es 3, aparecen 3 campos.
+// Campos para escribir el número de serie o de inventario de cada unidad
+// de un equipo o instrumento. Si la cantidad es 3, aparecen 3 campos.
+// Lo usan "Agregar recurso" (HU-12) y la entrada de unidades (HU-14).
 // Usa los estilos de FormularioNuevoRecurso.css.
-// Cubre: HU-12, RF-11 (CA-12.1)
+// Cubre: HU-12, RF-11 (CA-12.1), HU-14
 
-import type { DatosNuevoRecurso } from '../types/Recurso';
 import { MAXIMO_UNIDADES_CON_SERIE } from '../utils/unidades';
 
 interface PropsCamposNumerosSerie {
-  datos: DatosNuevoRecurso;
-  // Igual que en CamposDetalleRecurso: recibe los datos completos con un campo cambiado
-  onCambiar: (datos: DatosNuevoRecurso) => void;
+  // La cantidad de unidades, como texto (así la entrega el <input>)
+  cantidadTexto: string;
+  // Los números escritos hasta ahora (uno por unidad)
+  numeros: string[];
+  // Recibe la lista de números completa con una posición cambiada
+  onCambiar: (numeros: string[]) => void;
 }
 
 // Componente CamposNumerosSerie
-// Recibe: los datos del formulario y la función para cambiarlos.
+// Recibe: la cantidad, los números escritos y la función para cambiarlos.
 // Devuelve: un campo por unidad, o un aviso si la cantidad todavía no es válida.
 function CamposNumerosSerie(props: PropsCamposNumerosSerie) {
-  const datos = props.datos;
-  const cantidad = Number(datos.cantidadTexto);
+  const cantidad = Number(props.cantidadTexto);
 
   // Mientras la cantidad no sea un entero entre 1 y el máximo, no sabemos
   // cuántos campos mostrar
   const cantidadValida =
-    datos.cantidadTexto.trim() !== '' && Number.isInteger(cantidad) && cantidad >= 1 && cantidad <= MAXIMO_UNIDADES_CON_SERIE;
+    props.cantidadTexto.trim() !== '' && Number.isInteger(cantidad) && cantidad >= 1 && cantidad <= MAXIMO_UNIDADES_CON_SERIE;
 
   if (!cantidadValida) {
     return (
@@ -39,13 +40,13 @@ function CamposNumerosSerie(props: PropsCamposNumerosSerie) {
   // Recibe: la posición de la unidad y el texto nuevo. No devuelve nada.
   // Copia la lista, cambia solo esa posición y avisa al formulario.
   function cambiarNumero(posicion: number, texto: string) {
-    const numeros = [...datos.numerosUnidades];
+    const numeros = [...props.numeros];
     // Si la lista es más corta que la posición, rellenamos con textos vacíos
     while (numeros.length <= posicion) {
       numeros.push('');
     }
     numeros[posicion] = texto;
-    props.onCambiar({ ...datos, numerosUnidades: numeros });
+    props.onCambiar(numeros);
   }
 
   // Hacemos una lista [0, 1, 2...] con una posición por unidad para poder
@@ -64,8 +65,8 @@ function CamposNumerosSerie(props: PropsCamposNumerosSerie) {
         {posiciones.map((posicion) => {
           // Si todavía no escribió nada en esa posición, el campo va vacío
           let valor = '';
-          if (datos.numerosUnidades[posicion] !== undefined) {
-            valor = datos.numerosUnidades[posicion];
+          if (props.numeros[posicion] !== undefined) {
+            valor = props.numeros[posicion];
           }
           return (
             <label key={posicion} className="nuevo-recurso-campo">
