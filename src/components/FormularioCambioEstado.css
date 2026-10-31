@@ -116,3 +116,10 @@
     font-size: 16px;
   }
 }
+
+/* Línea de ayuda debajo del título de un recuadro ("Disponibles: 2 · Mínimo: 5") */
+.formulario-movimiento-ayuda {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+}

@@ -109,7 +109,7 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
   const codigo = armarUbicacion(datos).codigo;
   for (const recurso of existentes) {
     if (recurso.nombre.toLowerCase() === nombre && recurso.ubicacion.codigo === codigo) {
-      return 'Ya existe "' + recurso.nombre + '" en ' + codigo + '. Para sumar unidades usa "Reponer stock" en su ficha.';
+      return 'Ya existe "' + recurso.nombre + '" en ' + codigo + '. Para sumar unidades usa "Registrar entrada" en su ficha.';
     }
   }
 

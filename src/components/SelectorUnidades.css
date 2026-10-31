@@ -1,6 +1,6 @@
-/* FormularioCambioEstadoUnidades.css
-   Estilos de la lista de unidades con casillas dentro del recuadro
-   "Cambiar estado de unidades". El resto usa FormularioCambioEstado.css. */
+/* SelectorUnidades.css
+   Estilos de la lista de unidades con casillas (cambio de estado y salida).
+   Se usa dentro de un recuadro .formulario-cambio-estado. */
 
 .formulario-unidades-etiqueta {
   margin-top: 6px;

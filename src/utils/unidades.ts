@@ -35,12 +35,21 @@ export function categoriaUsaNumeroSerie(claveCategoria: string): boolean {
 // Devuelve: un texto con el error, o '' si todo está bien.
 // Revisa: que la cantidad no sea demasiado grande, que no falte ningún
 // número (CA-12.1) y que no haya repetidos dentro del mismo recurso (CA-12.2).
-export function validarNumerosUnidades(numeros: string[], cantidad: number): string {
+// Al agregar unidades a un recurso que ya existe (HU-14), "numerosExistentes"
+// son los números que ya tiene, para que los nuevos tampoco los repitan.
+export function validarNumerosUnidades(
+  numeros: string[],
+  cantidad: number,
+  numerosExistentes: string[] = [],
+): string {
   if (cantidad > MAXIMO_UNIDADES_CON_SERIE) {
     return 'Los equipos e instrumentos se agregan de a ' + MAXIMO_UNIDADES_CON_SERIE + ' unidades como máximo.';
   }
 
   const vistos: string[] = [];
+  for (const existente of numerosExistentes) {
+    vistos.push(existente.trim().toLowerCase());
+  }
   for (let i = 0; i < cantidad; i++) {
     // Si el encargado no escribió esa posición, el valor es undefined: lo tratamos como vacío
     let numero = '';

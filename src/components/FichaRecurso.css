@@ -131,7 +131,7 @@
 }
 
 /* Columna derecha (solo encargado): "Cambiar estado" y, debajo,
-   "Reponer stock", uno bajo el otro */
+   "Registrar entrada" y "Registrar salida", uno bajo el otro */
 .ficha-columna-derecha {
   display: flex;
   flex-direction: column;

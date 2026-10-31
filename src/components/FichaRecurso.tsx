@@ -3,21 +3,19 @@
 // completa, datos de la planilla (serie, marca, proveedor, observación)
 // y cuántas unidades hay en cada estado.
 // Se abre al hacer clic en una tarjeta del inventario.
-// A la derecha muestra los formularios "Cambiar estado" y "Reponer stock",
+// A la derecha muestra los formularios de cambio de estado, entrada y salida,
 // y debajo de los datos, el historial.
 // Los formularios solo los ve el encargado; los demás roles ven un aviso.
 // Cubre: HU-02 (ficha y cambio de estado), HU-06 (historial),
 //        HU-11 (aviso si la ubicación tiene problemas), RF-01, RF-10, RNF-03,
-//        RF-04 (reponer stock)
+//        RF-04 y RF-13 (entradas y salidas)
 
 import type { Recurso } from '../types/Recurso';
 import { useUsuario } from '../context/ContextoUsuario';
-import { puedeCambiarEstado, puedeReponerStock } from '../utils/permisos';
+import { puedeCambiarEstado } from '../utils/permisos';
 import { textoCategoria, textoCampoOpcional } from '../utils/inventario';
 import { obtenerHistorialDeRecurso } from '../services/historialService';
-import FormularioCambioEstado from './FormularioCambioEstado';
-import FormularioReponerStock from './FormularioReponerStock';
-import FormularioCambioEstadoUnidades from './FormularioCambioEstadoUnidades';
+import AccionesRecurso from './AccionesRecurso';
 import TablaUnidadesEstado from './TablaUnidadesEstado';
 import TablaUnidadesSerie from './TablaUnidadesSerie';
 import TablaHistorial from './TablaHistorial';
@@ -129,42 +127,13 @@ function FichaRecurso(props: PropsFichaRecurso) {
         {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
             Los demás roles ven los datos y el historial, pero en lugar
             de los formularios aparece un aviso. */}
-        {puedeCambiarEstado(usuario.rol) && recurso.unidades !== undefined && (
-          // Recursos con número de serie (HU-12): el estado se cambia por unidad
-          // (HU-02). "Reponer stock" sigue desactivado hasta HU-14, que pedirá
-          // los números de las unidades nuevas; si no, la tabla de unidades y
-          // las cantidades quedarían distintas.
-          <div className="ficha-columna-derecha">
-            <FormularioCambioEstadoUnidades
-              recurso={recurso}
-              onEstadoCambiado={props.onEstadoCambiado}
-            />
-            <p className="ficha-aviso-permiso">
-              Sumar unidades a este recurso (con sus números de serie) estará disponible en HU-14.
-            </p>
-          </div>
-        )}
-        {puedeCambiarEstado(usuario.rol) && recurso.unidades === undefined && (
-          <div className="ficha-columna-derecha">
-            <FormularioCambioEstado
-              recurso={recurso}
-              onEstadoCambiado={props.onEstadoCambiado}
-            />
-            {/* Reponer stock: suma unidades nuevas (resuelve las alertas
-                de reposición). Usa el mismo aviso hacia App que el cambio
-                de estado, porque también cambia los números. */}
-            {puedeReponerStock(usuario.rol) && (
-              <FormularioReponerStock
-                recurso={recurso}
-                onStockRepuesto={props.onEstadoCambiado}
-              />
-            )}
-          </div>
+        {puedeCambiarEstado(usuario.rol) && (
+          <AccionesRecurso recurso={recurso} onCambio={props.onEstadoCambiado} />
         )}
         {!puedeCambiarEstado(usuario.rol) && (
           <p className="ficha-aviso-permiso">
-            Solo el encargado de laboratorio puede cambiar el estado o reponer el stock
-            de un recurso.
+            Solo el encargado de laboratorio puede cambiar el estado, registrar entradas o
+            registrar salidas de un recurso.
           </p>
         )}
       </div>
