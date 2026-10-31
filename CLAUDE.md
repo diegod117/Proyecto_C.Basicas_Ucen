@@ -92,12 +92,12 @@ Reglas:
 Trabaja **una historia de usuario a la vez**. Para cada tarea sigue estos pasos y **no te saltes ninguno**:
 
 1. **Leer**: revisa `docs/linea-base-v1.md`, `docs/plan-fase-4.md` y los archivos de `docs/avance/` para saber qué hay hecho.
-2. **Planificar**: antes de escribir código, explícame en pocas líneas qué archivos vas a crear o modificar y por qué. **Espera mi confirmación.**
+2. **Planificar**: antes de escribir código, se definen los archivos a crear o modificar y por qué. Con el flujo de agentes, el plan lo aprueba el `validador-plan` (ver abajo); sin agentes, **espera mi confirmación**.
 3. **Implementar**: haz cambios pequeños, solo lo necesario para la historia de usuario. No refactorices otras partes sin preguntar.
 4. **Verificar**: ejecuta `npm run build` (y `npm run lint` si existe) y corrige los errores antes de decir que terminaste.
 5. **Explicar**: resume qué hiciste, en lenguaje simple, como si se lo explicaras a un compañero. Indica cómo probarlo en el navegador.
 6. **Registrar**: crea un archivo nuevo en `docs/avance/` (nombre y plantilla en `docs/avance.md`) con la fecha, la HU trabajada y los archivos tocados. Nunca agregues entradas al final de `docs/avance.md`: eso causaba conflictos.
-7. **Git (automático)**: cuando el build y el lint pasen, haz commit, push y abre el PR **sin pedir permiso**, siguiendo la sección "Git" de abajo.
+7. **Git (automático)**: commits, push, PR y merge **sin pedir permiso**, siguiendo las secciones "Flujo con agentes" y "Git" de abajo.
 
 Si algo de los requerimientos no está claro o está marcado como "pendiente de confirmar", **pregunta** en vez de inventar.
 
@@ -105,34 +105,42 @@ Si algo de los requerimientos no está claro o está marcado como "pendiente de 
 
 ## Flujo con agentes (`.claude/agents/`)
 
-En la sesión principal tú eres el **coordinador**: lees, planificas y conversas con Johann, pero **no escribes código ni haces git tú mismo**. Para cada HU:
+En la sesión principal tú eres el **coordinador**: eliges la HU, pasas los mensajes entre los agentes y le informas a Johann, pero **no escribes código ni haces git tú mismo**. Los agentes no se ven entre sí: tú les reenvías lo que dijo el anterior. Pásale a cada uno todo lo que necesita en el mensaje (HU, CA, plan, observaciones), porque no ven esta conversación.
 
-1. **Plan (tú):** pasos 1 y 2 de arriba. Espera la confirmación de Johann.
-2. **`implementador`:** pásale la HU, los CA y el plan aprobado. Programa, verifica, hace commits locales y crea la bitácora (pasos 3, 4 y 6).
-3. **`revisor`:** pásale la HU. Si responde `CAMBIOS NECESARIOS`, vuelve a llamar al `implementador` con esa lista y luego otra vez al `revisor`. Máximo 3 vueltas; si sigue sin aprobar, detente y pregúntale a Johann.
-4. **`encargado-pr`:** solo con `APROBADO`. Hace push y abre el PR (paso 7).
-5. **Resumen (tú):** explícale a Johann en lenguaje simple qué se hizo, cómo probarlo y el link del PR (paso 5). Espera a que haga el merge antes de pasar a la siguiente HU.
+Para cada HU:
 
-Pásale a cada agente todo lo que necesita en el mensaje: no ven esta conversación.
+1. **Plan:** llama al `implementador` con `MODO PLAN` y la HU (con sus CA de la línea base).
+2. **Validación del plan:** pásale ese plan al `validador-plan`.
+   - `CAMBIOS AL PLAN` → reenvía las observaciones al `implementador` (`MODO PLAN`) y vuelve a validar. Máximo 3 vueltas.
+   - `REQUIERE A JOHANN` → **detente**, muéstrale a Johann la decisión con sus opciones y espera su respuesta antes de seguir.
+   - `PLAN APROBADO` → continúa.
+3. **Implementación:** llama al `implementador` con `MODO IMPLEMENTAR` y el plan aprobado.
+4. **Revisión:** llama al `revisor` con la HU y el plan. Si responde `CAMBIOS NECESARIOS`, reenvía la lista al `implementador` (`MODO IMPLEMENTAR`) y vuelve a revisar. Máximo 3 vueltas.
+5. **PR:** con `APROBADO`, llama al `encargado-pr` con la HU, el resumen del implementador y el veredicto del revisor.
+6. **Merge:** llama al `integrador` con el link del PR y el veredicto `APROBADO` del revisor.
+7. **Resumen (tú):** explícale a Johann en lenguaje simple qué se hizo, cómo probarlo en el navegador, el link del PR y el resultado del build en `main`.
+
+**Cuándo detenerse y preguntarle a Johann:** `REQUIERE A JOHANN`; 3 vueltas sin aprobación (plan o revisión); el integrador no pudo hacer merge o el build de `main` falló; o cualquier agente devuelve una pregunta.
+
+**Después de cada HU:** detente y espera. Si Johann dijo "sigue con todo el plan", continúa con la siguiente HU de `docs/plan-fase-4.md` hasta terminarlo o hasta que ocurra una de las situaciones de arriba.
 
 ---
 
 ## Git
 
-Johann trabaja solo, así que Git va **en automático**. Para cada historia de usuario:
+Johann trabaja solo, así que Git va **en automático**. Cada paso lo hace un agente distinto:
 
-1. **Antes de empezar:** `git checkout main && git pull`, y crea la rama `feature/hu-XX-descripcion-corta` (ej.: `feature/hu-12-unidades-serie`).
-2. **Mientras trabajas:** haz commits pequeños **sin preguntar**, cada vez que una parte quede funcionando y `npm run build` pase. Mensajes en español, cortos y en presente:
+1. **Rama** (`implementador`): desde `main` actualizado (`git checkout main && git pull`), crea `feature/hu-XX-descripcion-corta` (ej.: `feature/hu-12-unidades-serie`).
+2. **Commits** (`implementador`): pequeños y **sin preguntar**, cada vez que una parte funciona y `npm run build` pasa. Mensajes en español, cortos y en presente:
    `feat(HU-12): agrega tabla de unidades con número de serie`
    `fix(HU-03): valida que la cantidad reservada no supere la disponible`
    `docs: agrega avance de J29`
-3. **Push:** después de cada commit, `git push` (la primera vez, `git push -u origin <rama>`).
-4. **Pull request:** al terminar la historia (build y lint sin errores y bitácora creada), abre el PR hacia `main` con `gh pr create --base main`. Título igual al commit principal; descripción en español con: HU y RF cubiertos, criterios de aceptación cumplidos (CA-XX.X), cómo probarlo en el navegador y archivos tocados.
-5. **Después del PR:** entrega el link del PR y espera. **No hagas merge**: Johann lo revisa y lo aprueba. Si te pide un cambio, haz commit y push en la misma rama (el PR se actualiza solo).
-6. **Siguiente historia:** solo cuando Johann te diga que el PR ya está en `main`.
+3. **Push y PR** (`encargado-pr`): solo con el `APROBADO` del revisor. PR hacia `main` con `gh pr create --base main`; título igual al commit principal; descripción en español con HU y RF cubiertos, CA cumplidos, cómo probarlo, archivos tocados y resultado de la revisión.
+4. **Merge** (`integrador`): solo después del PR y con el `APROBADO` del revisor, con `gh pr merge --merge`, sin conflictos y con los checks en verde. Luego actualiza `main` local y comprueba que el build pase.
 
 Nunca:
-- `git push --force`, `git reset --hard` sobre algo ya subido, ni borrar ramas.
+- `git push --force`, push directo a `main`, `git reset --hard` sobre algo ya subido, ni borrar ramas.
+- Merge sin el `APROBADO` del revisor o con conflictos.
 - Hacer commit de `.env`, claves de Firebase de servicio ni archivos de `node_modules`/`dist`.
 - Hacer commit con el build roto.
 
