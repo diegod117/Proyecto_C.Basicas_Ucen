@@ -6,6 +6,7 @@
 import type { Recurso, DatosNuevoRecurso, Ubicacion } from '../types/Recurso';
 import { obtenerCategoriaPorClave } from '../services/configuracionService';
 import { generarCodigoUbicacion, validarUbicacion } from './ubicacion';
+import { categoriaUsaNumeroSerie, validarNumerosUnidades, armarUnidades, contarUnidadesPorEstado } from './unidades';
 
 // datosVaciosNuevoRecurso
 // Valores con los que parte el formulario (todo vacío, torre B).
@@ -14,6 +15,7 @@ export const datosVaciosNuevoRecurso: DatosNuevoRecurso = {
   categoria: '',
   cantidadTexto: '1',
   stockMinimoTexto: '',
+  numerosUnidades: [],
   torre: 'B',
   sala: '',
   bodega: '',
@@ -76,6 +78,13 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
   }
   if (!esEnteroMayorQue(datos.cantidadTexto, 0)) {
     return 'La cantidad inicial debe ser un número entero mayor que 0.';
+  }
+  // Equipos e instrumentos: hay que escribir un número de serie por unidad (HU-12)
+  if (categoriaUsaNumeroSerie(datos.categoria)) {
+    const errorNumeros = validarNumerosUnidades(datos.numerosUnidades, Number(datos.cantidadTexto));
+    if (errorNumeros !== '') {
+      return errorNumeros;
+    }
   }
   if (usaStockMinimo(datos) && datos.stockMinimoTexto.trim() !== '') {
     // "mayor que -1" = acepta el 0 y cualquier entero positivo
@@ -145,6 +154,15 @@ export function armarRecurso(datos: DatosNuevoRecurso, id: number): Recurso {
 
   if (usaStockMinimo(datos) && datos.stockMinimoTexto.trim() !== '') {
     recurso.stockMinimo = Number(datos.stockMinimoTexto);
+  }
+
+  // Equipos e instrumentos: se guarda una unidad por cada número de serie y
+  // las cantidades por estado se calculan contándolas (así no se desfasan).
+  // El campo "numeroSerie" suelto no se usa, porque cada unidad tiene el suyo.
+  if (categoriaUsaNumeroSerie(datos.categoria)) {
+    recurso.unidades = armarUnidades(datos.numerosUnidades.slice(0, Number(datos.cantidadTexto)));
+    recurso.cantidades = contarUnidadesPorEstado(recurso.unidades);
+    recurso.numeroSerie = undefined;
   }
 
   return recurso;

@@ -8,10 +8,11 @@
 import type { Categoria, Torre, Sala } from '../types/Configuracion';
 
 // Las 6 categorías de RF-08. Solo insumos y reactivos usan stock mínimo (HU-09).
+// Solo equipos e instrumentos usan número de serie por unidad (HU-12).
 export const listaCategoriasPrueba: Categoria[] = [
-  { clave: 'instrumento', nombre: 'Instrumento', usaStockMinimo: false },
+  { clave: 'instrumento', nombre: 'Instrumento', usaStockMinimo: false, usaNumeroSerie: true },
   { clave: 'insumo', nombre: 'Insumo', usaStockMinimo: true },
-  { clave: 'equipo', nombre: 'Equipo', usaStockMinimo: false },
+  { clave: 'equipo', nombre: 'Equipo', usaStockMinimo: false, usaNumeroSerie: true },
   { clave: 'reactivo', nombre: 'Reactivo', usaStockMinimo: true },
   { clave: 'mobiliario', nombre: 'Mobiliario', usaStockMinimo: false },
   { clave: 'instalacion', nombre: 'Instalación', usaStockMinimo: false },

@@ -75,6 +75,17 @@ export interface CantidadesPorEstado {
 }
 
 // ------------------------------------------------------------------
+// Unidad con número de serie (RF-11, HU-12)
+// ------------------------------------------------------------------
+// En equipos e instrumentos cada unidad se identifica por su número de
+// serie o de inventario, para saber exactamente cuál se dañó o está en
+// mantención. Ejemplo: { numero: 'FLK-0001', estado: 'disponible' }.
+export interface Unidad {
+  numero: string; // número de serie o de inventario (no se repite dentro del recurso)
+  estado: EstadoRecurso; // en qué estado está esta unidad en particular
+}
+
+// ------------------------------------------------------------------
 // Recurso (el dato principal del inventario)
 // ------------------------------------------------------------------
 // Los primeros campos son los mismos que tiene hoy la planilla Excel
@@ -89,6 +100,11 @@ export interface Recurso {
   categoria: CategoriaRecurso; // usa el tipo de arriba, no un texto cualquiera
   ubicacion: Ubicacion; // un objeto dentro de otro objeto
   cantidades: CantidadesPorEstado;
+  // Solo los recursos de categorías con número de serie (equipos e
+  // instrumentos) la tienen. Es opcional porque los recursos antiguos y
+  // los insumos no tienen unidades registradas. Cuando existe,
+  // "cantidades" se calcula contando estas unidades (utils/unidades.ts).
+  unidades?: Unidad[];
   numeroSerie?: string;
   marca?: string;
   proveedor?: string;
@@ -114,6 +130,7 @@ export interface DatosNuevoRecurso {
   categoria: CategoriaRecurso | '';
   cantidadTexto: string; // unidades iniciales (entran como "disponible")
   stockMinimoTexto: string; // solo se usa en insumos y reactivos
+  numerosUnidades: string[]; // un número de serie por unidad (equipos e instrumentos, HU-12)
   torre: Torre;
   sala: string;
   bodega: string;

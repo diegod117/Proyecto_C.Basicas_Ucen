@@ -1,0 +1,22 @@
+/* TablaUnidadesSerie.css
+   Estilos de la tabla de unidades con número de serie de la ficha.
+   El subtítulo usa la clase .ficha-subtitulo de FichaRecurso.css. */
+
+.ficha-tabla-unidades {
+  border-collapse: collapse; /* une los bordes de las celdas */
+  font-size: 14px;
+  width: 100%;
+}
+
+.ficha-tabla-unidades th {
+  text-align: left;
+  font-weight: 700;
+  padding: 6px var(--espacio-sm);
+  border-bottom: 2px solid var(--color-borde);
+}
+
+.ficha-tabla-unidades td {
+  padding: 6px var(--espacio-sm);
+  border-bottom: 1px solid var(--color-borde);
+  overflow-wrap: anywhere; /* un número de serie largo no debe ensanchar la tarjeta en el celular */
+}
