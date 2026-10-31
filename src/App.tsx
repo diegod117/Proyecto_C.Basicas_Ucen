@@ -4,10 +4,11 @@
 // Si hay sesión, primero descarga los datos desde Firestore (CargadorDatos)
 // y luego muestra el menú y la página que corresponde a la ruta (URL):
 //   /inventario (y /inventario/nuevo, /inventario/:id), /reservas,
-//   /incidencias, /alertas y /configuracion.
+//   /incidencias, /alertas, /configuracion y /cargar-planilla.
 // El usuario conectado se comparte con toda la app con ContextoUsuario.
 // Cubre: navegación base con React Router, inicio de sesión con roles
-//        (sección 3.4 de requerimientos), RNF-03 y RNF-06 (datos de Firestore)
+//        (sección 3.4 de requerimientos), RNF-03 y RNF-06 (datos de Firestore),
+//        HU-16 (página de carga desde Excel)
 
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
@@ -21,6 +22,7 @@ import PaginaIncidencias from './pages/PaginaIncidencias';
 import PaginaAlertas from './pages/PaginaAlertas';
 import PaginaLogin from './pages/PaginaLogin';
 import PaginaConfiguracion from './pages/PaginaConfiguracion';
+import PaginaCargaExcel from './pages/PaginaCargaExcel';
 import CargadorDatos from './components/CargadorDatos';
 import { ContextoUsuario } from './context/ContextoUsuario';
 import { generarAlertas } from './utils/alertas';
@@ -177,6 +179,10 @@ function App() {
               <Route
                 path="/configuracion"
                 element={paginaSiPuede(usuarioActual, 'configuracion', <PaginaConfiguracion />)}
+              />
+              <Route
+                path="/cargar-planilla"
+                element={paginaSiPuede(usuarioActual, 'cargaExcel', <PaginaCargaExcel />)}
               />
               <Route path="*" element={<Navigate to="/inventario" replace />} />
             </Routes>

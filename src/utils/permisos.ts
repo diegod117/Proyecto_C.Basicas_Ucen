@@ -4,7 +4,7 @@
 // si hay que cambiar un permiso, se cambia SOLO aquí.
 // Las páginas y componentes preguntan "¿este rol puede...?" y, según la
 // respuesta, muestran u ocultan botones y formularios.
-// Cubre: RNF-03 (el encargado edita; el docente consulta y reserva;
+// Cubre: HU-16 (solo el encargado carga la planilla), RNF-03 (el encargado edita; el docente consulta y reserva;
 // el departamento revisa reportes y alertas)
 //
 // OJO: esto solo oculta cosas en la pantalla. Sin un backend, alguien que
@@ -27,12 +27,28 @@ export function puedeVerPagina(rol: RolUsuario, pagina: Pagina): boolean {
       return false;
     }
   }
+  // Cargar la planilla Excel también es solo del encargado (HU-16)
+  if (pagina === 'cargaExcel') {
+    return puedeCargarPlanilla(rol);
+  }
   if (pagina === 'incidencias' || pagina === 'alertas') {
     if (rol === 'docente') {
       return false;
     }
   }
   return true;
+}
+
+// puedeCargarPlanilla
+// Recibe: el rol del usuario.
+// Devuelve: true si puede cargar el inventario desde la planilla Excel (HU-16).
+// Solo el encargado edita el inventario (RNF-03).
+export function puedeCargarPlanilla(rol: RolUsuario): boolean {
+  if (rol === 'encargado') {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // puedeCambiarEstado

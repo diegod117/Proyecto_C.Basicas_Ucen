@@ -5,7 +5,7 @@
 // Cada opción del menú es un enlace de React Router (NavLink) a su ruta.
 // En celular el aside pasa a ser una fila horizontal (ver MenuNavegacion.css).
 // Cubre: navegación base con React Router, inicio de sesión con roles
-//        (sección 3.4 de requerimientos) y RNF-03.
+//        (sección 3.4 de requerimientos), RNF-03 y HU-16 (enlace "Cargar planilla").
 
 import { NavLink } from 'react-router-dom';
 import type { RolUsuario } from '../types/Usuario';
@@ -114,6 +114,11 @@ function MenuNavegacion(props: PropsMenuNavegacion) {
         {puedeVerPagina(usuario.rol, 'configuracion') && (
           <NavLink to="/configuracion" className={obtenerClaseEnlace}>
             Configuración
+          </NavLink>
+        )}
+        {puedeVerPagina(usuario.rol, 'cargaExcel') && (
+          <NavLink to="/cargar-planilla" className={obtenerClaseEnlace}>
+            Cargar planilla
           </NavLink>
         )}
       </nav>
