@@ -4,12 +4,14 @@
 // Valida que los campos obligatorios estén llenos antes de guardar.
 // RNF-02: el registro se completa en 5 pasos como máximo.
 // Cubre: HU-04 (formulario de incidencia), RF-05 (registro de incidencia),
-// HU-10 (la incidencia guarda quién la registró)
+// HU-10 (la incidencia guarda quién la registró),
+// HU-12 (se puede indicar la unidad afectada)
 
 import { useState } from 'react';
-import { obtenerRecursos } from '../services/recursosService';
+import { obtenerRecursos, obtenerRecursoPorId } from '../services/recursosService';
 import { agregarIncidencia } from '../services/incidenciasService';
 import { useUsuario } from '../context/ContextoUsuario';
+import CampoUnidadIncidencia from './CampoUnidadIncidencia';
 import './FormularioIncidencia.css';
 
 // Props que recibe el formulario desde la página.
@@ -34,6 +36,8 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
   // "Controlado" significa que React guarda el valor actual de cada campo
   // con useState, y el campo siempre muestra ese valor.
   const [recursoId, setRecursoId] = useState<string>('');
+  // Número de serie de la unidad afectada ('' = sin indicar). Es opcional (HU-12).
+  const [unidad, setUnidad] = useState('');
   const [docentePresente, setDocentePresente] = useState('');
   const [descripcion, setDescripcion] = useState('');
 
@@ -91,6 +95,7 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       // "pendiente" (D5), así que solo enviamos los datos del formulario.
       await agregarIncidencia({
         recursoId: Number(recursoId),
+        unidad: unidad === '' ? undefined : unidad,
         docentePresente: docentePresente.trim(),
         descripcion: descripcion.trim(),
         hayPersonasAfectadas,
@@ -102,6 +107,7 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
       // Limpiamos todos los campos para que el formulario quede listo
       // para registrar otra incidencia.
       setRecursoId('');
+      setUnidad('');
       setDocentePresente('');
       setDescripcion('');
       setHayPersonasAfectadas(false);
@@ -131,7 +137,11 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
         <select
           id="campo-recurso"
           value={recursoId}
-          onChange={(evento) => setRecursoId(evento.target.value)}
+          onChange={(evento) => {
+            setRecursoId(evento.target.value);
+            // La unidad elegida era de otro recurso: se borra
+            setUnidad('');
+          }}
         >
           <option value="">-- Seleccione un recurso --</option>
           {recursos.map((recurso) => (
@@ -141,6 +151,13 @@ function FormularioIncidencia(props: PropsFormularioIncidencia) {
           ))}
         </select>
       </div>
+
+      {/* Campo opcional: la unidad afectada, solo si el recurso tiene unidades (HU-12) */}
+      <CampoUnidadIncidencia
+        recurso={recursoId === '' ? undefined : obtenerRecursoPorId(Number(recursoId))}
+        valor={unidad}
+        onCambiar={setUnidad}
+      />
 
       {/* Campo 2: Docente presente en el momento de la incidencia */}
       <div className="campo-formulario">

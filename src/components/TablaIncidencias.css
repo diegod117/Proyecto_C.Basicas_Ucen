@@ -128,3 +128,9 @@
     white-space: nowrap;
   }
 }
+
+/* Número de serie de la unidad afectada, junto al nombre del recurso (HU-12) */
+.tabla-incidencias-unidad {
+  color: var(--color-texto-secundario);
+  overflow-wrap: anywhere;
+}
