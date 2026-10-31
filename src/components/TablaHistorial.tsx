@@ -1,12 +1,12 @@
 // TablaHistorial.tsx
 // Tabla "Historial de estados" que va debajo de la ficha de un recurso.
-// Muestra cada cambio de estado: cuándo, qué cambió, por qué y quién.
-// También muestra las reposiciones de stock (unidades nuevas que llegaron)
-// y el alta del recurso (cuando se agregó al inventario).
-// Cubre: HU-06 (ver el historial de cambios de estado), RF-04, RNF-06
+// Muestra cada movimiento: cuándo, qué cambió, por qué y quién. Son cambios
+// de estado, entradas y salidas de unidades, cambios de ubicación y el alta
+// del recurso. Del más reciente al más antiguo (CA-06.3).
+// Cubre: HU-06 (ver el historial), RF-04, RF-13, RNF-06
 
 import type { CambioEstado } from '../types/CambioEstado';
-import { textoEstado } from '../utils/inventario';
+import DetalleCambioHistorial from './DetalleCambioHistorial';
 import './TablaHistorial.css';
 
 interface PropsTablaHistorial {
@@ -48,41 +48,8 @@ function TablaHistorial(props: PropsTablaHistorial) {
                 <tr key={cambio.id}>
                   <td className="tabla-historial-fecha">{cambio.fecha}</td>
                   <td className="tabla-historial-cambio">
-                    {/* Alta del recurso. Ej: Alta 10 → [Disponible] */}
-                    {cambio.tipo === 'alta' && (
-                      <>
-                        <span className="tabla-historial-reposicion">Alta {cambio.cantidad}</span>
-                        {' → '}
-                        <span className="etiqueta etiqueta-disponible">
-                          {textoEstado('disponible')}
-                        </span>
-                      </>
-                    )}
-                    {/* Reposición. Ej: Reposición +10 → [Disponible] */}
-                    {cambio.tipo === 'reposicion' && (
-                      <>
-                        <span className="tabla-historial-reposicion">
-                          Reposición +{cambio.cantidad}
-                        </span>
-                        {' → '}
-                        <span className="etiqueta etiqueta-disponible">
-                          {textoEstado('disponible')}
-                        </span>
-                      </>
-                    )}
-                    {/* Cambio de estado. Ej: [Disponible] → [Dañado] (1) */}
-                    {cambio.tipo === 'cambio_estado' && (
-                      <>
-                        <span className={'etiqueta etiqueta-' + cambio.estadoAnterior}>
-                          {textoEstado(cambio.estadoAnterior)}
-                        </span>
-                        {' → '}
-                        <span className={'etiqueta etiqueta-' + cambio.estadoNuevo}>
-                          {textoEstado(cambio.estadoNuevo)}
-                        </span>
-                        <span className="tabla-historial-cantidad"> ({cambio.cantidad})</span>
-                      </>
-                    )}
+                    {/* Cada tipo de movimiento se dibuja distinto (ver DetalleCambioHistorial) */}
+                    <DetalleCambioHistorial cambio={cambio} />
                   </td>
                   <td>{cambio.motivo}</td>
                   <td>{cambio.usuario}</td>

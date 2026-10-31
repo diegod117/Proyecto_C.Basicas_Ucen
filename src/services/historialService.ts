@@ -3,7 +3,8 @@
 // cada cambio de estado de los recursos.
 // También guarda las reposiciones de stock.
 // Los registros se guardan en la colección "historial" de Firestore.
-// Cubre: HU-06 (historial de cambios de estado), RF-04 (reposición), RNF-06
+// Cubre: HU-06 (historial de movimientos), RF-04 (reposición), RF-13 (entradas y salidas),
+//        RF-10 (cambio de ubicación), RNF-06
 
 // RNF-06 pide que el historial "no se pierda ni se sobrescriba".
 // Por eso este servicio SOLO tiene funciones para AGREGAR y LEER registros.
@@ -11,10 +12,12 @@
 // si alguien se equivoca, se registra un cambio nuevo que lo corrija.
 // (J27 agrega reglas en Firestore para que el servidor tampoco lo permita.)
 
-import type { CambioEstado } from '../types/CambioEstado';
+import type { CambioEstado, TipoEntrada, TipoSalida } from '../types/CambioEstado';
 import type { EstadoRecurso } from '../types/Recurso';
 import { listaHistorialPrueba } from '../data/historialEstados';
 import { obtenerFechaActual } from '../utils/fechas';
+import { textoEstado } from '../utils/inventario';
+import { estadoNuevoDeSalida } from '../utils/historial';
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
 import type { WriteBatch } from 'firebase/firestore';
 import { baseDatos } from './firebase';
@@ -71,7 +74,8 @@ function obtenerSiguienteId(): number {
 
 // crearRegistroCambioEstado
 // Recibe: el id del recurso, los dos estados, la cantidad, el motivo y el
-//         nombre del usuario conectado que hizo el cambio.
+//         nombre del usuario conectado que hizo el cambio. Opcionalmente, el
+//         número de serie de la unidad afectada (HU-12).
 // Devuelve: el registro listo para guardar (con id, fecha y usuario).
 // OJO: solo lo CREA, no lo guarda. Lo guarda recursosService junto con el
 // cambio del recurso (ver agregarRegistroAlLote), para que se guarden juntos.
@@ -82,6 +86,7 @@ export function crearRegistroCambioEstado(
   cantidad: number,
   motivo: string,
   nombreUsuario: string,
+  unidad?: string,
 ): CambioEstado {
   return {
     id: obtenerSiguienteId(),
@@ -93,6 +98,9 @@ export function crearRegistroCambioEstado(
     cantidad: cantidad,
     motivo: motivo.trim(), // trim() quita espacios sobrantes al inicio y al final
     usuario: nombreUsuario,
+    valorAnterior: textoEstado(estadoAnterior),
+    valorNuevo: textoEstado(estadoNuevo),
+    unidad: unidad,
   };
 }
 
@@ -118,6 +126,7 @@ export function crearRegistroReposicion(
     cantidad: cantidad,
     motivo: motivo.trim(),
     usuario: nombreUsuario,
+    valorNuevo: textoEstado('disponible'),
   };
 }
 
@@ -142,6 +151,98 @@ export function crearRegistroAlta(
     cantidad: cantidad,
     motivo: 'Alta del recurso en el inventario',
     usuario: nombreUsuario,
+    valorNuevo: textoEstado('disponible'),
+  };
+}
+
+// crearRegistroEntrada
+// Recibe: el id del recurso, el tipo de entrada (adquisición, préstamo o
+//         reposición), cuántas unidades llegan, el motivo y el usuario.
+// Devuelve: el registro listo para guardar, con tipo 'entrada'. Lo usará
+// HU-14; los registros antiguos de reposición siguen existiendo como
+// 'reposicion' porque el historial no se puede modificar.
+export function crearRegistroEntrada(
+  recursoId: number,
+  subtipo: TipoEntrada,
+  cantidad: number,
+  motivo: string,
+  nombreUsuario: string,
+): CambioEstado {
+  return {
+    id: obtenerSiguienteId(),
+    tipo: 'entrada',
+    recursoId: recursoId,
+    fecha: obtenerFechaActual(),
+    // Las unidades que entran no vienen de ningún estado: quedan "disponible"
+    estadoAnterior: 'disponible',
+    estadoNuevo: 'disponible',
+    cantidad: cantidad,
+    motivo: motivo.trim(),
+    usuario: nombreUsuario,
+    valorNuevo: textoEstado('disponible'),
+    subtipo: subtipo,
+  };
+}
+
+// crearRegistroSalida
+// Recibe: el id del recurso, el tipo de salida (daño reparable o
+//         irreparable), el estado desde el que salen las unidades, cuántas,
+//         el motivo, el usuario y, si se indicó, el número de serie.
+// Devuelve: el registro listo para guardar, con tipo 'salida'. El daño
+// reparable deja la unidad "en mantención" y el irreparable "dado de baja".
+// Lo usará HU-14.
+export function crearRegistroSalida(
+  recursoId: number,
+  subtipo: TipoSalida,
+  estadoOrigen: EstadoRecurso,
+  cantidad: number,
+  motivo: string,
+  nombreUsuario: string,
+  unidad?: string,
+): CambioEstado {
+  const estadoNuevo = estadoNuevoDeSalida(subtipo);
+  return {
+    id: obtenerSiguienteId(),
+    tipo: 'salida',
+    recursoId: recursoId,
+    fecha: obtenerFechaActual(),
+    estadoAnterior: estadoOrigen,
+    estadoNuevo: estadoNuevo,
+    cantidad: cantidad,
+    motivo: motivo.trim(),
+    usuario: nombreUsuario,
+    valorAnterior: textoEstado(estadoOrigen),
+    valorNuevo: textoEstado(estadoNuevo),
+    unidad: unidad,
+    subtipo: subtipo,
+  };
+}
+
+// crearRegistroCambioUbicacion
+// Recibe: el id del recurso, el código de la ubicación anterior, el de la
+//         nueva, el motivo y el usuario.
+// Devuelve: el registro listo para guardar, con tipo 'cambio_ubicacion'.
+// Guarda la ubicación anterior y la nueva (CA-11.3). Lo usará HU-11.
+export function crearRegistroCambioUbicacion(
+  recursoId: number,
+  codigoAnterior: string,
+  codigoNuevo: string,
+  motivo: string,
+  nombreUsuario: string,
+): CambioEstado {
+  return {
+    id: obtenerSiguienteId(),
+    tipo: 'cambio_ubicacion',
+    recursoId: recursoId,
+    fecha: obtenerFechaActual(),
+    // Cambiar de lugar no cambia el estado de las unidades
+    estadoAnterior: 'disponible',
+    estadoNuevo: 'disponible',
+    cantidad: 0,
+    motivo: motivo.trim(),
+    usuario: nombreUsuario,
+    valorAnterior: codigoAnterior,
+    valorNuevo: codigoNuevo,
   };
 }
 
