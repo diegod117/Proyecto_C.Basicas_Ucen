@@ -1,9 +1,12 @@
 // filtrosInventario.ts
 // Funciones para filtrar el inventario por nombre, categoría,
-// laboratorio y estado. Las usa la página de inventario.
-// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-02
+// laboratorio, estado y antigüedad. Las usa la página de inventario.
+// Cubre: HU-01 (filtros por nombre, categoría, laboratorio y estado), RF-02,
+//        RF-12 y HU-13 (filtro por antigüedad)
 
 import type { Recurso } from '../types/Recurso';
+import { obtenerFechaHoy } from './fechas';
+import { cumpleFiltroAntiguedad } from './antiguedad';
 
 // Valor especial que usamos en los <select> para decir "sin filtro".
 // Lo guardamos en una constante para no escribir 'todos' a mano en
@@ -62,7 +65,7 @@ export function obtenerLaboratorios(listaRecursos: Recurso[]): string[] {
 }
 
 // hayFiltrosActivos
-// Recibe: los 4 filtros elegidos por el usuario.
+// Recibe: los 5 filtros elegidos por el usuario.
 // Devuelve: true si el usuario está usando AL MENOS un filtro,
 // false si está todo en "Todos" y el buscador vacío.
 // Sirve para mostrar el botón "Limpiar filtros" solo cuando tiene sentido.
@@ -71,20 +74,21 @@ export function hayFiltrosActivos(
   categoria: string,
   laboratorio: string,
   estado: string,
+  antiguedad: string,
 ): boolean {
   if (prepararTextoParaBuscar(textoBuscado) !== '') {
     return true;
   }
-  if (categoria !== SIN_FILTRO || laboratorio !== SIN_FILTRO || estado !== SIN_FILTRO) {
+  if (categoria !== SIN_FILTRO || laboratorio !== SIN_FILTRO || estado !== SIN_FILTRO || antiguedad !== SIN_FILTRO) {
     return true;
   }
   return false;
 }
 
 // filtrarRecursos
-// Recibe: la lista de recursos y los 4 filtros elegidos por el usuario.
+// Recibe: la lista de recursos y los 5 filtros elegidos por el usuario.
 //   - textoBuscado: lo escrito en el buscador ('' = sin filtro)
-//   - categoria, laboratorio, estado: lo elegido en cada <select>
+//   - categoria, laboratorio, estado, antiguedad: lo elegido en cada <select>
 //     (SIN_FILTRO = el usuario no eligió nada en ese filtro)
 // Devuelve: una lista NUEVA solo con los recursos que cumplen TODOS los filtros.
 export function filtrarRecursos(
@@ -93,8 +97,11 @@ export function filtrarRecursos(
   categoria: string,
   laboratorio: string,
   estado: string,
+  antiguedad: string,
 ): Recurso[] {
   const textoPreparado = prepararTextoParaBuscar(textoBuscado);
+  // La fecha de hoy se pide una sola vez, no por cada recurso
+  const fechaHoy = obtenerFechaHoy();
   const recursosEncontrados: Recurso[] = [];
 
   for (const recurso of listaRecursos) {
@@ -140,6 +147,14 @@ export function filtrarRecursos(
       }
 
       if (!tieneUnidadesEnEseEstado) {
+        cumpleFiltros = false;
+      }
+    }
+
+    // 5) Antigüedad: según la fecha de adquisición (HU-13). Los recursos
+    //    sin fecha no aparecen cuando hay un rango elegido.
+    if (antiguedad !== SIN_FILTRO) {
+      if (!cumpleFiltroAntiguedad(recurso.fechaAdquisicion, antiguedad, fechaHoy)) {
         cumpleFiltros = false;
       }
     }
