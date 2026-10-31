@@ -102,12 +102,12 @@ El orden respeta las dependencias: primero el modelo de datos (unidades y histor
 | 6 | J35 | `feature/hu-11-modificar-ubicacion` | HU-11, RF-10 | Botón "Cambiar ubicación" en la ficha (solo encargado), con las listas de Configuración; cada cambio queda en el historial. | 🔶 D3 (reglas) |
 | 7 | J36 | `feature/hu-13-fecha-adquisicion` | HU-13, RF-12 | Campo en "Agregar recurso" (no futura), antigüedad en la ficha y filtro (menos de 1 año, 1 a 2, más de 2). | 🔶 D3 (recursos ya guardados) |
 | 8 | J37 | `feature/rf-08-descripcion-categorias` | RF-08 | Descripción breve en cada categoría (formulario y lista en Configuración). | 🔶 D3 (categorías ya guardadas) |
-| 9 | J38 | `feature/hu-15-usuarios` | HU-15, RF-14 | Sección "Usuarios" en Configuración (solo encargado): agregar, cambiar rol y desactivar. Los roles pasan de `data/usuarios.ts` a Firestore. | 🔶 D4, D5, D6 |
-| 10 | J39 | `feature/hu-17-correos-reservas` | RF-09, HU-03 (CA-03.4) | Correo al docente al confirmar o cancelar una reserva (recurso, cantidad, fecha, horario y sala). | 🔶 D5 |
-| 11 | J40 | `feature/hu-16-carga-excel` | HU-16, RF-15 | Subir `.xlsx`, vista previa con filas válidas y con error, guardar solo las válidas. | 🔶 D8, y falta la planilla real |
-| 12 | J41 | `feature/rnf-cierre-fase-4` | RNF-01, 02, 03, 06, 08 | Pruebas completas a 360 px, conteo de acciones de la incidencia, reglas por rol, respaldo; HU-01 (texto de CA-01.4). | 🔶 D6, D7 |
+| 9 | J38 | `feature/hu-16-carga-excel` | HU-16, RF-15 | Subir `.xlsx`, vista previa con filas válidas y con error, guardar solo las válidas. | 🔶 D8, y falta la planilla real |
+| 10 | J39 | `feature/rnf-cierre-fase-4` | RNF-01, 02, 03, 06, 08 | Pruebas completas a 360 px, conteo de acciones de la incidencia, reglas por rol, respaldo; HU-01 (texto de CA-01.4). | 🔶 D6, D7 |
+| 11 | J40 | `feature/hu-15-usuarios` | HU-15, RF-14 | **Al final** (puede botarse al migrar, ver sección 5). Sección "Usuarios" en Configuración (solo encargado): agregar, cambiar rol y desactivar. Los roles pasan de `data/usuarios.ts` a Firestore. | 🔶 D4, D5, D6 |
+| — | J41 | `feature/hu-17-correos-reservas` | RF-09, HU-03 (CA-03.4) | **EN ESPERA (D5).** Correo al docente al confirmar o cancelar una reserva (recurso, cantidad, fecha, horario y sala). | 🔶 D5 |
 
-**Por qué este orden:** HU-12 cambia la forma de guardar un recurso, así que todo lo que toca estados (HU-02, HU-04, HU-14) va **después**. HU-06 va antes de HU-02 y HU-14 para que ya existan los tipos de movimiento que escriben. HU-15 va antes de los correos porque el acceso del usuario nuevo también es un correo. HU-16 va al final porque depende de la planilla real y de una librería.
+**Por qué este orden:** HU-12 cambia la forma de guardar un recurso, así que todo lo que toca estados (HU-02, HU-04, HU-14) va **después**. HU-06 va antes de HU-02 y HU-14 para que ya existan los tipos de movimiento que escriben. HU-16 va tarde porque depende de las unidades y del historial. HU-15 (usuarios) va **al final** y HU-17 (correos de reserva) queda en espera, porque ambas se apoyan en cosas que se botarían al migrar de Firebase (ver sección 5).
 
 **Cada rama sigue el flujo de `CLAUDE.md`:** plan corto → confirmación de Johann → implementar → `npm run build` y `npm run lint` → explicar y cómo probar → archivo en `docs/avance/` → commit, push y PR. No se empieza la siguiente historia hasta que Johann confirme que el PR anterior está en `main`.
 
