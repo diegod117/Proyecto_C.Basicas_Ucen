@@ -115,6 +115,22 @@ El orden respeta las dependencias: primero el modelo de datos (unidades y histor
 
 ## 4. Decisiones que necesita Johann 🔶
 
+### Decisiones tomadas (31-10-2026)
+
+| ID | Decisión |
+|---|---|
+| D1 | Las unidades van como arreglo `unidades` dentro de cada documento de `recursos`. |
+| D2 | Campo `usaNumeroSerie` en `Categoria`, igual que `usaStockMinimo`. |
+| D3 | Campos nuevos **opcionales** en los datos ya guardados (la app los completa al editar). Las reglas se actualizan en `docs/firestore.rules` y se pegan en la consola en cada rama que las cambie. |
+| D4 | Cuentas nuevas con una segunda instancia de la app de Firebase; desactivar con `activo: false` en Firestore, y la app niega el ingreso. |
+| D5 | Por ahora **solo** el correo de recuperación de contraseña (`sendPasswordResetEmail`). HU-17 (correos de reserva) queda **en espera**. |
+| D6 | Los roles pasan a Firestore (colección `usuarios`) junto con HU-15, y las reglas distinguen al encargado. |
+| D7 | Respaldo semanal: queda para después. |
+| D8 | Se instala la librería para leer `.xlsx` (en la rama de HU-16, no antes). |
+| Nuevo | Se viene la etapa de **backend con otra base de datos**. Todo el acceso a datos se mantiene dentro de `src/services/` y sin tipos de Firebase fuera de ellos, para que la migración cambie solo los servicios. Ver `docs/avance/` de cada rama. |
+
+Lo que sigue en esta sección es el detalle original de cada decisión, para referencia.
+
 Ninguna de estas se resuelve sin tu respuesta: `CLAUDE.md` pide preguntar antes de agregar librerías, servicios o backend nuevos, y antes de inventar lo que está "pendiente de confirmar".
 
 ### Librerías y servicios nuevos
