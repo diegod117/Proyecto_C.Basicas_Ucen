@@ -4,12 +4,13 @@
 // Las categorías nuevas aparecen en el filtro del inventario y en el
 // formulario "Agregar recurso".
 // Usa los estilos de PaginaConfiguracion.css.
-// Cubre: RF-08, RNF-05 (incorporar categorías sin cambios estructurales)
+// Cubre: RF-08, RNF-05 (incorporar categorías sin cambios estructurales), HU-12 (categorías con número de serie)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { obtenerCategorias, agregarCategoria } from '../services/configuracionService';
 import { crearClaveCategoria, validarNuevaCategoria } from '../utils/configuracion';
+import { categoriaUsaNumeroSerie } from '../utils/unidades';
 
 interface PropsSeccionCategorias {
   // Función de la página para avisar que se agregó una categoría
@@ -23,6 +24,8 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
   const [nombre, setNombre] = useState('');
   // Checkbox: ¿los recursos de esta categoría se gastan (tienen stock mínimo)?
   const [usaStockMinimo, setUsaStockMinimo] = useState(false);
+  // Checkbox: ¿cada unidad se identifica por número de serie o de inventario? (HU-12)
+  const [usaNumeroSerie, setUsaNumeroSerie] = useState(false);
   const [mensajeError, setMensajeError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -48,6 +51,7 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
       clave: crearClaveCategoria(nombreLimpio),
       nombre: nombreLimpio,
       usaStockMinimo: usaStockMinimo,
+      usaNumeroSerie: usaNumeroSerie,
     });
     setGuardando(false);
 
@@ -55,6 +59,7 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
       setMensajeExito('Categoría "' + nombreLimpio + '" agregada.');
       setNombre('');
       setUsaStockMinimo(false);
+      setUsaNumeroSerie(false);
       props.onAgregado();
     } else {
       setMensajeError('No se pudo guardar la categoría. Revisa tu conexión.');
@@ -71,6 +76,9 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
           <li key={categoria.clave} className="configuracion-item">
             {categoria.nombre}
             {categoria.usaStockMinimo && <span className="configuracion-nota"> · stock mínimo</span>}
+            {categoriaUsaNumeroSerie(categoria.clave) && (
+              <span className="configuracion-nota"> · número de serie</span>
+            )}
           </li>
         ))}
       </ul>
@@ -96,6 +104,14 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
             onChange={(evento) => setUsaStockMinimo(evento.target.checked)}
           />
           Se gasta (pedir stock mínimo, como insumos y reactivos)
+        </label>
+        <label className="configuracion-checkbox">
+          <input
+            type="checkbox"
+            checked={usaNumeroSerie}
+            onChange={(evento) => setUsaNumeroSerie(evento.target.checked)}
+          />
+          Cada unidad tiene número de serie o de inventario (como equipos e instrumentos)
         </label>
         <button type="submit" className="boton-principal" disabled={guardando}>
           + Agregar categoría

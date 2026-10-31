@@ -116,3 +116,11 @@
     font-size: 16px;
   }
 }
+
+/* Campos de número de serie (uno por unidad, HU-12): en columnas que se
+   acomodan solas y bajan a una sola columna en el celular */
+.nuevo-recurso-series-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--espacio-sm);
+}

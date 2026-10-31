@@ -6,6 +6,7 @@
 // Cubre: datos de la planilla (sección 1.1 de requerimientos)
 
 import type { DatosNuevoRecurso } from '../types/Recurso';
+import { categoriaUsaNumeroSerie } from '../utils/unidades';
 
 interface PropsCamposDetalleRecurso {
   datos: DatosNuevoRecurso;
@@ -33,14 +34,18 @@ function CamposDetalleRecurso(props: PropsCamposDetalleRecurso) {
             onChange={(evento) => props.onCambiar({ ...datos, marca: evento.target.value })}
           />
         </label>
-        <label className="nuevo-recurso-campo">
-          N° de serie
-          <input
-            type="text"
-            value={datos.numeroSerie}
-            onChange={(evento) => props.onCambiar({ ...datos, numeroSerie: evento.target.value })}
-          />
-        </label>
+        {/* En equipos e instrumentos cada unidad tiene su propio número (HU-12),
+            que se pide arriba, así que este campo suelto solo aparece en las demás */}
+        {!categoriaUsaNumeroSerie(datos.categoria) && (
+          <label className="nuevo-recurso-campo">
+            N° de serie
+            <input
+              type="text"
+              value={datos.numeroSerie}
+              onChange={(evento) => props.onCambiar({ ...datos, numeroSerie: evento.target.value })}
+            />
+          </label>
+        )}
       </div>
 
       <label className="nuevo-recurso-campo">

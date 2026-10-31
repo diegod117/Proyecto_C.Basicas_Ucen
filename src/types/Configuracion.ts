@@ -12,6 +12,10 @@ export interface Categoria {
   // true si los recursos de esta categoría se gastan y hay que reponerlos
   // (como insumos y reactivos): el formulario pide su stock mínimo (HU-09)
   usaStockMinimo: boolean;
+  // true si cada unidad de esta categoría se identifica por número de serie
+  // o de inventario (equipos e instrumentos, HU-12). Es opcional porque las
+  // categorías guardadas antes de HU-12 no lo tienen (ver utils/unidades.ts).
+  usaNumeroSerie?: boolean;
 }
 
 // Torre (edificio) donde hay laboratorios. Ej: { letra: 'B' }

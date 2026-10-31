@@ -6,7 +6,7 @@
 // La ubicación y los datos opcionales van en componentes aparte
 // (CamposUbicacionRecurso y CamposDetalleRecurso) para que este archivo
 // no crezca demasiado.
-// Cubre: RF-01, RF-08 (categoría), RF-10 y HU-11 (ubicación), RNF-03
+// Cubre: RF-01, RF-08 (categoría), RF-10 y HU-11 (ubicación), RF-11 y HU-12 (números de serie), RNF-03
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
@@ -17,6 +17,8 @@ import { datosVaciosNuevoRecurso, usaStockMinimo, validarNuevoRecurso } from '..
 import { agregarRecurso, obtenerRecursos } from '../services/recursosService';
 import CamposUbicacionRecurso from './CamposUbicacionRecurso';
 import CamposDetalleRecurso from './CamposDetalleRecurso';
+import CamposNumerosSerie from './CamposNumerosSerie';
+import { categoriaUsaNumeroSerie } from '../utils/unidades';
 import './FormularioNuevoRecurso.css';
 
 interface PropsFormularioNuevoRecurso {
@@ -124,6 +126,11 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
             />
           </label>
         </div>
+
+        {/* Equipos e instrumentos: un número de serie por cada unidad (HU-12) */}
+        {categoriaUsaNumeroSerie(datos.categoria) && (
+          <CamposNumerosSerie datos={datos} onCambiar={cambiarDatos} />
+        )}
 
         {/* El stock mínimo solo tiene sentido en insumos y reactivos (HU-09) */}
         {usaStockMinimo(datos) && (

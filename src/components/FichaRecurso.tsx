@@ -18,6 +18,7 @@ import { obtenerHistorialDeRecurso } from '../services/historialService';
 import FormularioCambioEstado from './FormularioCambioEstado';
 import FormularioReponerStock from './FormularioReponerStock';
 import TablaUnidadesEstado from './TablaUnidadesEstado';
+import TablaUnidadesSerie from './TablaUnidadesSerie';
 import TablaHistorial from './TablaHistorial';
 import AvisoUbicacion from './AvisoUbicacion';
 import './FichaRecurso.css';
@@ -115,6 +116,9 @@ function FichaRecurso(props: PropsFichaRecurso) {
 
             {/* Cantidad de unidades en cada estado (RF-01) */}
             <TablaUnidadesEstado recurso={recurso} />
+
+            {/* Cada unidad con su número de serie y su estado (HU-12) */}
+            <TablaUnidadesSerie recurso={recurso} />
           </div>
 
           {/* Historial de cambios de estado (HU-06), como en el mockup */}
@@ -124,7 +128,16 @@ function FichaRecurso(props: PropsFichaRecurso) {
         {/* Columna derecha (RNF-03): solo el encargado edita el inventario.
             Los demás roles ven los datos y el historial, pero en lugar
             de los formularios aparece un aviso. */}
-        {puedeCambiarEstado(usuario.rol) && (
+        {puedeCambiarEstado(usuario.rol) && recurso.unidades !== undefined && (
+          // Mientras el cambio de estado y la reposición no trabajen con
+          // unidades (HU-02 y HU-14), se desactivan en los recursos que ya
+          // las tienen, para que las cantidades y la tabla no se desfasen.
+          <p className="ficha-aviso-permiso">
+            Este recurso tiene sus unidades con número de serie. Cambiar el estado de una unidad
+            y sumar unidades estarán disponibles en las próximas historias (HU-02 y HU-14).
+          </p>
+        )}
+        {puedeCambiarEstado(usuario.rol) && recurso.unidades === undefined && (
           <div className="ficha-columna-derecha">
             <FormularioCambioEstado
               recurso={recurso}
