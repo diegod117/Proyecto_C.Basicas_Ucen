@@ -17,6 +17,7 @@ import { textoCategoria, textoCampoOpcional } from '../utils/inventario';
 import { obtenerHistorialDeRecurso } from '../services/historialService';
 import FormularioCambioEstado from './FormularioCambioEstado';
 import FormularioReponerStock from './FormularioReponerStock';
+import FormularioCambioEstadoUnidades from './FormularioCambioEstadoUnidades';
 import TablaUnidadesEstado from './TablaUnidadesEstado';
 import TablaUnidadesSerie from './TablaUnidadesSerie';
 import TablaHistorial from './TablaHistorial';
@@ -129,13 +130,19 @@ function FichaRecurso(props: PropsFichaRecurso) {
             Los demás roles ven los datos y el historial, pero en lugar
             de los formularios aparece un aviso. */}
         {puedeCambiarEstado(usuario.rol) && recurso.unidades !== undefined && (
-          // Mientras el cambio de estado y la reposición no trabajen con
-          // unidades (HU-02 y HU-14), se desactivan en los recursos que ya
-          // las tienen, para que las cantidades y la tabla no se desfasen.
-          <p className="ficha-aviso-permiso">
-            Este recurso tiene sus unidades con número de serie. Cambiar el estado de una unidad
-            y sumar unidades estarán disponibles en las próximas historias (HU-02 y HU-14).
-          </p>
+          // Recursos con número de serie (HU-12): el estado se cambia por unidad
+          // (HU-02). "Reponer stock" sigue desactivado hasta HU-14, que pedirá
+          // los números de las unidades nuevas; si no, la tabla de unidades y
+          // las cantidades quedarían distintas.
+          <div className="ficha-columna-derecha">
+            <FormularioCambioEstadoUnidades
+              recurso={recurso}
+              onEstadoCambiado={props.onEstadoCambiado}
+            />
+            <p className="ficha-aviso-permiso">
+              Sumar unidades a este recurso (con sus números de serie) estará disponible en HU-14.
+            </p>
+          </div>
         )}
         {puedeCambiarEstado(usuario.rol) && recurso.unidades === undefined && (
           <div className="ficha-columna-derecha">

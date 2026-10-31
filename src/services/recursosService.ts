@@ -5,7 +5,8 @@
 //        HU-06 (cada cambio de estado queda en el historial),
 //        RF-04 (reponer stock de un recurso),
 //        RNF-06 (los recursos se cargan desde Firestore),
-//        agregar recursos nuevos desde la página de inventario
+//        agregar recursos nuevos desde la página de inventario,
+//        HU-02 / RF-01 (cambiar el estado de unidades específicas)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -14,10 +15,11 @@
 // Además, como todas las páginas leen de aquí, todas ven los mismos datos:
 // si alguien cambia el estado de un recurso, todos ven el cambio.
 
-import type { Recurso, EstadoRecurso, CantidadesPorEstado, DatosNuevoRecurso } from '../types/Recurso';
+import type { Recurso, EstadoRecurso, CantidadesPorEstado, DatosNuevoRecurso, Unidad } from '../types/Recurso';
 import type { CambioEstado } from '../types/CambioEstado';
 import { listaRecursosPrueba } from '../data/recursos';
 import { armarRecurso } from '../utils/nuevoRecurso';
+import { contarUnidadesPorEstado } from '../utils/unidades';
 import {
   crearRegistroAlta,
   crearRegistroCambioEstado,
@@ -149,7 +151,7 @@ export async function cambiarEstadoRecurso(
     idRecurso, estadoOrigen, estadoNuevo, cantidad, motivo, nombreUsuario,
   );
 
-  return guardarCambioConHistorial(recurso, nuevasCantidades, registro);
+  return guardarCambioConHistorial(recurso, nuevasCantidades, [registro]);
 }
 
 // reponerStock
@@ -183,26 +185,38 @@ export async function reponerStock(
   // en el historial desde el servicio (RNF-06).
   const registro = crearRegistroReposicion(idRecurso, cantidad, motivo, nombreUsuario);
 
-  return guardarCambioConHistorial(recurso, nuevasCantidades, registro);
+  return guardarCambioConHistorial(recurso, nuevasCantidades, [registro]);
 }
 
 // guardarCambioConHistorial
-// Recibe: el recurso, sus cantidades nuevas y el registro del historial.
+// Recibe: el recurso, sus cantidades nuevas, la lista de registros del
+//         historial y, si cambió el estado de unidades, la lista de unidades nueva.
 // Devuelve: una Promise<boolean>: true si se guardó, false si Firestore falló.
-// La usan cambiarEstadoRecurso y reponerStock, que guardan lo mismo:
-// las cantidades del recurso + un registro del historial.
+// La usan cambiarEstadoRecurso, reponerStock y cambiarEstadoUnidades, que
+// guardan lo mismo: las cantidades del recurso + registros del historial.
 async function guardarCambioConHistorial(
   recurso: Recurso,
   nuevasCantidades: CantidadesPorEstado,
-  registro: CambioEstado,
+  registros: CambioEstado[],
+  nuevasUnidades?: Unidad[],
 ): Promise<boolean> {
   // writeBatch ("lote"): las dos escrituras se envían juntas y Firestore
   // guarda LAS DOS o NINGUNA. Así nunca queda un cambio de cantidades sin
   // su registro en el historial, ni un registro sin su cambio.
   const lote = writeBatch(baseDatos);
-  // update cambia solo el campo "cantidades" del documento del recurso
-  lote.update(doc(baseDatos, 'recursos', String(recurso.id)), { cantidades: nuevasCantidades });
-  agregarRegistroAlLote(lote, registro);
+  // update cambia solo los campos indicados del documento del recurso:
+  // siempre "cantidades" y, si se cambió el estado de unidades (HU-02), "unidades"
+  const camposNuevos: { cantidades: CantidadesPorEstado; unidades?: Unidad[] } = {
+    cantidades: nuevasCantidades,
+  };
+  if (nuevasUnidades !== undefined) {
+    camposNuevos.unidades = nuevasUnidades;
+  }
+  lote.update(doc(baseDatos, 'recursos', String(recurso.id)), camposNuevos);
+  // Un registro del historial por cada unidad que cambió (o uno solo si no hay unidades)
+  for (const registro of registros) {
+    agregarRegistroAlLote(lote, registro);
+  }
 
   try {
     await lote.commit(); // aquí se envía todo a Firestore
@@ -215,8 +229,71 @@ async function guardarCambioConHistorial(
   // Como "recurso" apunta al MISMO objeto que está en listaRecursos, todas
   // las páginas que lean del servicio verán el cambio.
   recurso.cantidades = nuevasCantidades;
-  agregarRegistroEnMemoria(registro);
+  if (nuevasUnidades !== undefined) {
+    recurso.unidades = nuevasUnidades;
+  }
+  for (const registro of registros) {
+    agregarRegistroEnMemoria(registro);
+  }
   return true;
+}
+
+// cambiarEstadoUnidades
+// Recibe: el id del recurso, los números de serie de las unidades que
+//         cambian, el estado nuevo, el motivo y el nombre del usuario conectado.
+// Devuelve: una Promise<boolean>: true si se guardó, false si no.
+// Es la versión de cambiarEstadoRecurso para equipos e instrumentos (HU-02,
+// CA-02.2): en vez de mover una cantidad, cambia el estado de unidades
+// específicas. Las cantidades por estado se recalculan contando las
+// unidades, y cada unidad deja su propio registro en el historial (con su
+// número de serie), todo en un solo lote: se guarda todo o nada.
+export async function cambiarEstadoUnidades(
+  idRecurso: number,
+  numerosUnidades: string[],
+  estadoNuevo: EstadoRecurso,
+  motivo: string,
+  nombreUsuario: string,
+): Promise<boolean> {
+  const recurso = obtenerRecursoPorId(idRecurso);
+
+  if (recurso === undefined || recurso.unidades === undefined) {
+    return false; // no existe, o no tiene unidades registradas
+  }
+  if (numerosUnidades.length < 1) {
+    return false; // no se marcó ninguna unidad
+  }
+
+  // Copiamos cada unidad ({ ...unidad }) para no tocar las de la memoria
+  // hasta que Firestore acepte el cambio. Las marcadas pasan al estado nuevo.
+  const nuevasUnidades: Unidad[] = [];
+  const registros: CambioEstado[] = [];
+  for (const unidad of recurso.unidades) {
+    const copia = { ...unidad };
+    if (numerosUnidades.includes(unidad.numero)) {
+      if (unidad.estado === estadoNuevo) {
+        return false; // ya estaba en ese estado: el formulario no debería permitirlo
+      }
+      const registro = crearRegistroCambioEstado(
+        idRecurso, unidad.estado, estadoNuevo, 1, motivo, nombreUsuario, unidad.numero,
+      );
+      // Los registros todavía no están en la memoria del historial, así que
+      // crearRegistroCambioEstado les da a todos el MISMO id. Cada uno toma
+      // el id siguiente al del registro anterior para que no se pisen.
+      if (registros.length > 0) {
+        registro.id = registros[registros.length - 1].id + 1;
+      }
+      registros.push(registro);
+      copia.estado = estadoNuevo;
+    }
+    nuevasUnidades.push(copia);
+  }
+
+  if (registros.length !== numerosUnidades.length) {
+    return false; // alguno de los números no existe en este recurso
+  }
+
+  const nuevasCantidades = contarUnidadesPorEstado(nuevasUnidades);
+  return guardarCambioConHistorial(recurso, nuevasCantidades, registros, nuevasUnidades);
 }
 
 // agregarRecurso
