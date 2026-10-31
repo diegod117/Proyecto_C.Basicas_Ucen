@@ -1,12 +1,14 @@
 // nuevoRecurso.ts
 // Funciones de ayuda para el formulario "Agregar recurso": validar lo que
 // escribió el encargado y convertirlo en un Recurso listo para guardar.
-// Cubre: RF-01, RF-08 (categoría) y RF-10, HU-11 (ubicación obligatoria)
+// Cubre: RF-01, RF-08 (categoría) y RF-10, HU-11 (ubicación obligatoria),
+//        RF-12 y HU-13 (fecha de adquisición obligatoria y no futura)
 
 import type { Recurso, DatosNuevoRecurso, DatosUbicacion, Ubicacion } from '../types/Recurso';
 import { obtenerCategoriaPorClave } from '../services/configuracionService';
 import { generarCodigoUbicacion, validarUbicacion, buscarRecursoRepetido } from './ubicacion';
 import { categoriaUsaNumeroSerie, validarNumerosUnidades, armarUnidades, contarUnidadesPorEstado } from './unidades';
+import { obtenerFechaHoy } from './fechas';
 
 // datosVaciosNuevoRecurso
 // Valores con los que parte el formulario (todo vacío, torre B).
@@ -24,6 +26,7 @@ export const datosVaciosNuevoRecurso: DatosNuevoRecurso = {
   numeroSerie: '',
   proveedor: '',
   observacion: '',
+  fechaAdquisicion: '',
 };
 
 // usaStockMinimo
@@ -79,6 +82,14 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
   }
   if (!esEnteroMayorQue(datos.cantidadTexto, 0)) {
     return 'La cantidad inicial debe ser un número entero mayor que 0.';
+  }
+  // Fecha de adquisición (HU-13, CA-13.1): obligatoria y no puede ser futura.
+  // Las fechas "AAAA-MM-DD" se pueden comparar como texto (igual que en utils/movimientos.ts).
+  if (datos.fechaAdquisicion === '') {
+    return 'Elige la fecha de adquisición.';
+  }
+  if (datos.fechaAdquisicion > obtenerFechaHoy()) {
+    return 'La fecha de adquisición no puede ser futura.';
   }
   // Equipos e instrumentos: hay que escribir un número de serie por unidad (HU-12)
   if (categoriaUsaNumeroSerie(datos.categoria)) {
@@ -151,6 +162,7 @@ export function armarRecurso(datos: DatosNuevoRecurso, id: number): Recurso {
     numeroSerie: textoOpcional(datos.numeroSerie),
     proveedor: textoOpcional(datos.proveedor),
     observacion: textoOpcional(datos.observacion),
+    fechaAdquisicion: datos.fechaAdquisicion,
   };
 
   if (usaStockMinimo(datos) && datos.stockMinimoTexto.trim() !== '') {
