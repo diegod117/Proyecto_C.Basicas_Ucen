@@ -89,3 +89,45 @@ export function textoResumenCambio(
     textoEstado(estadoOrigen) + ' → ' + textoEstado(estadoNuevo) + '.'
   );
 }
+
+// validarCambioEstadoUnidades
+// Recibe: el recurso, los números de serie de las unidades marcadas, el
+//         estado nuevo y el motivo.
+// Devuelve: un mensaje de error, o '' (texto vacío) si todo está bien.
+// Es la versión de validarCambioEstado para equipos e instrumentos (CA-02.2,
+// CA-02.3): se eligen unidades específicas en vez de una cantidad.
+export function validarCambioEstadoUnidades(
+  recurso: Recurso,
+  numerosMarcados: string[],
+  estadoNuevo: EstadoRecurso,
+  motivo: string,
+): string {
+  if (numerosMarcados.length === 0) {
+    return 'Marca al menos una unidad.';
+  }
+
+  // Ninguna unidad marcada puede estar ya en el estado nuevo
+  if (recurso.unidades !== undefined) {
+    for (const unidad of recurso.unidades) {
+      if (numerosMarcados.includes(unidad.numero) && unidad.estado === estadoNuevo) {
+        return 'La unidad ' + unidad.numero + ' ya está en estado "' + textoEstado(estadoNuevo) + '".';
+      }
+    }
+  }
+
+  if (motivo.trim() === '') {
+    return 'Escribe el motivo del cambio (ej: "Punta rota").';
+  }
+
+  return '';
+}
+
+// textoResumenCambioUnidades
+// Recibe: los números de serie cambiados y el estado nuevo.
+// Devuelve: el mensaje de confirmación (CA-02.4).
+export function textoResumenCambioUnidades(numeros: string[], estadoNuevo: EstadoRecurso): string {
+  if (numeros.length === 1) {
+    return 'Cambio guardado: la unidad ' + numeros[0] + ' pasó a ' + textoEstado(estadoNuevo) + '.';
+  }
+  return 'Cambio guardado: ' + numeros.length + ' unidades pasaron a ' + textoEstado(estadoNuevo) + '.';
+}
