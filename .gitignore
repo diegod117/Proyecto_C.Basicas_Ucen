@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Planillas Excel de inventario (datos institucionales, no se suben a Git)
+*.xlsx

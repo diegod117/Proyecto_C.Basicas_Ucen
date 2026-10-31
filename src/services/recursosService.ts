@@ -5,7 +5,8 @@
 //        HU-06 (cada cambio de estado queda en el historial),
 //        RNF-06 (los recursos se cargan desde Firestore),
 //        agregar recursos nuevos desde la página de inventario,
-//        HU-02 / RF-01 (cambiar el estado de unidades específicas)
+//        HU-02 / RF-01 (cambiar el estado de unidades específicas),
+//        HU-16 (ids y memoria para la carga desde Excel)
 
 // ¿Para qué sirve un "servicio"?
 // Las páginas no deberían saber DE DÓNDE vienen los datos.
@@ -258,6 +259,28 @@ export async function cambiarEstadoUnidades(
 
   const nuevasCantidades = contarUnidadesPorEstado(nuevasUnidades);
   return guardarCambioConHistorial(recurso, nuevasCantidades, registros, nuevasUnidades);
+}
+
+// obtenerSiguienteIdRecurso
+// Recibe: nada. Devuelve: el id para un recurso nuevo (el mayor que exista + 1).
+// La usa la carga desde Excel (importacionService), que guarda varios
+// recursos seguidos y necesita calcular el id al empezar cada tanda.
+export function obtenerSiguienteIdRecurso(): number {
+  let mayorId = 0;
+  for (const recurso of listaRecursos) {
+    if (recurso.id > mayorId) {
+      mayorId = recurso.id;
+    }
+  }
+  return mayorId + 1;
+}
+
+// agregarRecursoEnMemoria
+// Recibe: un recurso que YA se guardó en Firestore. No devuelve nada.
+// Lo agrega al final de la copia en memoria (los ids van en aumento, así que
+// la lista sigue ordenada). Lo usa la carga desde Excel después de cada tanda.
+export function agregarRecursoEnMemoria(recurso: Recurso): void {
+  listaRecursos.push(recurso);
 }
 
 // agregarRecurso
