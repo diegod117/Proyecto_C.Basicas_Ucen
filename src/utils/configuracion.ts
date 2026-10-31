@@ -18,9 +18,13 @@ export function crearClaveCategoria(nombre: string): string {
 }
 
 // validarNuevaCategoria
-// Recibe: el nombre escrito y las categorías que ya existen.
+// Recibe: el nombre escrito, la descripción breve escrita y las categorías que ya existen.
 // Devuelve: un mensaje de error, o '' (texto vacío) si se puede agregar.
-export function validarNuevaCategoria(nombre: string, existentes: Categoria[]): string {
+export function validarNuevaCategoria(
+  nombre: string,
+  descripcion: string,
+  existentes: Categoria[],
+): string {
   if (nombre.trim() === '') {
     return 'Escribe el nombre de la categoría.';
   }
@@ -29,6 +33,17 @@ export function validarNuevaCategoria(nombre: string, existentes: Categoria[]): 
     if (categoria.clave === clave) {
       return 'Ya existe la categoría "' + categoria.nombre + '".';
     }
+  }
+  // La descripción es obligatoria al crear una categoría (RF-08) y debe ser breve
+  const descripcionLimpia = descripcion.trim();
+  if (descripcionLimpia === '') {
+    return 'Escribe una descripción breve de la categoría.';
+  }
+  if (descripcionLimpia.length > MAXIMO_DESCRIPCION_CATEGORIA) {
+    return (
+      'La descripción debe tener máximo ' + MAXIMO_DESCRIPCION_CATEGORIA +
+      ' caracteres (tiene ' + descripcionLimpia.length + ').'
+    );
   }
   return '';
 }

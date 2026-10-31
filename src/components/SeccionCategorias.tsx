@@ -1,16 +1,20 @@
 // SeccionCategorias.tsx
-// Parte de la página "Configuración": lista las categorías de recursos y
-// tiene un formulario para agregar una nueva (ej: "Material de vidrio").
+// Parte de la página "Configuración": lista las categorías de recursos (con su
+// descripción breve) y tiene un formulario para agregar una nueva (ej: "Material de vidrio").
 // Las categorías nuevas aparecen en el filtro del inventario y en el
 // formulario "Agregar recurso".
 // Usa los estilos de PaginaConfiguracion.css.
-// Cubre: RF-08, RNF-05 (incorporar categorías sin cambios estructurales), HU-12 (categorías con número de serie)
+// Cubre: RF-08 (descripción breve), RNF-05 (incorporar categorías sin cambios estructurales), HU-12 (categorías con número de serie)
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { obtenerCategorias, agregarCategoria } from '../services/configuracionService';
-import { crearClaveCategoria, validarNuevaCategoria } from '../utils/configuracion';
-import { categoriaUsaNumeroSerie } from '../utils/unidades';
+import {
+  crearClaveCategoria,
+  validarNuevaCategoria,
+  MAXIMO_DESCRIPCION_CATEGORIA,
+} from '../utils/configuracion';
+import ItemCategoria from './ItemCategoria';
 
 interface PropsSeccionCategorias {
   // Función de la página para avisar que se agregó una categoría
@@ -22,6 +26,8 @@ interface PropsSeccionCategorias {
 // Devuelve: la tarjeta con la lista de categorías y el formulario.
 function SeccionCategorias(props: PropsSeccionCategorias) {
   const [nombre, setNombre] = useState('');
+  // Descripción breve de la categoría (RF-08): es obligatoria y de máximo 120 caracteres
+  const [descripcion, setDescripcion] = useState('');
   // Checkbox: ¿los recursos de esta categoría se gastan (tienen stock mínimo)?
   const [usaStockMinimo, setUsaStockMinimo] = useState(false);
   // Checkbox: ¿cada unidad se identifica por número de serie o de inventario? (HU-12)
@@ -38,7 +44,7 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
     evento.preventDefault();
     setMensajeExito('');
 
-    const error = validarNuevaCategoria(nombre, categorias);
+    const error = validarNuevaCategoria(nombre, descripcion, categorias);
     if (error !== '') {
       setMensajeError(error);
       return;
@@ -50,6 +56,7 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
     const seGuardo = await agregarCategoria({
       clave: crearClaveCategoria(nombreLimpio),
       nombre: nombreLimpio,
+      descripcion: descripcion.trim(),
       usaStockMinimo: usaStockMinimo,
       usaNumeroSerie: usaNumeroSerie,
     });
@@ -58,6 +65,7 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
     if (seGuardo) {
       setMensajeExito('Categoría "' + nombreLimpio + '" agregada.');
       setNombre('');
+      setDescripcion('');
       setUsaStockMinimo(false);
       setUsaNumeroSerie(false);
       props.onAgregado();
@@ -70,16 +78,10 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
     <article className="configuracion-tarjeta">
       <h3 className="configuracion-titulo">Categorías de recursos ({categorias.length})</h3>
 
-      {/* Lista de categorías como etiquetas. La "key" es la clave, que no se repite. */}
+      {/* Lista de categorías. La "key" es la clave, que no se repite. */}
       <ul className="configuracion-lista">
         {categorias.map((categoria) => (
-          <li key={categoria.clave} className="configuracion-item">
-            {categoria.nombre}
-            {categoria.usaStockMinimo && <span className="configuracion-nota"> · stock mínimo</span>}
-            {categoriaUsaNumeroSerie(categoria.clave) && (
-              <span className="configuracion-nota"> · número de serie</span>
-            )}
-          </li>
+          <ItemCategoria key={categoria.clave} categoria={categoria} />
         ))}
       </ul>
 
@@ -92,6 +94,18 @@ function SeccionCategorias(props: PropsSeccionCategorias) {
             value={nombre}
             onChange={(evento) => {
               setNombre(evento.target.value);
+              setMensajeError('');
+            }}
+          />
+        </label>
+        <label className="configuracion-campo">
+          Descripción breve (máx. {MAXIMO_DESCRIPCION_CATEGORIA} caracteres)
+          <input
+            type="text"
+            placeholder="Ej: Elementos fijos como llaves de gas, data o mesones"
+            value={descripcion}
+            onChange={(evento) => {
+              setDescripcion(evento.target.value);
               setMensajeError('');
             }}
           />
