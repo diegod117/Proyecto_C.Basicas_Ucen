@@ -91,7 +91,13 @@ function TablaIncidencias() {
           {incidencias.map((incidencia) => (
             <tr key={incidencia.id}>
               <td>{incidencia.fecha}</td>
-              <td>{nombreDelRecurso(incidencia.recursoId)}</td>
+              <td>
+                {nombreDelRecurso(incidencia.recursoId)}
+                {/* Si se indicó una unidad, mostramos su número de serie (HU-12) */}
+                {incidencia.unidad !== undefined && (
+                  <span className="tabla-incidencias-unidad"> · unidad {incidencia.unidad}</span>
+                )}
+              </td>
               <td>{incidencia.descripcion}</td>
               {/* Nombre del usuario que inició sesión al registrarla (HU-10) */}
               <td>{incidencia.registradaPor}</td>

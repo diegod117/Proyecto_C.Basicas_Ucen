@@ -23,6 +23,10 @@ export interface Incidencia {
   // El ítem afectado. Igual que en Reserva, guardamos solo el id del recurso.
   recursoId: number;
 
+  // Número de serie o de inventario de la unidad afectada, si el recurso tiene
+  // unidades y el encargado la indicó (HU-12, CA-12.4). Es opcional ("?").
+  unidad?: string;
+
   // Fecha y hora en que se registró. HU-10 pide que se ponga sola
   // (automática), así que el usuario no la escribe en el formulario.
   fecha: string; // ej: "2026-10-01 11:20"
