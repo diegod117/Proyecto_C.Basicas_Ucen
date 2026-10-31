@@ -1,27 +1,27 @@
 // CamposUbicacionRecurso.tsx
-// Parte del formulario "Agregar recurso" con la ubicación física:
-// torre, sala, bodega y mueble. Muestra el código de ubicación que se
+// Campos de la ubicación física: torre, sala, bodega y mueble.
+// Los usan el formulario "Agregar recurso" y el recuadro "Cambiar ubicación". Muestra el código de ubicación que se
 // genera solo (ej: "B307-B1-M2"), así nadie tiene que escribirlo.
 // La torre y la sala se eligen de listas que vienen de la página
 // "Configuración" (colecciones "torres" y "salas" de Firestore).
 // Usa los estilos de FormularioNuevoRecurso.css.
-// Cubre: RF-10, HU-11 (ubicación obligatoria con código)
+// Cubre: RF-10, HU-11 (ubicación obligatoria con código y cambio de ubicación)
 
-import type { DatosNuevoRecurso } from '../types/Recurso';
+import type { DatosUbicacion } from '../types/Recurso';
 import { armarUbicacion } from '../utils/nuevoRecurso';
 import { obtenerTorres, obtenerSalasDeTorre } from '../services/configuracionService';
 
 interface PropsCamposUbicacionRecurso {
-  // Todos los datos del formulario (este componente usa solo los de ubicación)
-  datos: DatosNuevoRecurso;
+  // Los 4 datos de la ubicación que se están escribiendo
+  datos: DatosUbicacion;
   // Función del formulario para guardar los datos con un campo cambiado.
-  // Recibe los datos COMPLETOS: { ...props.datos, sala: '307' } copia todos
-  // los campos y cambia solo "sala".
-  onCambiar: (datos: DatosNuevoRecurso) => void;
+  // Recibe los datos de ubicación COMPLETOS: { ...props.datos, sala: '307' }
+  // copia todos los campos y cambia solo "sala".
+  onCambiar: (datos: DatosUbicacion) => void;
 }
 
 // Componente CamposUbicacionRecurso
-// Recibe: los datos del formulario y la función para cambiarlos.
+// Recibe: los datos de ubicación y la función para cambiarlos.
 // Devuelve: el grupo de campos de ubicación.
 function CamposUbicacionRecurso(props: PropsCamposUbicacionRecurso) {
   const datos = props.datos;

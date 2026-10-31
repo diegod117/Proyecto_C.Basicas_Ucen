@@ -3,9 +3,9 @@
 // escribió el encargado y convertirlo en un Recurso listo para guardar.
 // Cubre: RF-01, RF-08 (categoría) y RF-10, HU-11 (ubicación obligatoria)
 
-import type { Recurso, DatosNuevoRecurso, Ubicacion } from '../types/Recurso';
+import type { Recurso, DatosNuevoRecurso, DatosUbicacion, Ubicacion } from '../types/Recurso';
 import { obtenerCategoriaPorClave } from '../services/configuracionService';
-import { generarCodigoUbicacion, validarUbicacion } from './ubicacion';
+import { generarCodigoUbicacion, validarUbicacion, buscarRecursoRepetido } from './ubicacion';
 import { categoriaUsaNumeroSerie, validarNumerosUnidades, armarUnidades, contarUnidadesPorEstado } from './unidades';
 
 // datosVaciosNuevoRecurso
@@ -42,10 +42,11 @@ export function usaStockMinimo(datos: DatosNuevoRecurso): boolean {
 }
 
 // armarUbicacion
-// Recibe: los datos del formulario.
+// Recibe: los datos de ubicación (sirve también el formulario completo,
+// porque tiene esos mismos 4 campos).
 // Devuelve: la ubicación con su código generado automáticamente (HU-11),
 // ej: torre B, sala 307, Bodega 1, Mueble 2 -> "B307-B1-M2".
-export function armarUbicacion(datos: DatosNuevoRecurso): Ubicacion {
+export function armarUbicacion(datos: DatosUbicacion): Ubicacion {
   const ubicacion: Ubicacion = {
     torre: datos.torre,
     sala: datos.sala.trim(),
@@ -105,12 +106,12 @@ export function validarNuevoRecurso(datos: DatosNuevoRecurso, existentes: Recurs
   }
 
   // No puede haber dos recursos con el mismo nombre en la misma ubicación
-  const nombre = datos.nombre.trim().toLowerCase();
+  // (la búsqueda es la misma que usa el cambio de ubicación, ver utils/ubicacion.ts;
+  // el id 0 no lo tiene ningún recurso, así que no se ignora ninguno)
   const codigo = armarUbicacion(datos).codigo;
-  for (const recurso of existentes) {
-    if (recurso.nombre.toLowerCase() === nombre && recurso.ubicacion.codigo === codigo) {
-      return 'Ya existe "' + recurso.nombre + '" en ' + codigo + '. Para sumar unidades usa "Registrar entrada" en su ficha.';
-    }
+  const repetido = buscarRecursoRepetido(datos.nombre, codigo, existentes, 0);
+  if (repetido !== undefined) {
+    return 'Ya existe "' + repetido.nombre + '" en ' + codigo + '. Para sumar unidades usa "Registrar entrada" en su ficha.';
   }
 
   return '';
