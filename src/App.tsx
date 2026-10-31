@@ -182,7 +182,11 @@ function App() {
               />
               <Route
                 path="/cargar-planilla"
-                element={paginaSiPuede(usuarioActual, 'cargaExcel', <PaginaCargaExcel />)}
+                element={paginaSiPuede(
+                    usuarioActual,
+                    'cargaExcel',
+                    <PaginaCargaExcel onInventarioCambiado={registrarCambioInventario} />,
+                  )}
               />
               <Route path="*" element={<Navigate to="/inventario" replace />} />
             </Routes>

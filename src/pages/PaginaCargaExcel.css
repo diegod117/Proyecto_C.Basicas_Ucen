@@ -81,6 +81,21 @@
   color: var(--color-danado);
 }
 
+/* Cada paso (crear categorías y salas / guardar) en un recuadro aparte */
+.carga-paso {
+  margin-top: var(--espacio-lg);
+  padding: var(--espacio-md);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+  overflow-wrap: anywhere;
+}
+
+.carga-paso ul {
+  margin: 0 0 var(--espacio-md) 0;
+  padding-left: var(--espacio-lg);
+}
+
 @media (max-width: 768px) {
   .carga-tarjeta {
     padding: var(--espacio-md);

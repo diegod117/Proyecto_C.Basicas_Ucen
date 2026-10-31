@@ -8,7 +8,7 @@
 // Cubre: HU-16, RF-15 (CA-16.1 a CA-16.4)
 
 import { useState } from 'react';
-import type { FilaPlanilla, ResultadoRevision } from '../types/Importacion';
+import type { FilaPlanilla, ResultadoGuardado, ResultadoRevision } from '../types/Importacion';
 import { leerArchivoPlanilla } from '../services/planillaService';
 import { obtenerCategorias, obtenerTorres, obtenerSalas } from '../services/configuracionService';
 import { obtenerRecursos } from '../services/recursosService';
@@ -18,22 +18,38 @@ import SelectorArchivoPlanilla from '../components/SelectorArchivoPlanilla';
 import ResumenCarga from '../components/ResumenCarga';
 import TablaFilasValidas from '../components/TablaFilasValidas';
 import TablaFilasConError from '../components/TablaFilasConError';
+import AvisoFaltantesCarga from '../components/AvisoFaltantesCarga';
+import PasoGuardarCarga from '../components/PasoGuardarCarga';
+import MensajeResultadoCarga from '../components/MensajeResultadoCarga';
+import type { DatosResultadoCarga } from '../components/MensajeResultadoCarga';
 import './PaginaCargaExcel.css';
 
+interface PropsPaginaCargaExcel {
+  // Función de App que se llama al guardar, para recalcular las alertas del menú
+  onInventarioCambiado: () => void;
+}
+
 // Componente PaginaCargaExcel
-// No recibe props. Devuelve la página con el selector, la vista previa y los pasos.
-function PaginaCargaExcel() {
+// Recibe: la función que avisa que el inventario cambió.
+// Devuelve la página con el selector, la vista previa y los pasos.
+function PaginaCargaExcel(props: PropsPaginaCargaExcel) {
   const [nombreArchivo, setNombreArchivo] = useState('');
   // Filas leídas del archivo; null mientras no se haya elegido uno válido
   const [filas, setFilas] = useState<FilaPlanilla[] | null>(null);
   const [errorLectura, setErrorLectura] = useState('');
   const [leyendo, setLeyendo] = useState(false);
+  // Resultado de la última carga (se muestra cuando se terminó de guardar)
+  const [resultado, setResultado] = useState<DatosResultadoCarga | null>(null);
+  // El valor no se usa: solo sirve para que React redibuje la página y la
+  // revisión se recalcule después de crear categorías y salas
+  const [, setCambios] = useState(0);
 
   // elegirArchivo
   // Recibe el archivo elegido. No devuelve nada. Es "async" porque leer el
   // archivo toma un momento. Si algo falla, deja el mensaje de error.
   async function elegirArchivo(archivo: File) {
     setNombreArchivo(archivo.name);
+    setResultado(null);
     setFilas(null);
     setErrorLectura('');
     setLeyendo(true);
@@ -60,6 +76,22 @@ function PaginaCargaExcel() {
     revision = revisarFilas(filas, obtenerCategorias(), obtenerTorres(), obtenerSalas(), obtenerRecursos());
   }
 
+  // terminarCarga
+  // Recibe: el resultado de guardar. No devuelve nada. Deja el mensaje final,
+  // limpia la vista previa (los recursos ya están guardados, saldrían como
+  // repetidos) y avisa a App para recalcular las alertas del menú.
+  function terminarCarga(guardado: ResultadoGuardado) {
+    if (revision !== null) {
+      setResultado({
+        guardado: guardado,
+        conError: revision.conError.length,
+        sinGuardar: revision.validas.length - guardado.guardados,
+      });
+    }
+    setFilas(null);
+    props.onInventarioCambiado();
+  }
+
   return (
     <section className="contenido-pagina">
       <header className="encabezado-pagina">
@@ -84,12 +116,23 @@ function PaginaCargaExcel() {
             cantidadValidas={revision.validas.length}
             cantidadConError={revision.conError.length}
           />
+          <AvisoFaltantesCarga
+            faltantes={revision.faltantes}
+            onCreado={() => setCambios((cambiosAnteriores) => cambiosAnteriores + 1)}
+          />
           <h3 className="carga-subtitulo">Filas con error ({revision.conError.length})</h3>
           <TablaFilasConError filas={revision.conError} />
           <h3 className="carga-subtitulo">Filas válidas ({revision.validas.length})</h3>
           <TablaFilasValidas filas={revision.validas} />
+          <PasoGuardarCarga
+            validas={revision.validas}
+            faltaCrear={revision.faltantes.categorias.length > 0 || revision.faltantes.salas.length > 0}
+            onTerminado={terminarCarga}
+          />
         </div>
       )}
+
+      {resultado !== null && <MensajeResultadoCarga datos={resultado} />}
     </section>
   );
 }
