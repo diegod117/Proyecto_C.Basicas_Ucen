@@ -4,6 +4,7 @@
 // También guarda las reposiciones de stock.
 // Los registros se guardan en la colección "historial" de Firestore.
 // Cubre: HU-06 (historial de movimientos), RF-04 (reposición), RF-13 (entradas y salidas),
+//        HU-16 (alta con motivo propio en la carga desde Excel),
 //        RF-10 (cambio de ubicación), RNF-06
 
 // RNF-06 pide que el historial "no se pierda ni se sobrescriba".
@@ -105,14 +106,16 @@ export function crearRegistroCambioEstado(
 }
 
 // crearRegistroAlta
-// Recibe: el id del recurso nuevo, sus unidades iniciales y el nombre del
-//         usuario conectado.
+// Recibe: el id del recurso nuevo, sus unidades iniciales, el nombre del
+//         usuario conectado y, si se quiere, un motivo distinto al normal
+//         (la carga desde Excel escribe "Carga inicial desde la planilla Excel").
 // Devuelve: el registro listo para guardar, con tipo 'alta'. Así el
 // historial de cada recurso empieza el día en que se agregó (RNF-06).
 export function crearRegistroAlta(
   recursoId: number,
   cantidad: number,
   nombreUsuario: string,
+  motivo: string = 'Alta del recurso en el inventario',
 ): CambioEstado {
   return {
     id: obtenerSiguienteId(),
@@ -123,7 +126,7 @@ export function crearRegistroAlta(
     estadoAnterior: 'disponible',
     estadoNuevo: 'disponible',
     cantidad: cantidad,
-    motivo: 'Alta del recurso en el inventario',
+    motivo: motivo,
     usuario: nombreUsuario,
     valorNuevo: textoEstado('disponible'),
   };
