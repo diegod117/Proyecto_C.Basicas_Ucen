@@ -71,6 +71,18 @@ export function puedeAgregarRecurso(rol: RolUsuario): boolean {
   }
 }
 
+// puedeCambiarUbicacion
+// Recibe: el rol del usuario.
+// Devuelve: true si puede cambiar la ubicación de un recurso (HU-11).
+// Igual que el resto del inventario: solo el encargado lo edita (RNF-03).
+export function puedeCambiarUbicacion(rol: RolUsuario): boolean {
+  if (rol === 'encargado') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // puedeReservar
 // Recibe: el rol del usuario.
 // Devuelve: true si puede reservar un recurso (HU-03).

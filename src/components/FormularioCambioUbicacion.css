@@ -1,0 +1,32 @@
+/* FormularioCambioUbicacion.css
+   Ajustes del recuadro "Cambiar ubicación". Reutiliza los campos de
+   ubicación del formulario "Agregar recurso" (CamposUbicacionRecurso), que
+   están pensados para una tarjeta ancha: aquí van en una columna angosta. */
+
+/* Torre y sala, y bodega y mueble, uno debajo del otro */
+.formulario-cambio-ubicacion .nuevo-recurso-fila {
+  grid-template-columns: 1fr;
+}
+
+/* El grupo de campos ya está dentro de una tarjeta: sin borde propio */
+.formulario-cambio-ubicacion .nuevo-recurso-grupo {
+  margin: var(--espacio-sm) 0 0 0;
+  padding: 0;
+  border: none;
+}
+
+/* Los textos de los campos con el mismo estilo que los demás recuadros de la ficha */
+.formulario-cambio-ubicacion .nuevo-recurso-campo {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+
+/* Los campos conservan el texto normal (sin mayúsculas) */
+.formulario-cambio-ubicacion .nuevo-recurso-campo input,
+.formulario-cambio-ubicacion .nuevo-recurso-campo select {
+  text-transform: none;
+  letter-spacing: normal;
+}

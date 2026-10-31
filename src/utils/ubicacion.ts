@@ -2,9 +2,10 @@
 // Funciones para generar y validar la ubicación física de un recurso.
 // HU-11 pide que cada recurso tenga una ubicación OBLIGATORIA
 // (laboratorio, bodega y mueble) con un código para encontrarlo rápido.
-// Cubre: HU-11, RF-10
+// También valida el cambio de ubicación de un recurso que ya existe.
+// Cubre: HU-11, RF-10 (CA-11.1 y CA-11.2)
 
-import type { Ubicacion } from '../types/Recurso';
+import type { Recurso, Ubicacion } from '../types/Recurso';
 
 // Regla del código de ubicación:
 //   torre + sala - bodega - mueble
@@ -110,4 +111,70 @@ export function validarUbicacion(ubicacion: Ubicacion): string[] {
   }
 
   return problemas;
+}
+
+// buscarRecursoRepetido
+// Recibe: un nombre, un código de ubicación, la lista de recursos y el id de
+//         un recurso que se debe ignorar (el que se está modificando).
+// Devuelve: el recurso que ya tiene ese mismo nombre en ese mismo código, o
+// undefined si no hay ninguno. No distingue mayúsculas de minúsculas.
+// La usan "Agregar recurso" y "Cambiar ubicación" para no repetir la regla.
+export function buscarRecursoRepetido(
+  nombre: string,
+  codigo: string,
+  existentes: Recurso[],
+  idIgnorado: number,
+): Recurso | undefined {
+  const nombreBuscado = nombre.trim().toLowerCase();
+  for (const recurso of existentes) {
+    if (
+      recurso.id !== idIgnorado &&
+      recurso.nombre.toLowerCase() === nombreBuscado &&
+      recurso.ubicacion.codigo === codigo
+    ) {
+      return recurso;
+    }
+  }
+  return undefined;
+}
+
+// validarCambioUbicacion
+// Recibe: el recurso, la ubicación nueva (ya armada con su código) y la lista
+//         de todos los recursos.
+// Devuelve: un mensaje de error, o '' (texto vacío) si el cambio se puede guardar.
+// Revisa en orden y devuelve el PRIMER problema que encuentra (CA-11.2).
+export function validarCambioUbicacion(
+  recurso: Recurso,
+  nuevaUbicacion: Ubicacion,
+  existentes: Recurso[],
+): string {
+  // La sala se elige de una lista, así que lo único que puede fallar es no elegir ninguna
+  if (nuevaUbicacion.sala === '') {
+    return 'Elige la sala donde queda el recurso.';
+  }
+
+  // Bodega y mueble no pueden quedar vacíos (reutiliza la validación de HU-11)
+  const problemas = validarUbicacion(nuevaUbicacion);
+  if (problemas.length > 0) {
+    return problemas[0];
+  }
+
+  // Tiene que ser distinta a la que ya tiene
+  const actual = recurso.ubicacion;
+  if (
+    actual.torre === nuevaUbicacion.torre &&
+    actual.sala === nuevaUbicacion.sala &&
+    actual.bodega === nuevaUbicacion.bodega &&
+    actual.mueble === nuevaUbicacion.mueble
+  ) {
+    return 'La ubicación nueva es igual a la actual. Cambia algún dato para moverlo.';
+  }
+
+  // No puede chocar con otro recurso del mismo nombre en esa ubicación
+  const repetido = buscarRecursoRepetido(recurso.nombre, nuevaUbicacion.codigo, existentes, recurso.id);
+  if (repetido !== undefined) {
+    return 'Ya existe "' + repetido.nombre + '" en ' + nuevaUbicacion.codigo + '.';
+  }
+
+  return '';
 }

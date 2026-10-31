@@ -59,6 +59,19 @@ export interface Ubicacion {
 }
 
 // ------------------------------------------------------------------
+// Datos de ubicación que se escriben en un formulario (HU-11)
+// ------------------------------------------------------------------
+// Son los 4 campos de la ubicación que elige el encargado, sin el código
+// (el código se genera solo a partir de ellos). Los usan el formulario
+// "Agregar recurso" y el recuadro "Cambiar ubicación".
+export interface DatosUbicacion {
+  torre: Torre;
+  sala: string;
+  bodega: string;
+  mueble: string;
+}
+
+// ------------------------------------------------------------------
 // Cantidad de unidades en cada estado (RF-01, RF-02)
 // ------------------------------------------------------------------
 // Un recurso puede tener varias unidades (ej: 14 multímetros) y no todas

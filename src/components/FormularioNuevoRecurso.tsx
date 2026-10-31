@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { DatosNuevoRecurso } from '../types/Recurso';
+import type { DatosNuevoRecurso, DatosUbicacion } from '../types/Recurso';
 import { useUsuario } from '../context/ContextoUsuario';
 import { obtenerCategorias } from '../services/configuracionService';
 import { datosVaciosNuevoRecurso, usaStockMinimo, validarNuevoRecurso } from '../utils/nuevoRecurso';
@@ -51,6 +51,15 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
   function cambiarDatos(nuevosDatos: DatosNuevoRecurso) {
     setDatos(nuevosDatos);
     setMensajeError('');
+  }
+
+  // cambiarUbicacion
+  // Recibe: los datos de ubicación con algún campo cambiado. No devuelve nada.
+  // CamposUbicacionRecurso solo conoce la ubicación, así que aquí la
+  // mezclamos con el resto de los datos: { ...datos, ...nuevaUbicacion }
+  // copia todo y reemplaza torre, sala, bodega y mueble.
+  function cambiarUbicacion(nuevaUbicacion: DatosUbicacion) {
+    cambiarDatos({ ...datos, ...nuevaUbicacion });
   }
 
   // guardar
@@ -150,8 +159,8 @@ function FormularioNuevoRecurso(props: PropsFormularioNuevoRecurso) {
         )}
       </fieldset>
 
-      {/* Le pasamos cambiarDatos: los componentes hijos la llaman con los datos cambiados */}
-      <CamposUbicacionRecurso datos={datos} onCambiar={cambiarDatos} />
+      {/* Le pasamos las funciones de arriba: los componentes hijos las llaman con los datos cambiados */}
+      <CamposUbicacionRecurso datos={datos} onCambiar={cambiarUbicacion} />
       <CamposDetalleRecurso datos={datos} onCambiar={cambiarDatos} />
 
       {mensajeError !== '' && <p className="nuevo-recurso-error">{mensajeError}</p>}
