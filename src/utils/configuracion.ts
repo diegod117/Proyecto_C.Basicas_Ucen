@@ -1,10 +1,13 @@
 // configuracion.ts
 // Funciones de ayuda para la página "Configuración": validar las categorías,
-// torres y salas nuevas antes de guardarlas.
-// Cubre: RF-08, RF-10, RNF-05
+// torres y salas nuevas antes de guardarlas, y mostrar la descripción de una categoría.
+// Cubre: RF-08 (categorías con descripción breve), RF-10, RNF-05
 
 import type { Categoria, Torre, Sala } from '../types/Configuracion';
 import { prepararTextoParaBuscar } from './filtrosInventario';
+
+// Máximo de caracteres de la descripción de una categoría: tiene que ser "breve" (RF-08)
+export const MAXIMO_DESCRIPCION_CATEGORIA = 120;
 
 // crearClaveCategoria
 // Recibe: el nombre que escribió el encargado, ej: "Material de vidrio".
@@ -28,6 +31,18 @@ export function validarNuevaCategoria(nombre: string, existentes: Categoria[]): 
     }
   }
   return '';
+}
+
+// textoDescripcionCategoria
+// Recibe: una categoría.
+// Devuelve: su descripción breve, o "Sin descripción" si no tiene (las
+// categorías guardadas antes de RF-08 no traen el campo, o viene vacío o
+// con solo espacios).
+export function textoDescripcionCategoria(categoria: Categoria): string {
+  if (categoria.descripcion === undefined || categoria.descripcion.trim() === '') {
+    return 'Sin descripción';
+  }
+  return categoria.descripcion.trim();
 }
 
 // validarNuevaTorre
