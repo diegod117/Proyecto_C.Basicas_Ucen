@@ -1,9 +1,46 @@
 /* PaginaLogin.css
-   Estilos de la página de bienvenida como un todo (ruta /login).
+   Estilos de la página de bienvenida como un todo (ruta /login):
+   el fondo y las "entradas" de las secciones al bajar.
    Cubre: RNF-01 (celular) */
 
 /* Fondo blanco de toda la página (sin degradados ni sombras) */
 .pagina-bienvenida {
   background-color: var(--ucen-papel);
   color: var(--ucen-tinta);
+}
+
+/* ---------- Entradas al bajar ----------
+   NINGÚN elemento .aparece puede quedar oculto si algo falla. Por eso el
+   estado oculto existe SOLO si se cumplen las tres cosas:
+     - es una pantalla (no al imprimir),
+     - la persona no pidió "reducir movimiento" en su sistema,
+     - el <html> tiene la clase con-animacion (la pone PaginaLogin.tsx; si el
+       código no corre, no está, y todo se ve normal).
+   Si el navegador no tiene IntersectionObserver, PaginaLogin.tsx pone
+   "visible" a todo de inmediato; y al salir de la página quita la clase. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  /* Los enlaces #que-hace, #preguntas... bajan suavemente (solo en esta página) */
+  html.con-animacion {
+    scroll-behavior: smooth;
+  }
+
+  html.con-animacion .aparece {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 600ms ease, transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html.con-animacion .aparece.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Escalonado: título, después texto, después foto (80ms entre cada uno) */
+  html.con-animacion .aparece-2 {
+    transition-delay: 80ms;
+  }
+
+  html.con-animacion .aparece-3 {
+    transition-delay: 160ms;
+  }
 }

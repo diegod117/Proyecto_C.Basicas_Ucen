@@ -10,6 +10,7 @@
      3) Tablet (701 a 1024px): nombre y foto arriba, ingreso + acento al
         medio y la foto de hornos abajo, a todo el ancho.
      4) Celular (hasta 700px): una sola columna.
+   El tile del nombre está en NombreTablero.css y las fotos en FotoTablero.css.
    Cubre: RNF-01 (celular, sin scroll horizontal) y RNF-11 (contraste) */
 
 .tablero {
@@ -45,48 +46,6 @@
   border-radius: var(--ucen-radio);
 }
 
-.tablero-nombre {
-  grid-area: nombre;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 32px;
-  background-color: var(--ucen-papel);
-}
-
-/* align-self: flex-start evita que el flex estire el logo a todo el ancho
-   (si se estira, el dibujo del SVG queda centrado y no a la izquierda) */
-.tablero-logo {
-  display: block;
-  align-self: flex-start;
-  width: auto;
-  height: 48px;
-}
-
-/* "LabCentral": paso "Nombre". Montserrat 600 con -0.04em mide 5,2 veces
-   su tamaño de letra; el tamaño máximo de cada disposición está calculado
-   para que quepa en su tile (ver bitácora J42). */
-.tablero-titulo {
-  margin: 0;
-  font-size: clamp(64px, 7.6vw, 124px);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-  color: var(--ucen-tinta); /* global.css pinta los h1 de azul: aquí no */
-  white-space: nowrap;
-}
-
-/* Frase bajo el nombre: paso "Título" */
-.tablero-frase {
-  margin: 24px 0 0;
-  font-size: clamp(24px, 2.4vw, 32px);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  color: var(--ucen-tinta);
-}
-
 /* Tile de ingreso: un paso de tono para que se distinga del fondo blanco */
 .tablero-ingreso {
   grid-area: ingreso;
@@ -94,7 +53,7 @@
   background-color: var(--ucen-superficie);
 }
 
-/* Tile de acento azul con la frase en blanco, arriba a la izquierda */
+/* Tile de acento azul con la frase en blanco (9,6:1), arriba a la izquierda */
 .tablero-acento {
   grid-area: acento;
   padding: 32px;
@@ -110,46 +69,11 @@
   color: var(--ucen-papel);
 }
 
-/* Fotos: cubren su tile, en escala de grises (tratamiento único de la página).
-   overflow: hidden recorta la foto con las esquinas redondeadas del tile.
-   La foto va con position: absolute para que su tamaño original (1600px)
-   NO estire la fila de la grilla: el tile mide lo que dice la grilla y la
-   foto solo lo llena. */
-.tablero-foto {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--ucen-superficie);
-}
-
-.tablero-foto img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.05);
-}
-
-.tablero-foto-probetas {
-  grid-area: probetas;
-}
-
-.tablero-foto-hornos {
-  grid-area: hornos;
-}
-
-/* Escritorio de 801 a 900px de alto: tiles con menos relleno y el nombre
-   limitado también por el alto (11vh), para que el formulario quepa. */
+/* Escritorio de 801 a 900px de alto: tiles con menos relleno */
 @media (min-width: 1025px) and (max-height: 900px) {
-  .tablero-nombre,
   .tablero-ingreso,
   .tablero-acento {
     padding: 24px;
-  }
-
-  .tablero-titulo {
-    font-size: min(7.6vw, 11vh);
   }
 }
 
@@ -172,21 +96,8 @@
     justify-content: center;
   }
 
-  /* La columna "nombre" mide la mitad del tablero: (100vw - 32px) / 2.
-     Menos 48px de relleno queda 50vw - 64px de espacio, y el nombre mide
-     5,2 veces su letra: dividir por 5,4 deja un poco de margen. 11vh lo
-     limita también por el alto. */
-  .tablero-titulo {
-    font-size: min(calc((50vw - 64px) / 5.4), 11vh);
-  }
-
-  .tablero-frase,
   .tablero-acento p {
     font-size: 24px;
-  }
-
-  .tablero-frase {
-    margin-top: 16px;
   }
 }
 
@@ -203,15 +114,9 @@
       'hornos hornos hornos hornos hornos hornos hornos hornos hornos hornos';
   }
 
-  .tablero-nombre,
   .tablero-ingreso,
   .tablero-acento {
     padding: 24px;
-  }
-
-  /* El tile del nombre mide la mitad del ancho: 7vw cabe desde 701px */
-  .tablero-titulo {
-    font-size: 7vw;
   }
 }
 
@@ -233,19 +138,7 @@
       'hornos';
   }
 
-  /* El nombre llena el ancho: 64px = 2 × 8 de margen + 2 × 24 de relleno,
-     y el nombre mide 5,2 veces su letra (dividir por 5,4 deja margen).
-     En 360px queda en 55px y en 390px en 60px. */
-  .tablero-titulo {
-    font-size: calc((100vw - 64px) / 5.4);
-  }
-
-  .tablero-frase,
   .tablero-acento p {
     font-size: 24px;
-  }
-
-  .tablero-foto {
-    aspect-ratio: 4 / 3;
   }
 }

@@ -72,9 +72,11 @@
 }
 
 /* Foco con teclado en los tiles oscuros: contorno BLANCO hacia adentro,
-   porque un contorno azul no se vería sobre el azul del tile */
-.barra-marca:focus-visible,
-.barra-ingresar:focus-visible {
+   porque un contorno azul no se vería sobre el azul del tile.
+   Empieza con .pagina-bienvenida para ganarle a la regla general de foco
+   de bienvenida.css (que pone el contorno azul por fuera). */
+.pagina-bienvenida .barra-marca:focus-visible,
+.pagina-bienvenida .barra-ingresar:focus-visible {
   outline: 2px solid var(--ucen-papel);
   outline-offset: -6px;
 }
