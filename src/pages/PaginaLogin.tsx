@@ -13,6 +13,7 @@ import SeccionQueHace from '../components/SeccionQueHace';
 import SeccionLaboratorios from '../components/SeccionLaboratorios';
 import SeccionQuienes from '../components/SeccionQuienes';
 import SeccionPreguntas from '../components/SeccionPreguntas';
+import PieBienvenida from '../components/PieBienvenida';
 import './PaginaLogin.css';
 
 interface PropsPaginaLogin {
@@ -34,6 +35,7 @@ function PaginaLogin(props: PropsPaginaLogin) {
         <SeccionQuienes />
         <SeccionPreguntas />
       </main>
+      <PieBienvenida />
     </div>
   );
 }
