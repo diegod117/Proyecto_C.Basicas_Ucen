@@ -10,8 +10,8 @@ import './SeccionPreguntas.css';
 // No recibe props. Devuelve el título y las preguntas con sus respuestas.
 function SeccionPreguntas() {
   return (
-    <section id="preguntas" className="bienv-seccion bienv-ancho bienv-grilla" aria-labelledby="preguntas-titulo">
-      <h2 id="preguntas-titulo" className="bienv-titulo preguntas-titulo aparece">
+    <section id="preguntas" className="bienv-seccion bienv-ancho" aria-labelledby="preguntas-titulo">
+      <h2 id="preguntas-titulo" className="bienv-display bienv-cabecera aparece">
         Preguntas frecuentes
       </h2>
 

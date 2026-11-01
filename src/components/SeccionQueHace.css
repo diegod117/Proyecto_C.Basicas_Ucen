@@ -13,10 +13,12 @@
   margin-top: 32px;
 }
 
+/* El selector va centrado bajo el título, igual que la cabecera */
 .selector-rol {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 12px 16px;
 }
 
@@ -24,9 +26,12 @@
   color: var(--ucen-tinta);
 }
 
+/* Si los botones no caben en una fila (celular), la segunda fila
+   también queda centrada */
 .selector-rol-botones {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
 }
 

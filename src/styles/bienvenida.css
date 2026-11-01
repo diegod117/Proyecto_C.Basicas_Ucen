@@ -95,6 +95,24 @@
   margin-top: 160px;
 }
 
+/* Cabecera de sección: título (y su párrafo) centrados en la página.
+   Todas las secciones abren igual, así la página se ve ordenada y pareja.
+   grid-column: 1 / -1 la estira a todo el ancho cuando está en una grilla;
+   margin auto la centra cuando no lo está. */
+.pagina-bienvenida .bienv-cabecera {
+  grid-column: 1 / -1;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Párrafo de la cabecera: más angosto que el título para que se lea bien */
+.pagina-bienvenida .bienv-cabecera .bienv-texto {
+  max-width: 60ch;
+  margin: 24px auto 0;
+}
+
 /* ---------- Foco con teclado ----------
    :focus-visible solo aparece al navegar con Tab (no al hacer clic).
    Sobre fondos claros: contorno azul por fuera. */

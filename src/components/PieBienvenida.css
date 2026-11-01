@@ -16,9 +16,11 @@
    dejar margen (también si la ventana tiene barra de scroll).
    Ancho del contenido = 100vw menos el margen de los dos lados (32px cada
    uno). line-height 0.8 junta las líneas, pero el texto no se recorta (no
-   hay overflow: hidden). */
+   hay overflow: hidden). text-align: center reparte el espacio que sobra
+   por igual a los dos lados. */
 .pie-nombre {
   margin: 0;
+  text-align: center;
   font-size: calc((100vw - 64px) / 5.5);
   font-weight: 600;
   letter-spacing: -0.05em;
@@ -94,12 +96,13 @@
   cursor: pointer;
 }
 
-/* Logos de la facultad y de la carrera, con el lema */
+/* Logos de la facultad y de la carrera, con el lema, centrados */
 .pie-logos {
   margin-top: 72px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 24px 40px;
 }
 
@@ -150,5 +153,12 @@
 
   .pie-enlaces {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* En celular la última fila se apila: centrada, como los créditos de arriba */
+  .pie-final {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }

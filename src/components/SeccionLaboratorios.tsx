@@ -14,14 +14,17 @@ function SeccionLaboratorios() {
   return (
     <section id="laboratorios" className="bienv-seccion laboratorios bienv-oscuro" aria-labelledby="laboratorios-titulo">
       <div className="bienv-ancho bienv-grilla">
-        <h2 id="laboratorios-titulo" className="bienv-display bienv-eje aparece">
-          Dos salas, un inventario
-        </h2>
-        <p className="bienv-texto bienv-eje laboratorios-parrafo aparece aparece-2">
-          El inventario del laboratorio de Ciencias Básicas está en la Torre B, salas B206 y B302:
-          balanzas, control de temperatura, material volumétrico, pH-metros, computadores e
-          instrumentos de mecánica, óptica y electrónica, en 13 categorías.
-        </p>
+        {/* Cabecera centrada (ver bienvenida.css) */}
+        <div className="bienv-cabecera">
+          <h2 id="laboratorios-titulo" className="bienv-display aparece">
+            Dos salas, un inventario
+          </h2>
+          <p className="bienv-texto laboratorios-parrafo aparece aparece-2">
+            El inventario del laboratorio de Ciencias Básicas está en la Torre B, salas B206 y B302:
+            balanzas, control de temperatura, material volumétrico, pH-metros, computadores e
+            instrumentos de mecánica, óptica y electrónica, en 13 categorías.
+          </p>
+        </div>
 
         {/* Mosaico sin separación: 3 × 2 en escritorio, 2 columnas en tablet y celular */}
         <div className="laboratorios-mosaico aparece aparece-3">

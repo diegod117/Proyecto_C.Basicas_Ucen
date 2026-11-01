@@ -1,89 +1,62 @@
 /* SeccionQuienes.css
-   "Hecho en la Central": párrafo grande con el sello de la carrera
-   flotando a la izquierda, y tres datos cortos al margen.
+   "Hecho en la Central": un bloque centrado con el sello de la carrera
+   arriba, el título, una frase grande con los nombres del equipo, un
+   párrafo de texto normal y tres datos cortos en una fila.
+   El centrado lo da .bienv-cabecera (bienvenida.css).
    Cubre: RNF-01 (celular) y RNF-11 (#33465c sobre blanco: 9,67:1) */
 
-/* Datos cortos: columnas 1 y 2, alineados arriba con el sello */
-.quienes-datos {
-  grid-column: 1 / 3;
-  margin-top: 48px;
+/* Sello: cuadrado de 96px, centrado arriba del título */
+.quienes-sello {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 32px;
+  border-radius: var(--ucen-radio);
+  object-fit: cover;
 }
 
-.pagina-bienvenida .quienes-datos .bienv-nota {
-  color: var(--ucen-tinta-suave);
-}
-
-.pagina-bienvenida .quienes-datos .bienv-nota + .bienv-nota {
-  margin-top: 6px;
-}
-
-/* Texto: columnas 3 a 12 */
-.quienes-texto {
-  grid-column: 3 / -1;
-  margin-top: 48px;
-}
-
-/* Párrafo grande: paso "Título" pero con peso normal */
+/* Frase grande: paso "Título" pero con peso normal */
 .quienes-parrafo {
-  margin: 0;
+  margin: 32px 0 0;
   font-size: var(--bienv-titulo);
   font-weight: 400;
   line-height: 1.3;
   color: var(--ucen-tinta-suave);
 }
 
-.quienes-parrafo + .quienes-parrafo {
-  margin-top: 0.8em;
-}
-
 /* Los nombres del equipo en tinta completa */
 .quienes-nombre {
   color: var(--ucen-tinta);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* Sello: cuadrado, del alto de 3 líneas de texto (3 × 1,3 = 3,9em).
-   float: left hace que el texto lo rodee por la derecha. */
-.quienes-sello {
-  float: left;
-  width: 3.9em;
-  height: 3.9em;
-  margin: 0.15em 0.5em 0 0;
-  border-radius: var(--ucen-radio);
-  object-fit: cover;
+/* Párrafo de texto normal, en tinta suave */
+.pagina-bienvenida .quienes-detalle {
+  color: var(--ucen-tinta-suave);
 }
 
-/* Tablet: los datos van arriba en una fila y el texto usa todo el ancho */
-@media (max-width: 1024px) {
-  .quienes-datos {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 24px;
-  }
-
-  .pagina-bienvenida .quienes-datos .bienv-nota + .bienv-nota {
-    margin-top: 0;
-  }
-
-  .quienes-texto {
-    grid-column: 1 / -1;
-    margin-top: 24px;
-  }
+/* Datos cortos: una fila centrada; si no caben, bajan a otra línea */
+.quienes-datos {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 24px;
 }
 
-/* Celular: sello de 4 líneas (~110px), datos debajo en una fila */
+.pagina-bienvenida .quienes-datos .bienv-nota {
+  color: var(--ucen-tinta-suave);
+}
+
+/* Celular: sello un poco más chico */
 @media (max-width: 700px) {
   .quienes-sello {
-    width: 5em;
-    height: 5em;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
   }
 
-  .quienes-datos {
-    order: 2;
-  }
-
-  .quienes-texto {
-    margin-top: 32px;
+  .quienes-parrafo {
+    margin-top: 24px;
   }
 }

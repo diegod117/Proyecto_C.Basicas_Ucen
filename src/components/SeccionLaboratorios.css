@@ -10,8 +10,6 @@
 }
 
 .pagina-bienvenida .laboratorios-parrafo {
-  margin-top: 32px;
-  max-width: 46ch;
   color: var(--ucen-texto-claro);
 }
 

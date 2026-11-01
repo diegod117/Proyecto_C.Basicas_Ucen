@@ -27,7 +27,7 @@ function SeccionQueHace() {
       {/* "aparece" va en el título, el selector y la LISTA completa, nunca en
           cada fila: al cambiar de rol se dibujan filas nuevas y, si tuvieran
           "aparece", quedarían invisibles (ver PaginaLogin.tsx). */}
-      <h2 id="que-hace-titulo" className="bienv-display aparece">
+      <h2 id="que-hace-titulo" className="bienv-display bienv-cabecera aparece">
         Todo el laboratorio, ordenado
       </h2>
 
