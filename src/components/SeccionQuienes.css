@@ -26,7 +26,7 @@
 /* Párrafo grande: paso "Título" pero con peso normal */
 .quienes-parrafo {
   margin: 0;
-  font-size: clamp(24px, 2.4vw, 32px);
+  font-size: var(--bienv-titulo);
   font-weight: 400;
   line-height: 1.3;
   color: var(--ucen-tinta-suave);
@@ -72,12 +72,8 @@
   }
 }
 
-/* Celular: texto a 22px y sello de 4 líneas (~110px), datos debajo en una fila */
+/* Celular: sello de 4 líneas (~110px), datos debajo en una fila */
 @media (max-width: 700px) {
-  .quienes-parrafo {
-    font-size: 22px;
-  }
-
   .quienes-sello {
     width: 5em;
     height: 5em;

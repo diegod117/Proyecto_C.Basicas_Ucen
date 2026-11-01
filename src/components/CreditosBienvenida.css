@@ -29,7 +29,7 @@
 .creditos-fotos {
   margin: 48px 0 0;
   max-width: 110ch;
-  font-size: 14px;
+  font-size: var(--bienv-pequeno);
   line-height: 1.6;
   color: var(--ucen-texto-claro);
 }

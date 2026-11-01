@@ -43,7 +43,7 @@
 
 .barra-enlaces a {
   color: var(--ucen-tinta);
-  font-size: 17px;
+  font-size: var(--bienv-cuerpo);
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -61,7 +61,7 @@
   background-color: var(--ucen-noche);
   color: var(--ucen-papel);
   font-family: inherit;
-  font-size: 17px;
+  font-size: var(--bienv-cuerpo);
   font-weight: 600;
   text-align: left;
   cursor: pointer;

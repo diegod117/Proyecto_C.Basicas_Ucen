@@ -9,7 +9,7 @@
   background-color: #f0fdf4;
   border-radius: var(--ucen-radio);
   padding: 8px 12px;
-  font-size: 16px;
+  font-size: var(--bienv-cuerpo);
   line-height: 1.4;
   margin: 0 0 16px;
 }

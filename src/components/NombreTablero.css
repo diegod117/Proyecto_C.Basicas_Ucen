@@ -5,6 +5,8 @@
    "LabCentral" en Montserrat 600 con -0.04em mide 5,2 veces su tamaño de
    letra: cada tamaño está calculado para que quepa en su tile (medidas en
    la bitácora J42).
+   El relleno de los lados es --bienv-margen menos los 8px del borde del
+   tablero: así el texto queda alineado con el de las secciones y el pie.
    Cubre: RNF-01 (celular, sin scroll horizontal) y RNF-11 (contraste) */
 
 .tablero-nombre {
@@ -13,7 +15,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 24px;
-  padding: 32px;
+  padding: 32px 24px;
   background-color: var(--ucen-papel);
 }
 
@@ -40,7 +42,7 @@
 /* Frase bajo el nombre: paso "Título" */
 .tablero-frase {
   margin: 24px 0 0;
-  font-size: clamp(24px, 2.4vw, 32px);
+  font-size: var(--bienv-titulo);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.15;
@@ -85,15 +87,15 @@
   }
 }
 
-/* 4) Celular: el nombre llena el ancho. 64px = 2 × 8 de margen + 2 × 24 de
-   relleno; dividir por 5,4 deja margen. En 360px queda en 55px y en 390px
-   en 60px. */
+/* 4) Celular: el nombre llena el ancho. 48px = 2 × 8 de borde + 2 × 16 de
+   relleno; dividir por 5,4 deja margen. En 360px queda en 58px y en 390px
+   en 63px (el nombre del pie usa la MISMA fórmula, así es un solo tamaño). */
 @media (max-width: 700px) {
-  .tablero-titulo {
-    font-size: calc((100vw - 64px) / 5.4);
+  .tablero-nombre {
+    padding: 24px 16px;
   }
 
-  .tablero-frase {
-    font-size: 24px;
+  .tablero-titulo {
+    font-size: calc((100vw - 48px) / 5.4);
   }
 }

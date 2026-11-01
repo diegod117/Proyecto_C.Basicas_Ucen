@@ -3,12 +3,11 @@
    en dos columnas (como un diario), sin cajas ni íconos.
    Cubre: RNF-01 (celular) y RNF-11 (contraste) */
 
-/* Título al margen izquierdo (columnas 1 a 3), alineado arriba.
-   Paso "Título", pero con 28px de mínimo */
+/* Título al margen izquierdo (columnas 1 a 3), alineado arriba */
 .pagina-bienvenida .preguntas-titulo {
   grid-column: 1 / 4;
   align-self: start;
-  font-size: clamp(28px, 2.4vw, 32px);
+  font-size: var(--bienv-titulo);
 }
 
 /* Texto en las columnas 5 a 12, repartido en 2 columnas CSS */

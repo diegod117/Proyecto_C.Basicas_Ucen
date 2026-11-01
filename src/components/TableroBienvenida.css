@@ -11,6 +11,8 @@
         medio y la foto de hornos abajo, a todo el ancho.
      4) Celular (hasta 700px): una sola columna.
    El tile del nombre está en NombreTablero.css y las fotos en FotoTablero.css.
+   Relleno de los lados de los tiles = --bienv-margen menos los 8px del borde
+   (24px; 16px en celular): el texto queda alineado con las secciones.
    Cubre: RNF-01 (celular, sin scroll horizontal) y RNF-11 (contraste) */
 
 .tablero {
@@ -49,20 +51,20 @@
 /* Tile de ingreso: un paso de tono para que se distinga del fondo blanco */
 .tablero-ingreso {
   grid-area: ingreso;
-  padding: 32px;
+  padding: 32px 24px;
   background-color: var(--ucen-superficie);
 }
 
 /* Tile de acento azul con la frase en blanco (9,6:1), arriba a la izquierda */
 .tablero-acento {
   grid-area: acento;
-  padding: 32px;
+  padding: 32px 24px;
   background-color: var(--ucen-azul);
 }
 
 .tablero-acento p {
   margin: 0;
-  font-size: clamp(24px, 2.4vw, 32px);
+  font-size: var(--bienv-titulo);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.15;
@@ -138,7 +140,8 @@
       'hornos';
   }
 
-  .tablero-acento p {
-    font-size: 24px;
+  .tablero-ingreso,
+  .tablero-acento {
+    padding: 24px 16px;
   }
 }

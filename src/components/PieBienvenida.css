@@ -14,12 +14,12 @@
 /* "LabCentral" llenando el ancho del contenido. Montserrat 600 con -0.05em
    mide 5,1 veces su letra; se divide el ancho del contenido por 5,5 para
    dejar margen (también si la ventana tiene barra de scroll).
-   Ancho del contenido = 100vw menos el margen de los dos lados (48px cada
-   uno en escritorio). line-height 0.8 junta las líneas, pero el texto no se
-   recorta (no hay overflow: hidden). */
+   Ancho del contenido = 100vw menos el margen de los dos lados (32px cada
+   uno). line-height 0.8 junta las líneas, pero el texto no se recorta (no
+   hay overflow: hidden). */
 .pie-nombre {
   margin: 0;
-  font-size: calc((100vw - 96px) / 5.5);
+  font-size: calc((100vw - 64px) / 5.5);
   font-weight: 600;
   letter-spacing: -0.05em;
   line-height: 0.8;
@@ -51,7 +51,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  font-size: 15px;
+  font-size: var(--bienv-cuerpo);
   line-height: 1.5;
 }
 
@@ -120,7 +120,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px 24px;
-  font-size: 14px;
+  font-size: var(--bienv-pequeno);
   color: var(--ucen-texto-claro);
 }
 
@@ -130,10 +130,6 @@
 
 /* Tablet: lugares arriba y enlaces debajo, cada uno a todo el ancho */
 @media (max-width: 1024px) {
-  .pie-nombre {
-    font-size: calc((100vw - 64px) / 5.5);
-  }
-
   .pie-lugares,
   .pie-enlaces {
     grid-column: 1 / -1;
@@ -146,8 +142,10 @@
     padding-top: 72px;
   }
 
+  /* Misma fórmula que el nombre del tablero en celular (NombreTablero.css),
+     para que los dos sean un solo tamaño de letra */
   .pie-nombre {
-    font-size: calc((100vw - 48px) / 5.5);
+    font-size: calc((100vw - 48px) / 5.4);
   }
 
   .pie-enlaces {

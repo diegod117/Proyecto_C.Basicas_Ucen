@@ -36,7 +36,7 @@
   background-color: var(--ucen-superficie);
   color: var(--ucen-tinta);
   font-family: inherit;
-  font-size: 16px;
+  font-size: var(--bienv-cuerpo);
   font-weight: 600;
   cursor: pointer;
 }
