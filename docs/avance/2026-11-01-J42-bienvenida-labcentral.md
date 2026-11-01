@@ -94,7 +94,17 @@ Las salas B206 y B302 y las 13 categorías se verificaron en la planilla real: B
   - El título de la barra azul ya se cortaba con "…" y se sigue cortando.
   - Los números de las tablas usan dígitos proporcionales; no molesta, se anota para la rama de rediseño.
   - Las clases nuevas no chocan con ninguna clase de la app, y las reglas compartidas cuelgan de `.pagina-bienvenida`.
-- **No se probó con una sesión real** (falta la contraseña de prueba). Hay que probar el ingreso de verdad (ver abajo).
+- **Ingreso con sesión real** (cuenta de Johann, encargado): entra a `/inventario` sin error. Inventario, Reservas, Incidencias, Alertas, Configuración y Cargar planilla a 360 px con Montserrat: **sin desbordes** (scrollWidth 360) y sin errores de consola. Solo se leyó; no se guardó nada.
+
+**Correcciones de diseño después del inspector** (`inspect.mjs`: 0 FAIL; queda solo el aviso de que no hay video, que no hace falta):
+- Todas las secciones abren igual: título (y su párrafo) **centrados** con la clase nueva `.bienv-cabecera` de `bienvenida.css`. El selector de rol también va centrado.
+- "Qué puedes hacer" usa todo el ancho: 4 filas lado a lado en escritorio, foto + texto en tablet y apiladas en celular, con fotos del mismo tamaño.
+- "Hecho en la Central" es un solo bloque centrado (sello, título, nombres del equipo en grande, el resto como texto normal y los datos en una fila).
+- "Preguntas frecuentes" con título grande centrado y el texto en 2 columnas centradas (1 columna en tablet y celular).
+- Tile azul del tablero: la frase baja a 24 px y abajo lleva "Torre B · Salas B206 y B302" y el lema UCEN, para que no quede medio vacío.
+- Pie: el nombre "LabCentral", los logos y los créditos van centrados; en celular, también la última fila.
+- Cinco tamaños de letra como variables y el mismo margen a los dos lados en toda la página.
+- Sin scroll horizontal en 1440×900, 1366×768, 1280×720, 1025×700, 768×1024, 390×844 y 360×740.
 
 **Créditos de las fotos** (también en el pie, con enlaces):
 - «Graduated Cylinders and Beaker filled with Chemical Compounds», Horia Varlan, CC BY 2.0;
