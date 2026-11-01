@@ -68,6 +68,24 @@
      En celular el menú lateral se convierte en una fila fija debajo de la
      barra azul. El contenido usa este valor para empezar justo debajo. */
   --alto-menu-celular: 52px;
+
+  /* --- Colores de la marca UCEN (J42, página de bienvenida) ---
+     Salen del Brandbook UCEN 2026. Por ahora solo los usa la página de
+     bienvenida e ingreso; el resto de la app sigue con los colores de arriba. */
+  --ucen-azul: #004680;          /* "azul clásico" oficial: botón Ingresar y bloques de acento */
+  --ucen-azul-hover: #003a6b;    /* un paso más oscuro, para el hover del botón */
+  --ucen-noche: #002147;         /* azul noche del sello de la carrera: bloques oscuros y pie */
+  --ucen-tinta: #0f1d2e;         /* texto principal sobre blanco (17:1) */
+  --ucen-tinta-suave: #33465c;   /* texto un poco más suave sobre blanco (9,67:1) */
+  --ucen-papel: #ffffff;         /* fondo de la página */
+  --ucen-superficie: #eef2f6;    /* un paso de tono sobre el blanco (tiles claros) */
+  --ucen-gris: #8290a1;          /* SOLO notas sobre --ucen-noche (4,93:1) */
+  --ucen-texto-claro: #c9d6e6;   /* texto secundario sobre noche (10,89:1) y sobre azul (6,51:1) */
+  /* Borde de los campos del formulario: 3,25:1 contra el blanco del campo.
+     Contra la superficie da ~2,9:1, pero se acepta porque el campo tiene
+     relleno blanco y eso ya lo separa del fondo. */
+  --ucen-borde-campo: #8290a1;
+  --ucen-radio: 8px;             /* único radio de esquina de la bienvenida */
 }
 
 /* =====================================================
@@ -82,8 +100,9 @@
 
 body {
   margin: 0;
-  /* M16: Inter es la fuente del mockup, cargada desde Google Fonts en index.html */
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  /* J42: Montserrat reemplaza a Inter en toda la app (cargada desde Google
+     Fonts en index.html). Arial queda de respaldo si no hay internet. */
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto);
   line-height: 1.5;
