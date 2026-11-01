@@ -1,0 +1,50 @@
+/* SeccionPreguntas.css
+   Preguntas frecuentes como texto de lectura: título al margen y el texto
+   en dos columnas (como un diario), sin cajas ni íconos.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste) */
+
+/* Título al margen izquierdo (columnas 1 a 3), alineado arriba.
+   Paso "Título", pero con 28px de mínimo */
+.pagina-bienvenida .preguntas-titulo {
+  grid-column: 1 / 4;
+  align-self: start;
+  font-size: clamp(28px, 2.4vw, 32px);
+}
+
+/* Texto en las columnas 5 a 12, repartido en 2 columnas CSS */
+.preguntas-texto {
+  grid-column: 5 / -1;
+  columns: 2;
+  column-gap: 56px;
+}
+
+/* break-inside: avoid evita que una pregunta quede partida entre las dos columnas */
+.pagina-bienvenida .preguntas-item {
+  margin: 0 0 20px;
+  break-inside: avoid;
+  color: var(--ucen-tinta);
+}
+
+.preguntas-item strong {
+  font-weight: 600;
+}
+
+/* Tablet: el título va arriba, en el eje, y el texto en una sola columna
+   (en 2 columnas quedaría muy angosto) */
+@media (max-width: 1024px) {
+  .pagina-bienvenida .preguntas-titulo {
+    grid-column: 5 / -1;
+  }
+
+  .preguntas-texto {
+    columns: 1;
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 700px) {
+  .pagina-bienvenida .preguntas-titulo,
+  .preguntas-texto {
+    grid-column: 1 / -1;
+  }
+}
