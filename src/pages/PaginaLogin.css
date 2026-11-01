@@ -1,19 +1,9 @@
 /* PaginaLogin.css
-   Estilos de la página de bienvenida (ruta /login).
+   Estilos de la página de bienvenida como un todo (ruta /login).
    Cubre: RNF-01 (celular) */
 
-/* Fondo blanco de toda la página (sin degradados) */
+/* Fondo blanco de toda la página (sin degradados ni sombras) */
 .pagina-bienvenida {
-  min-height: 100svh;
   background-color: var(--ucen-papel);
   color: var(--ucen-tinta);
-}
-
-/* Contenedor del formulario mientras se arma el tablero */
-.pagina-bienvenida-ingreso {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 32px 24px;
-  background-color: var(--ucen-superficie);
-  border-radius: var(--ucen-radio);
 }
