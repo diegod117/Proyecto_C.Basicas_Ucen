@@ -2,7 +2,8 @@
 // Servicio que guarda en Firestore los recursos leídos de la planilla Excel,
 // por tandas. Cada recurso queda con su registro de "alta" en el historial.
 // Cubre: HU-16, RF-15 (CA-16.3: se guardan solo las filas válidas; CA-16.4:
-//        los recursos quedan "disponibles")
+//        los recursos quedan "disponibles"), HU-15 (tandas pequeñas por el
+//        límite de consultas de las reglas de seguridad)
 
 import { doc, writeBatch } from 'firebase/firestore';
 import { baseDatos } from './firebase';
@@ -18,8 +19,11 @@ import {
 } from './historialService';
 
 // Recursos por tanda. Cada recurso son 2 escrituras (el recurso y su alta en
-// el historial) y Firestore acepta como máximo 500 en un lote: 200 x 2 = 400.
-export const RECURSOS_POR_TANDA = 200;
+// el historial). Firestore acepta 500 escrituras por lote, PERO las reglas de
+// seguridad (HU-15) consultan el documento del usuario (get) en cada
+// escritura, y Firebase limita a 20 las consultas de las reglas en un lote.
+// Por eso cada tanda queda en 9 recursos = 18 escrituras.
+export const RECURSOS_POR_TANDA = 9;
 
 // Motivo que queda escrito en el historial de cada recurso importado
 const MOTIVO_CARGA = 'Carga inicial desde la planilla Excel';

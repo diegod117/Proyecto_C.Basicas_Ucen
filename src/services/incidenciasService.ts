@@ -123,12 +123,20 @@ export async function cargarIncidencias(): Promise<void> {
 
   if (snapshot.empty) {
     console.log('Colección incidencias vacía, subiendo datos de prueba...');
-    for (const incidencia of listaIncidenciasPrueba) {
-      const docRef = doc(baseDatos, 'incidencias', incidencia.id.toString());
-      await setDoc(docRef, incidencia);
+    // Desde HU-15 solo el encargado puede crear incidencias (reglas de Firestore).
+    // Si quien entra primero a un proyecto vacío es otro rol, la siembra falla:
+    // no es un error, la lista queda vacía y la app sigue funcionando.
+    try {
+      for (const incidencia of listaIncidenciasPrueba) {
+        const docRef = doc(baseDatos, 'incidencias', incidencia.id.toString());
+        await setDoc(docRef, incidencia);
+      }
+      const nuevoSnapshot = await getDocs(coleccion);
+      incidencias = nuevoSnapshot.docs.map(d => d.data() as Incidencia);
+    } catch (error) {
+      console.error('No se pudieron subir las incidencias de prueba:', error);
+      incidencias = [];
     }
-    const nuevoSnapshot = await getDocs(coleccion);
-    incidencias = nuevoSnapshot.docs.map(d => d.data() as Incidencia);
   } else {
     incidencias = snapshot.docs.map(d => d.data() as Incidencia);
   }

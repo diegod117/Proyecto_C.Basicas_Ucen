@@ -114,12 +114,21 @@ export async function cargarReservas(): Promise<void> {
 
   if (snapshot.empty) {
     console.log('Colección reservas vacía, subiendo datos de prueba...');
-    for (const reserva of listaReservasPrueba) {
-      const docRef = doc(baseDatos, 'reservas', reserva.id.toString());
-      await setDoc(docRef, reserva);
+    // Con las reglas de HU-15 un docente solo puede crear reservas a su nombre y
+    // el departamento ninguna: si quien entra primero a un proyecto vacío no es
+    // el encargado, la siembra falla. No es un error: la lista queda vacía y
+    // la app sigue funcionando.
+    try {
+      for (const reserva of listaReservasPrueba) {
+        const docRef = doc(baseDatos, 'reservas', reserva.id.toString());
+        await setDoc(docRef, reserva);
+      }
+      const nuevoSnapshot = await getDocs(coleccion);
+      listaReservas = nuevoSnapshot.docs.map(d => d.data() as Reserva);
+    } catch (error) {
+      console.error('No se pudieron subir las reservas de prueba:', error);
+      listaReservas = [];
     }
-    const nuevoSnapshot = await getDocs(coleccion);
-    listaReservas = nuevoSnapshot.docs.map(d => d.data() as Reserva);
   } else {
     listaReservas = snapshot.docs.map(d => d.data() as Reserva);
   }
