@@ -3,12 +3,15 @@
 // antes de aceptar cualquier lectura o escritura. Aunque alguien modifique
 // el código de la app en su navegador, no puede saltarse estas reglas.
 // Cubre: RNF-06 (el historial no se pierde ni se sobrescribe) y J27 del
-// plan de la fase 3 (docs/plan-fase-3.md).
+// plan de la fase 3 (docs/plan-fase-3.md); HU-15 y RNF-03 (reglas por rol, J40).
 //
 // CÓMO SE PUBLICAN: no usamos firebase-tools, así que se copian a mano.
 //   Consola de Firebase > Firestore Database > pestaña "Reglas" >
 //   pegar TODO este archivo > "Publicar".
 // Si se cambia algo aquí, hay que volver a pegarlo en la consola.
+// ORDEN IMPORTANTE (ver la bitácora J40): primero hay que crear en la consola
+// los documentos de la colección "usuarios"; recién después se publican estas
+// reglas. Si se publican antes, nadie puede leer nada.
 //
 // Cada regla dice qué operaciones se permiten en una colección:
 //   read   = leer
@@ -17,18 +20,61 @@
 //   delete = borrar
 // Si una operación no aparece permitida, Firestore la RECHAZA.
 //
-// LÍMITE CONOCIDO: los roles (encargado, docente, departamento) están en
-// src/data/usuarios.ts, no en Firestore, así que estas reglas no pueden
-// distinguir roles: solo exigen que haya una sesión iniciada. Los permisos
-// por rol (RNF-03) los aplica la app.
+// ROLES: desde HU-15 los usuarios y sus roles están en la colección "usuarios"
+// de Firestore (un documento por usuario, con el correo en minúsculas como
+// nombre). Las reglas leen ese documento para saber si quien hace la petición
+// está registrado, activo y qué rol tiene. Quien no tiene documento no puede
+// leer ni escribir nada (get() de un documento que no existe rechaza la regla).
+//
+// LÍMITES CONOCIDOS:
+//   - RNF-08 (el docente solo ve sus propias reservas) NO se aplica aquí: la app
+//     necesita leer TODAS las reservas para calcular la disponibilidad, así que
+//     el filtro de "Mis reservas" sigue haciéndose solo en la app.
+//   - Las reglas no pueden contar documentos: que siempre quede al menos un
+//     encargado activo lo revisa la app.
+//   - Cada escritura consulta el documento del usuario (un get). Firebase
+//     limita a 20 esas consultas en un lote (writeBatch): por eso ningún lote
+//     de la app debe pasar de ~19 escrituras.
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // true si quien hace la petición inició sesión en la app
-    function conSesion() {
-      return request.auth != null;
+    // Datos del usuario que hace la petición: el documento usuarios/<su correo
+    // en minúsculas>. Si no existe, el get() falla y la regla que lo usa se rechaza.
+    function datosUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.token.email.lower())).data;
+    }
+
+    // true si el documento no dice "activo: false"
+    function estaActivo(u) {
+      return u.get('activo', true) != false;
+    }
+
+    // Cada función consulta el documento UNA sola vez (let u = ...).
+
+    // true si inició sesión, está registrado y no está desactivado
+    function registrado() {
+      let u = datosUsuario();
+      return request.auth != null && estaActivo(u);
+    }
+    function esEncargado() {
+      let u = datosUsuario();
+      return request.auth != null && estaActivo(u) && u.rol == 'encargado';
+    }
+    // Crear una reserva: el encargado a nombre de cualquiera; el docente, solo al suyo
+    function puedeCrearReserva() {
+      let u = datosUsuario();
+      return request.auth != null && estaActivo(u)
+        && (u.rol == 'encargado'
+            || (u.rol == 'docente' && request.resource.data.docente == u.nombre));
+    }
+    // Cancelar una reserva: el encargado cualquiera; el docente, solo las suyas
+    function puedeCancelarReserva() {
+      let u = datosUsuario();
+      return request.auth != null && estaActivo(u)
+        && (u.rol == 'encargado'
+            || (u.rol == 'docente' && resource.data.docente == u.nombre));
     }
 
     // true si la modificación SOLO cambia los campos de la lista.
@@ -37,60 +83,98 @@ service cloud.firestore {
     function soloCambia(campos) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
     }
+    function rolValido(rol) {
+      return rol in ['encargado', 'docente', 'departamento'];
+    }
 
-    // RECURSOS: se crean una vez (datos de prueba) y después solo cambian
-    // sus cantidades, sus unidades y su ubicación (cambiar estado, reponer
-    // stock y cambiar de lugar, HU-11).
-    // "unidades" es la lista de equipos e instrumentos con número de serie
-    // (HU-12): al cambiar el estado de una unidad (HU-02) cambia esa lista
-    // junto con las cantidades. "ubicacion" cambia al mover el recurso de
-    // torre, sala, bodega o mueble (HU-11). No se borran.
-    match /recursos/{id} {
-      allow read, create: if conSesion();
-      allow update: if conSesion() && soloCambia(['cantidades', 'unidades', 'ubicacion']);
+    // USUARIOS (HU-15, RNF-03). El nombre del documento es el correo en minúsculas.
+    match /usuarios/{id} {
+      // Cada persona lee su propio documento (aunque esté desactivada, para que
+      // el login le diga por qué no puede entrar). El encargado lee todos.
+      allow get: if request.auth != null && request.auth.token.email.lower() == id;
+      allow get, list: if esEncargado();
+      // Crear: solo el encargado, con exactamente estos campos. Crear un correo
+      // que ya existe se rechaza solo (sería un update).
+      allow create: if esEncargado()
+        && id == id.lower()
+        && request.resource.data.keys().hasAll(['correo', 'nombre', 'rol', 'activo'])
+        && request.resource.data.keys().hasOnly(['correo', 'nombre', 'rol', 'activo', 'fechaAlta'])
+        && request.resource.data.correo == id
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && rolValido(request.resource.data.rol)
+        && request.resource.data.activo is bool;
+      // Modificar: solo el rol y si está activo. El nombre NO se cambia (une al
+      // docente con sus reservas). Un encargado no puede quitarse a sí mismo el
+      // rol ni desactivarse (para no quedarse sin acceso).
+      allow update: if esEncargado()
+        && soloCambia(['rol', 'activo'])
+        && rolValido(request.resource.data.rol)
+        && request.resource.data.activo is bool
+        && (id != request.auth.token.email.lower()
+            || (request.resource.data.rol == 'encargado' && request.resource.data.activo == true));
+      // Un usuario no se borra: se desactiva
       allow delete: if false;
     }
 
-    // HISTORIAL (HU-06, RNF-06): solo se agregan registros.
-    // Un registro NUNCA se modifica ni se borra: si hubo un error, se
-    // registra un cambio nuevo que lo corrija.
-    // Esto también evita que dos personas que guardan al mismo tiempo con
-    // el mismo id se pisen: el segundo "create" sería un "update" y se rechaza.
+    // RECURSOS: los lee cualquier usuario registrado; solo el encargado los crea
+    // y después solo cambian sus cantidades, sus unidades y su ubicación
+    // (cambiar estado, entradas y salidas, y cambiar de lugar). No se borran.
+    // "unidades" es la lista de equipos e instrumentos con número de serie
+    // (HU-12); "ubicacion" cambia al mover el recurso (HU-11).
+    match /recursos/{id} {
+      allow read: if registrado();
+      allow create: if esEncargado();
+      allow update: if esEncargado() && soloCambia(['cantidades', 'unidades', 'ubicacion']);
+      allow delete: if false;
+    }
+
+    // HISTORIAL (HU-06, RNF-06): solo se agregan registros (los escribe el
+    // encargado). Un registro NUNCA se modifica ni se borra: si hubo un error,
+    // se registra un cambio nuevo que lo corrija. Esto también evita que dos
+    // personas con el mismo id se pisen: el segundo "create" sería un "update".
     match /historial/{id} {
-      allow read, create: if conSesion();
+      allow read: if registrado();
+      allow create: if esEncargado();
       allow update, delete: if false;
     }
 
-    // INCIDENCIAS (HU-04, HU-10, RNF-06): se crean y después solo puede
-    // cambiar su estado (pendiente -> en revisión -> resuelta). No se borran.
+    // INCIDENCIAS (HU-04, HU-10, RNF-06): las registra el encargado y después
+    // solo puede cambiar su estado (pendiente -> en revisión -> resuelta).
     match /incidencias/{id} {
-      allow read, create: if conSesion();
-      allow update: if conSesion() && soloCambia(['estado']);
+      allow read: if registrado();
+      allow create: if esEncargado();
+      allow update: if esEncargado() && soloCambia(['estado']);
       allow delete: if false;
     }
 
-    // RESERVAS (HU-03, RF-03): se crean y se borran (cancelar una reserva).
-    // No se modifican: para cambiar una reserva se cancela y se hace otra.
+    // RESERVAS (HU-03, RF-03): las crea el encargado (a nombre de cualquiera) o
+    // el docente (solo a su propio nombre). Cancelar es borrar: el encargado
+    // cualquiera, el docente solo las suyas. No se modifican.
     match /reservas/{id} {
-      allow read, create, delete: if conSesion();
+      allow read: if registrado();
+      allow create: if puedeCrearReserva();
+      allow delete: if puedeCancelarReserva();
       allow update: if false;
     }
 
-    // CONFIGURACIÓN (RF-08, RF-10, RNF-05): categorías, torres y salas que
-    // el encargado agrega desde la página "Configuración".
-    // Solo se agregan: no se modifican ni se borran, porque un recurso o
-    // una reserva podría estar usándolas. Si alguien intenta agregar una
-    // que ya existe (mismo nombre de documento), sería un "update" y se rechaza.
+    // CONFIGURACIÓN (RF-08, RF-10, RNF-05): categorías, torres y salas que el
+    // encargado agrega desde la página "Configuración". Solo se agregan: no se
+    // modifican ni se borran, porque un recurso o una reserva podría estar
+    // usándolas. Repetir un nombre de documento sería un "update" y se rechaza.
     match /categorias/{id} {
-      allow read, create: if conSesion();
+      allow read: if registrado();
+      allow create: if esEncargado();
       allow update, delete: if false;
     }
     match /torres/{id} {
-      allow read, create: if conSesion();
+      allow read: if registrado();
+      allow create: if esEncargado();
       allow update, delete: if false;
     }
     match /salas/{id} {
-      allow read, create: if conSesion();
+      allow read: if registrado();
+      allow create: if esEncargado();
       allow update, delete: if false;
     }
 
