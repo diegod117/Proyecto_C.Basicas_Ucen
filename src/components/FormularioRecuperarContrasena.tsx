@@ -1,9 +1,10 @@
 // FormularioRecuperarContrasena.tsx
 // Formulario de "¿Olvidaste tu contraseña?": pide el correo y Firebase
 // envía un enlace para crear una contraseña nueva.
-// Se muestra dentro de la pantalla de login, en lugar del formulario normal.
-// Usa las mismas clases de la tarjeta de login (PaginaLogin.css) para
-// que se vea igual.
+// Se muestra dentro del tile de ingreso de la bienvenida, en lugar del
+// formulario normal. Usa las mismas clases login-* de FormularioIngreso.css
+// para que se vea igual (J42: su título pasó de h1 a h2, porque el único
+// h1 de la página es "LabCentral").
 // Cubre: inicio de sesión (sección 3.4 de requerimientos)
 
 import { useState } from 'react';
@@ -21,7 +22,7 @@ interface PropsFormularioRecuperarContrasena {
 
 // Componente FormularioRecuperarContrasena
 // Recibe: el correo inicial y la función para volver al login.
-// Devuelve: la tarjeta con el formulario para recuperar la contraseña.
+// Devuelve: el formulario para recuperar la contraseña.
 function FormularioRecuperarContrasena(props: PropsFormularioRecuperarContrasena) {
   const [correo, setCorreo] = useState(props.correoInicial);
   const [mensajeError, setMensajeError] = useState('');
@@ -57,46 +58,44 @@ function FormularioRecuperarContrasena(props: PropsFormularioRecuperarContrasena
   }
 
   return (
-    <form className="login-tarjeta" onSubmit={manejarEnvio}>
-      <div className="login-tarjeta-cuerpo">
-        <h1 className="login-titulo">Recuperar contraseña</h1>
-        <p className="texto-secundario login-subtitulo">
-          Te enviaremos un enlace para crear una contraseña nueva.
+    <form className="login-formulario" onSubmit={manejarEnvio}>
+      <h2 className="login-titulo">Recuperar contraseña</h2>
+      <p className="login-subtitulo">
+        Te enviaremos un enlace para crear una contraseña nueva.
+      </p>
+
+      <label className="login-etiqueta" htmlFor="recuperar-correo">
+        Correo
+      </label>
+      <input
+        id="recuperar-correo"
+        className="login-input"
+        type="email"
+        autoComplete="email"
+        value={correo}
+        onChange={(evento) => setCorreo(evento.target.value)}
+      />
+
+      {mensajeError !== '' && <p className="login-error">{mensajeError}</p>}
+
+      {/* El mensaje es el mismo exista o no la cuenta: Firebase no nos
+          dice si el correo está registrado, para que nadie pueda
+          averiguar qué cuentas existen. */}
+      {correoEnviado && (
+        <p className="recuperar-exito">
+          Si el correo está registrado, te llegará un enlace para crear una
+          contraseña nueva. Revisa también la carpeta de spam.
         </p>
+      )}
 
-        <label className="login-etiqueta" htmlFor="recuperar-correo">
-          Correo
-        </label>
-        <input
-          id="recuperar-correo"
-          className="login-input"
-          type="email"
-          autoComplete="email"
-          value={correo}
-          onChange={(evento) => setCorreo(evento.target.value)}
-        />
+      <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
+        {textoBoton}
+      </button>
 
-        {mensajeError !== '' && <p className="login-error">{mensajeError}</p>}
-
-        {/* El mensaje es el mismo exista o no la cuenta: Firebase no nos
-            dice si el correo está registrado, para que nadie pueda
-            averiguar qué cuentas existen. */}
-        {correoEnviado && (
-          <p className="recuperar-exito">
-            Si el correo está registrado, te llegará un enlace para crear una
-            contraseña nueva. Revisa también la carpeta de spam.
-          </p>
-        )}
-
-        <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
-          {textoBoton}
-        </button>
-
-        {/* type="button" para que este botón NO envíe el formulario */}
-        <button type="button" className="login-enlace" onClick={props.onVolver}>
-          ← Volver al inicio de sesión
-        </button>
-      </div>
+      {/* type="button" para que este botón NO envíe el formulario */}
+      <button type="button" className="login-enlace" onClick={props.onVolver}>
+        ← Volver al inicio de sesión
+      </button>
     </form>
   );
 }
