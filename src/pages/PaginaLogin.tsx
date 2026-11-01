@@ -10,15 +10,21 @@ import { iniciarSesion } from '../services/authService';
 import FormularioRecuperarContrasena from '../components/FormularioRecuperarContrasena';
 import './PaginaLogin.css';
 
+interface PropsPaginaLogin {
+  // Mensaje de por qué no se pudo entrar al abrir la página con una sesión
+  // guardada (cuenta desactivada, no registrada o sin conexión). Puede ir vacío.
+  mensajeInicial: string;
+}
+
 // Componente PaginaLogin
-// No recibe props: no necesita avisarle nada a App, porque App se entera
+// Recibe: el mensaje inicial (ver arriba). No necesita avisarle nada a App, porque App se entera
 // sola del login a través de escucharSesion() (ver App.tsx).
 // Devuelve el formulario de inicio de sesión.
-function PaginaLogin() {
+function PaginaLogin(props: PropsPaginaLogin) {
   // Formulario controlado: cada input guarda su valor en un useState.
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [mensajeError, setMensajeError] = useState('');
+  const [mensajeError, setMensajeError] = useState(props.mensajeInicial);
 
   // true mientras esperamos la respuesta de Firebase.
   // Sirve para desactivar el botón y que no se haga clic dos veces.

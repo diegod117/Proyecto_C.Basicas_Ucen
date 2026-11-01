@@ -1,11 +1,12 @@
 // authService.ts
 // Servicio de inicio y cierre de sesión.
-// Firebase revisa el correo y la contraseña; después buscamos el rol
-// del usuario en src/data/usuarios.ts.
+// Firebase revisa el correo y la contraseña; después buscamos al usuario (su
+// rol y si está activo) en la colección "usuarios" de Firestore.
 // Las páginas y componentes usan este servicio, nunca Firebase directo.
 // Así, si algún día cambiamos Firebase por otra cosa, solo se cambia aquí.
 // También envía el correo para recuperar la contraseña.
-// Cubre: inicio de sesión con roles (sección 3.4 de requerimientos), base para RNF-03
+// Cubre: inicio de sesión con roles (sección 3.4 de requerimientos), base para RNF-03,
+//        HU-15, RF-14 (CA-15.3: un usuario desactivado no entra; CA-15.4: "Usuario no registrado")
 
 import {
   signInWithEmailAndPassword,
@@ -15,24 +16,31 @@ import {
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { autenticacion } from './firebase';
-import { listaUsuarios } from '../data/usuarios';
+import { leerUsuarioPorCorreo } from './usuariosService';
 import type { Usuario } from '../types/Usuario';
 
-// ------------------------------------------------------------------
-// buscarUsuarioPorCorreo
-// ------------------------------------------------------------------
-// Recibe un correo. Devuelve el usuario de nuestra lista (con su rol),
-// o undefined si ese correo no tiene un rol asignado.
-// Pasamos todo a minúsculas porque "Docente@prueba.cl" y
-// "docente@prueba.cl" son el mismo correo.
-function buscarUsuarioPorCorreo(correo: string): Usuario | undefined {
-  const correoMinusculas = correo.toLowerCase();
-  for (const usuario of listaUsuarios) {
-    if (usuario.correo.toLowerCase() === correoMinusculas) {
-      return usuario;
-    }
+// Mensajes cuando la cuenta de Authentication existe pero no sirve para entrar
+const MENSAJE_NO_REGISTRADO = 'Usuario no registrado. Habla con el encargado del sistema.';
+const MENSAJE_DESACTIVADO = 'Tu cuenta está desactivada. Habla con el encargado del sistema.';
+
+// verificarCuentaRegistrada
+// Recibe: el correo de alguien que ya pasó la revisión de Authentication.
+// Devuelve: el usuario si está registrado y activo, o null y el mensaje de por
+// qué no puede entrar. La usan iniciarSesion y escucharSesion (misma regla).
+async function verificarCuentaRegistrada(
+  correo: string,
+): Promise<{ usuario: Usuario | null; mensaje: string }> {
+  const lectura = await leerUsuarioPorCorreo(correo);
+  if (lectura.error !== '') {
+    return { usuario: null, mensaje: lectura.error };
   }
-  return undefined;
+  if (lectura.usuario === null) {
+    return { usuario: null, mensaje: MENSAJE_NO_REGISTRADO };
+  }
+  if (!lectura.usuario.activo) {
+    return { usuario: null, mensaje: MENSAJE_DESACTIVADO };
+  }
+  return { usuario: lectura.usuario, mensaje: '' };
 }
 
 // ------------------------------------------------------------------
@@ -48,7 +56,9 @@ function traducirError(codigo: string): string {
     codigo === 'auth/wrong-password' ||
     codigo === 'auth/user-not-found'
   ) {
-    return 'Correo o contraseña incorrectos.';
+    // Firebase no distingue "correo que no existe" de "contraseña mala" (para no
+    // revelar qué correos tienen cuenta), así que el mensaje cubre los dos casos
+    return 'Correo o contraseña incorrectos, o usuario no registrado.';
   } else if (codigo === 'auth/invalid-email') {
     return 'El correo no tiene un formato válido.';
   } else if (codigo === 'auth/too-many-requests') {
@@ -83,11 +93,12 @@ async function iniciarSesion(correo: string, contrasena: string): Promise<string
     return 'No se pudo iniciar sesión.';
   }
 
-  // El correo y la contraseña son correctos, pero además el correo
-  // tiene que estar en nuestra lista para saber su rol.
-  if (buscarUsuarioPorCorreo(correo) === undefined) {
+  // Contraseña correcta, pero además hay que estar registrado y activo (HU-15).
+  // Si no, se cierra la sesión que Firebase acaba de abrir.
+  const cuenta = await verificarCuentaRegistrada(correo);
+  if (cuenta.usuario === null) {
     await signOut(autenticacion);
-    return 'Tu cuenta no tiene un rol asignado. Habla con el encargado del sistema.';
+    return cuenta.mensaje;
   }
 
   return '';
@@ -130,26 +141,42 @@ async function cerrarSesion(): Promise<void> {
 // ------------------------------------------------------------------
 // escucharSesion
 // ------------------------------------------------------------------
-// Recibe una función que se ejecutará CADA VEZ que la sesión cambie:
-// al abrir la página (si ya había una sesión guardada), al iniciar
-// sesión y al cerrarla. Esa función recibe el usuario, o null si
-// no hay nadie conectado.
+// Recibe una función que se ejecutará CADA VEZ que la sesión cambie (al abrir
+// la página con una sesión guardada, al iniciar sesión y al cerrarla). Esa
+// función recibe el usuario (o null) y, si no pudo entrar, el mensaje de por qué.
 // Devuelve otra función que sirve para dejar de escuchar.
-function escucharSesion(alCambiar: (usuario: Usuario | null) => void): () => void {
+function escucharSesion(
+  alCambiar: (usuario: Usuario | null, mensaje: string) => void,
+): () => void {
   // onAuthStateChanged es de Firebase: nos avisa cuando cambia la sesión.
-  // usuarioFirebase es null si nadie inició sesión.
-  const dejarDeEscuchar = onAuthStateChanged(autenticacion, (usuarioFirebase) => {
+  // El callback es "async" porque ahora hay que ir a Firestore a buscar el rol.
+  const dejarDeEscuchar = onAuthStateChanged(autenticacion, async (usuarioFirebase) => {
     if (usuarioFirebase === null || usuarioFirebase.email === null) {
-      alCambiar(null);
+      alCambiar(null, '');
       return;
     }
+    const correo = usuarioFirebase.email;
 
-    // Si el correo no está en nuestra lista, se trata como "sin sesión".
-    const usuario = buscarUsuarioPorCorreo(usuarioFirebase.email);
-    if (usuario === undefined) {
-      alCambiar(null);
-    } else {
-      alCambiar(usuario);
+    // try/catch: si algo fallara, la app no puede quedar en "Cargando..."
+    try {
+      const cuenta = await verificarCuentaRegistrada(correo);
+
+      // La lectura tarda: si mientras tanto la persona cerró sesión (o entró
+      // otra), esta respuesta ya no corresponde y se ignora.
+      const actual = autenticacion.currentUser;
+      if (actual === null || actual.email === null || actual.email.toLowerCase() !== correo.toLowerCase()) {
+        return;
+      }
+
+      if (cuenta.usuario === null) {
+        await signOut(autenticacion);
+        alCambiar(null, cuenta.mensaje);
+      } else {
+        alCambiar(cuenta.usuario, '');
+      }
+    } catch (error) {
+      console.error('Error al verificar la sesión:', error);
+      alCambiar(null, 'No se pudo verificar tu cuenta. Revisa tu conexión.');
     }
   });
 

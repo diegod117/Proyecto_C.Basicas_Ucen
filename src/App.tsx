@@ -8,7 +8,7 @@
 // El usuario conectado se comparte con toda la app con ContextoUsuario.
 // Cubre: navegación base con React Router, inicio de sesión con roles
 //        (sección 3.4 de requerimientos), RNF-03 y RNF-06 (datos de Firestore),
-//        HU-16 (página de carga desde Excel)
+//        HU-15 (el rol sale de Firestore), HU-16 (página de carga desde Excel)
 
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
@@ -58,6 +58,10 @@ function App() {
   // Usuario que inició sesión, o null si no hay nadie conectado.
   const [usuarioActual, setUsuarioActual] = useState<Usuario | null>(null);
 
+  // Mensaje de por qué no se pudo entrar (cuenta desactivada, no registrada o sin
+  // conexión). Se muestra en la pantalla de login.
+  const [mensajeSesion, setMensajeSesion] = useState('');
+
   // true mientras Firebase revisa si ya había una sesión guardada.
   // Sin esto, al recargar la página se vería el login por un instante
   // aunque el usuario ya estuviera conectado.
@@ -76,8 +80,9 @@ function App() {
   // Aquí empezamos a escuchar los cambios de sesión de Firebase: cada vez
   // que alguien inicia o cierra sesión, se actualiza usuarioActual.
   useEffect(() => {
-    const dejarDeEscuchar = escucharSesion((usuario) => {
+    const dejarDeEscuchar = escucharSesion((usuario, mensaje) => {
       setUsuarioActual(usuario);
+      setMensajeSesion(mensaje);
       setRevisandoSesion(false);
     });
 
@@ -131,7 +136,7 @@ function App() {
   if (usuarioActual === null) {
     return (
       <Routes>
-        <Route path="/login" element={<PaginaLogin />} />
+        <Route path="/login" element={<PaginaLogin mensajeInicial={mensajeSesion} />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
