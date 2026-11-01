@@ -1,6 +1,9 @@
 /* SeccionQueHace.css
-   Sección "Qué puedes hacer": título en el eje, selector de rol y filas
-   con una foto al margen derecho (cada foto de un tamaño distinto).
+   Sección "Qué puedes hacer": título, selector de rol y las filas del rol
+   elegido. Usa todo el ancho de la página (sin columnas vacías): en
+   escritorio las filas van lado a lado, cada una con su foto arriba; en
+   tablet cada fila es foto + texto; en celular se apilan.
+   Todas las fotos tienen el mismo tamaño y la misma proporción (4:3).
    También tiene los estilos de SelectorRolBienvenida.
    Cubre: RNF-01 (celular) y RNF-11 (contraste) */
 
@@ -54,61 +57,39 @@
 
 /* ---------- Filas ---------- */
 
+/* Escritorio (1200px o más): las filas una al lado de la otra.
+   grid-auto-flow: column pone cada fila en una columna nueva, y
+   grid-auto-columns: 1fr las deja del mismo ancho. Así 4 filas (o 3, para el
+   Departamento) llenan siempre todo el ancho. */
 .que-hace-lista {
   margin-top: 64px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 24px;
 }
 
-/* Cada fila: el texto a la izquierda y la foto a la derecha, alineada
-   arriba con el título. 96px entre filas y sin líneas separadoras. */
+/* Cada fila: la foto arriba y el texto debajo */
 .fila-que-hace {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 48px;
-}
-
-.fila-que-hace + .fila-que-hace {
-  margin-top: 96px;
-}
-
-.fila-que-hace-texto {
-  max-width: 34ch;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .pagina-bienvenida .fila-que-hace-texto .bienv-texto {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
-/* Fotos: escala de grises, esquinas de 8px y recorte con object-fit.
-   min(...) deja la foto en su tamaño, pero nunca más del 40 % de la fila,
-   para que el texto no quede apretado en pantallas medianas. */
+/* Fotos: todas del mismo tamaño (ancho de su columna, proporción 4:3),
+   en escala de grises y con las esquinas de 8px */
 .fila-foto {
-  flex-shrink: 0;
   display: block;
+  width: 100%;
   height: auto;
+  aspect-ratio: 4 / 3;
   border-radius: var(--ucen-radio);
   object-fit: cover;
   filter: grayscale(1) contrast(1.05);
-}
-
-.fila-foto-1 {
-  width: min(240px, 40%);
-  aspect-ratio: 4 / 5;
-}
-
-.fila-foto-2 {
-  width: min(320px, 40%);
-  aspect-ratio: 3 / 2;
-}
-
-.fila-foto-3 {
-  width: min(200px, 40%);
-  aspect-ratio: 1 / 1;
-}
-
-.fila-foto-4 {
-  width: min(280px, 40%);
-  aspect-ratio: 4 / 3;
 }
 
 /* Respuesta al tocar los botones del selector */
@@ -122,35 +103,33 @@
   }
 }
 
-/* ---------- Celular ----------
-   Cada fila apila título, párrafo y foto. Las fotos alternan su ancho y su
-   lado (100 %, 70 % a la derecha, 55 % a la izquierda...). */
+/* Escritorio angosto y tablet (hasta 1199px): con 4 columnas el texto
+   quedaría muy angosto. Cada fila ocupa todo el ancho: foto a la izquierda
+   y texto a la derecha, en dos mitades iguales. */
+@media (max-width: 1199px) {
+  .que-hace-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .fila-que-hace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px;
+  }
+}
+
+/* Celular: cada fila apila la foto (a todo el ancho) y el texto */
 @media (max-width: 700px) {
   .que-hace-lista {
     margin-top: 48px;
   }
 
   .fila-que-hace {
+    display: flex;
     flex-direction: column;
-    gap: 24px;
-  }
-
-  .fila-que-hace + .fila-que-hace {
-    margin-top: 64px;
-  }
-
-  .fila-foto-1 {
-    width: 100%;
-  }
-
-  .fila-foto-2,
-  .fila-foto-4 {
-    width: 70%;
-    align-self: flex-end;
-  }
-
-  .fila-foto-3 {
-    width: 55%;
-    align-self: flex-start;
+    gap: 16px;
   }
 }

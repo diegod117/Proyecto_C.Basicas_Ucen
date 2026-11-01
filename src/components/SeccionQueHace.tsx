@@ -1,6 +1,8 @@
 // SeccionQueHace.tsx
 // Sección "Qué puedes hacer" de la bienvenida: con el selector se elige un
 // rol y las filas muestran lo que ESE rol puede hacer en el sistema.
+// En escritorio las filas van una al lado de la otra (4 columnas, o 3 para
+// el Departamento) y ocupan todo el ancho; en tablet y celular se apilan.
 // Cubre: RNF-03 (qué hace cada rol), RNF-01
 
 import { useState } from 'react';
@@ -21,33 +23,33 @@ function SeccionQueHace() {
   const filas = filasSegunRol(rolElegido);
 
   return (
-    <section id="que-hace" className="bienv-seccion bienv-ancho bienv-grilla" aria-labelledby="que-hace-titulo">
+    <section id="que-hace" className="bienv-seccion bienv-ancho" aria-labelledby="que-hace-titulo">
       {/* "aparece" va en el título, el selector y la LISTA completa, nunca en
           cada fila: al cambiar de rol se dibujan filas nuevas y, si tuvieran
           "aparece", quedarían invisibles (ver PaginaLogin.tsx). */}
-      <h2 id="que-hace-titulo" className="bienv-display bienv-eje aparece">
+      <h2 id="que-hace-titulo" className="bienv-display aparece">
         Todo el laboratorio, ordenado
       </h2>
 
-      <div className="bienv-eje que-hace-selector aparece aparece-2">
+      <div className="que-hace-selector aparece aparece-2">
         <SelectorRolBienvenida rolElegido={rolElegido} onElegir={setRolElegido} />
       </div>
 
-      <div className="bienv-eje que-hace-lista aparece aparece-3">
+      <div className="que-hace-lista aparece aparece-3">
         {/* .map recorre las filas del rol; "indice" dice qué foto le toca.
             key ayuda a React a saber qué fila es cuál al cambiar de rol. */}
         {filas.map((fila, indice) => (
           <article key={rolElegido + '-' + indice} className="fila-que-hace">
-            <div className="fila-que-hace-texto">
-              <h3 className="bienv-titulo">{fila.titulo}</h3>
-              <p className="bienv-texto">{fila.texto}</p>
-            </div>
             <img
-              className={'fila-foto ' + fotosQueHace[indice].clase}
+              className="fila-foto"
               src={'/bienvenida/' + fotosQueHace[indice].archivo}
               alt={fotosQueHace[indice].alt}
               loading="lazy"
             />
+            <div className="fila-que-hace-texto">
+              <h3 className="bienv-lead">{fila.titulo}</h3>
+              <p className="bienv-texto">{fila.texto}</p>
+            </div>
           </article>
         ))}
       </div>

@@ -11,13 +11,11 @@ export interface FilaQueHace {
   texto: string;
 }
 
-// Una foto de la página: el archivo en public/bienvenida/, su texto
-// alternativo (qué muestra, para lectores de pantalla) y una clase CSS
-// con su tamaño.
+// Una foto de la página: el archivo en public/bienvenida/ y su texto
+// alternativo (qué muestra, para lectores de pantalla).
 export interface FotoBienvenida {
   archivo: string;
   alt: string;
-  clase: string;
 }
 
 // Una pregunta frecuente con su respuesta

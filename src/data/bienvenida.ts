@@ -73,13 +73,12 @@ export const filasDepartamento: FilaQueHace[] = [
 ];
 
 // Fotos de las filas: son las mismas para todos los roles (la fila 1 usa la
-// primera, la fila 2 la segunda...). Cada una tiene un tamaño distinto a
-// propósito (ver SeccionQueHace.css).
+// primera, la fila 2 la segunda...). Todas se muestran del mismo tamaño.
 export const fotosQueHace: FotoBienvenida[] = [
-  { archivo: 'osciloscopio.jpg', alt: 'Osciloscopio analógico sobre un mesón, con su pantalla encendida', clase: 'fila-foto-1' },
-  { archivo: 'ph-metro.jpg', alt: 'pH-metro de mesa antiguo con su aguja y sus perillas', clase: 'fila-foto-2' },
-  { archivo: 'probetas-graduadas.jpg', alt: 'Dos probetas graduadas junto a un mortero y frascos de reactivo', clase: 'fila-foto-3' },
-  { archivo: 'densimetro.jpg', alt: 'Una mano introduce un densímetro en una probeta con una muestra de color café', clase: 'fila-foto-4' },
+  { archivo: 'osciloscopio.jpg', alt: 'Osciloscopio analógico sobre un mesón, con su pantalla encendida' },
+  { archivo: 'ph-metro.jpg', alt: 'pH-metro de mesa antiguo con su aguja y sus perillas' },
+  { archivo: 'probetas-graduadas.jpg', alt: 'Dos probetas graduadas junto a un mortero y frascos de reactivo' },
+  { archivo: 'densimetro.jpg', alt: 'Una mano introduce un densímetro en una probeta con una muestra de color café' },
 ];
 
 // Integrantes del equipo, escritos como pidió el profesor. Los usan
