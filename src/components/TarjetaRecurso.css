@@ -44,6 +44,9 @@
 }
 
 .tarjeta-categoria {
+  /* RNF-01: una categoría de 40 letras sin espacios debe partirse en vez de salirse de la tarjeta */
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--color-principal);

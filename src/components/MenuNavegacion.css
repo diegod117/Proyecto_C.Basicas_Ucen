@@ -3,7 +3,8 @@
    Layout de pantalla completa:
      - Barra superior azul (header) con el título y el usuario conectado.
      - Menú lateral gris a la izquierda (aside) con los botones de navegación.
-   En celular (max-width 768px): el menú lateral pasa a fila horizontal arriba. */
+   En celular (max-width 768px): el menú lateral pasa a fila horizontal arriba.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste del botón, el rol y el contador). */
 
 /* =====================================================
    BARRA SUPERIOR (header)
@@ -58,12 +59,16 @@
 
 .app-header-usuario-rol {
   font-size: 0.75rem;
-  opacity: 0.82;
+  /* RNF-11: con 0.82 el contraste sobre el azul era 4,55:1; con 0.9 es 5,11:1 */
+  opacity: 0.9;
 }
 
-/* Botón "Cerrar sesión" en la barra superior */
+/* Botón "Cerrar sesión" en la barra superior.
+   RNF-11: el fondo es transparente (texto blanco sobre el azul = 5,92:1);
+   con el fondo blanco translúcido de antes el contraste era 4,39:1 y 3,36:1
+   al pasar el mouse. El borde es solo decorativo. */
 .boton-cerrar-sesion {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: transparent;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radio-borde-sm);
@@ -77,7 +82,7 @@
 }
 
 .boton-cerrar-sesion:hover {
-  background-color: rgba(255, 255, 255, 0.28);
+  background-color: var(--color-principal-oscuro); /* blanco sobre este azul = 8,11:1 */
 }
 
 /* =====================================================
@@ -159,7 +164,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #ef4444;
+  background-color: var(--color-danado); /* RNF-11: blanco sobre este rojo = 6,47:1 (con #ef4444 era 3,76:1) */
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -235,6 +240,16 @@
 /* M21: ajustes para pantallas muy pequeñas (375px — iPhone SE, Galaxy S)
    Se prueban a 375px de ancho en las DevTools del navegador. */
 @media (max-width: 420px) {
+  /* RNF-01 (360 px): menos relleno lateral y menos separación en la barra azul,
+     para que el título, el nombre y el botón no compitan por 288 px */
+  .app-header {
+    padding: 0 var(--espacio-sm);
+  }
+
+  .app-header-usuario {
+    gap: var(--espacio-sm);
+  }
+
   /* Ocultar el rol del usuario para liberar espacio en el header */
   .app-header-usuario-rol {
     display: none;

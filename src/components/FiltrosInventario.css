@@ -1,14 +1,19 @@
 /* FiltrosInventario.css
    Estilos de la barra de filtros del inventario.
    D16: los filtros van en una franja blanca y el buscador es más grande.
-   Todos los colores, sombras y radios vienen de global.css. */
+   Todos los colores, sombras y radios vienen de global.css.
+   Cubre: HU-01, HU-13 (filtro de antigüedad), RNF-01 (que los textos de los
+   filtros no se corten entre 360 y 1100 px). */
 
 /* Franja blanca: fondo, esquinas redondeadas y sombra suave, igual que
-   las tarjetas. El buscador ocupa más espacio que los 4 select.
-   En pantallas angostas (celular) cada filtro ocupa una fila completa. */
+   las tarjetas. El buscador ocupa toda la primera fila y los 4 select van
+   debajo, en 4 columnas iguales (con 5 columnas en una sola fila los select
+   quedaban de 115 a 149 px y textos como "Entre 1 y 2 años" se cortaban).
+   Entre 701 y 1100 px los select pasan a 2 columnas, y en celular (700 px o
+   menos) cada filtro ocupa una fila completa. */
 .filtros-inventario {
   display: grid;
-  grid-template-columns: 2.4fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--espacio-md);
   padding: var(--espacio-md) var(--espacio-lg);
   margin-bottom: var(--espacio-lg);
@@ -22,6 +27,14 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* min-width: 0 deja que el filtro se achique al ancho de su columna aunque
+     el select tenga una opción muy larga (ej: una categoría de 40 letras) */
+  min-width: 0;
+}
+
+/* El primer filtro (el buscador) ocupa toda la fila */
+.campo-filtro:first-child {
+  grid-column: 1 / -1;
 }
 
 .campo-filtro label {
@@ -69,6 +82,14 @@
   border-color: var(--color-principal);
   background-color: var(--color-blanco);
   box-shadow: 0 0 0 3px var(--color-principal-claro);
+}
+
+/* Pantallas medianas (hasta 1100px): los 4 select pasan a 2 columnas.
+   Va ANTES del bloque de 700px para que ese siga ganando en celular. */
+@media (max-width: 1100px) {
+  .filtros-inventario {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* @media aplica estas reglas SOLO si la pantalla mide 700px o menos.

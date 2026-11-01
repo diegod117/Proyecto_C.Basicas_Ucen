@@ -2,7 +2,7 @@
 // Mensaje que se muestra cuando ningún recurso cumple los filtros,
 // con un botón para limpiarlos. Así el usuario no ve una pantalla vacía
 // sin saber qué pasó.
-// Cubre: HU-01
+// Cubre: HU-01 (CA-01.4: el texto exacto de la línea base)
 
 import './MensajeSinResultados.css';
 
@@ -18,7 +18,7 @@ interface PropsMensajeSinResultados {
 function MensajeSinResultados(props: PropsMensajeSinResultados) {
   return (
     <div className="sin-resultados">
-      <p className="sin-resultados-titulo">No hay recursos que coincidan con los filtros</p>
+      <p className="sin-resultados-titulo">No se encontraron recursos con esos filtros</p>
       <p className="sin-resultados-texto">
         Prueba con otro nombre o cambia la categoría, el laboratorio o el estado.
       </p>
