@@ -24,13 +24,13 @@ import { autenticacion, configuracionFirebase } from './firebase';
 //   cualquier otro texto -> el mensaje de error
 export type ResultadoCuenta = 'creada' | 'existia' | string;
 
-// crearContrasenaTemporal
+// crearContrasenaTemporal (se exporta para poder probarla)
 // No recibe nada. Devuelve una contraseña al azar de 24 caracteres que nadie
 // ve: la persona crea la suya con el enlace del correo. crypto.getRandomValues
 // da números al azar seguros (Math.random no sirve para contraseñas).
 // Al final se agregan una minúscula, una mayúscula, un número y un símbolo
 // por si el proyecto exige una política de contraseñas.
-function crearContrasenaTemporal(): string {
+export function crearContrasenaTemporal(): string {
   const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
   const azar = new Uint32Array(20);
   crypto.getRandomValues(azar);
