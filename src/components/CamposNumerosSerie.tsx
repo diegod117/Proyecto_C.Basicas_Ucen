@@ -3,7 +3,7 @@
 // de un equipo o instrumento. Si la cantidad es 3, aparecen 3 campos.
 // Lo usan "Agregar recurso" (HU-12) y la entrada de unidades (HU-14).
 // Usa los estilos de FormularioNuevoRecurso.css.
-// Cubre: HU-12, RF-11 (CA-12.1), HU-14
+// Cubre: HU-12, RF-11 (CA-12.1), HU-14, HU-15 (máximo de unidades por operación)
 
 import { MAXIMO_UNIDADES_CON_SERIE } from '../utils/unidades';
 
@@ -14,6 +14,9 @@ interface PropsCamposNumerosSerie {
   numeros: string[];
   // Recibe la lista de números completa con una posición cambiada
   onCambiar: (numeros: string[]) => void;
+  // Máximo de unidades que acepta el formulario. Si no se indica, es el de
+  // "Agregar recurso" (100). La entrada de unidades pasa un máximo menor (HU-15).
+  maximo?: number;
 }
 
 // Componente CamposNumerosSerie
@@ -21,17 +24,20 @@ interface PropsCamposNumerosSerie {
 // Devuelve: un campo por unidad, o un aviso si la cantidad todavía no es válida.
 function CamposNumerosSerie(props: PropsCamposNumerosSerie) {
   const cantidad = Number(props.cantidadTexto);
+  let maximo = MAXIMO_UNIDADES_CON_SERIE;
+  if (props.maximo !== undefined) {
+    maximo = props.maximo;
+  }
 
   // Mientras la cantidad no sea un entero entre 1 y el máximo, no sabemos
   // cuántos campos mostrar
   const cantidadValida =
-    props.cantidadTexto.trim() !== '' && Number.isInteger(cantidad) && cantidad >= 1 && cantidad <= MAXIMO_UNIDADES_CON_SERIE;
+    props.cantidadTexto.trim() !== '' && Number.isInteger(cantidad) && cantidad >= 1 && cantidad <= maximo;
 
   if (!cantidadValida) {
     return (
       <p className="texto-secundario">
-        Escribe una cantidad inicial entre 1 y {MAXIMO_UNIDADES_CON_SERIE} para ingresar el número
-        de serie de cada unidad.
+        Escribe una cantidad entre 1 y {maximo} para ingresar el número de serie de cada unidad.
       </p>
     );
   }
