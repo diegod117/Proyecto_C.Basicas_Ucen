@@ -57,6 +57,7 @@
    comparten las torres y las salas, que siguen siendo pastillas de una línea. */
 .configuracion-item-categoria {
   max-width: 320px;
+  overflow-wrap: anywhere; /* RNF-01: un nombre largo sin espacios debe partirse a 360 px */
   padding: 8px 12px;
   font-size: 0.85rem;
   font-weight: 500;

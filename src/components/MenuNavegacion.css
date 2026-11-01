@@ -240,6 +240,16 @@
 /* M21: ajustes para pantallas muy pequeñas (375px — iPhone SE, Galaxy S)
    Se prueban a 375px de ancho en las DevTools del navegador. */
 @media (max-width: 420px) {
+  /* RNF-01 (360 px): menos relleno lateral y menos separación en la barra azul,
+     para que el título, el nombre y el botón no compitan por 288 px */
+  .app-header {
+    padding: 0 var(--espacio-sm);
+  }
+
+  .app-header-usuario {
+    gap: var(--espacio-sm);
+  }
+
   /* Ocultar el rol del usuario para liberar espacio en el header */
   .app-header-usuario-rol {
     display: none;

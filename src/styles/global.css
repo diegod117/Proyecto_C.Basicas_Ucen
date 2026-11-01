@@ -110,6 +110,19 @@ h1 {
   color: var(--color-texto-secundario);
 }
 
+/* RNF-01 (360 px): un fieldset no se achica más que su contenido por defecto, y
+   un select con una opción muy larga (ej: una categoría de 40 letras) tampoco
+   se achica solo. Con esto ninguno ensancha la página. */
+fieldset {
+  min-width: 0;
+}
+
+select,
+input,
+textarea {
+  max-width: 100%;
+}
+
 /* RNF-11: el texto de ayuda dentro de los campos (placeholder) usa el mismo
    gris de contraste que el resto de los textos secundarios. El navegador lo
    deja en #757575, que sobre el fondo de los campos (#f8fafc) da 4,40:1.

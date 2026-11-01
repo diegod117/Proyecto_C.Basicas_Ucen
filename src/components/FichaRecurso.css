@@ -79,6 +79,7 @@
 }
 
 .ficha-categoria {
+  overflow-wrap: anywhere; /* RNF-01: una categoría larga sin espacios no debe salirse de la tarjeta */
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -120,6 +121,7 @@
 }
 
 .ficha-datos dd {
+  overflow-wrap: anywhere; /* RNF-01: una serie o un modelo largo sin espacios no debe ensanchar la tarjeta */
   margin: 0; /* el navegador le pone margen a <dd> por defecto */
   font-weight: 500;
 }
