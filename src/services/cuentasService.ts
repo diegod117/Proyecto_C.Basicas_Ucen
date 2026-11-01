@@ -17,12 +17,7 @@ import {
   sendPasswordResetEmail,
 } from 'firebase/auth';
 import { autenticacion, configuracionFirebase } from './firebase';
-
-// Resultado de crear la cuenta de acceso:
-//   'creada'  -> se creó la cuenta en Authentication
-//   'existia' -> el correo ya tenía cuenta (no es un error: solo falta registrarlo)
-//   cualquier otro texto -> el mensaje de error
-export type ResultadoCuenta = 'creada' | 'existia' | string;
+import type { ResultadoCuenta } from '../types/Usuario';
 
 // crearContrasenaTemporal (se exporta para poder probarla)
 // No recibe nada. Devuelve una contraseña al azar de 24 caracteres que nadie
@@ -59,7 +54,7 @@ function traducirErrorCuenta(codigo: string): string {
 
 // crearCuentaDeAcceso
 // Recibe: el correo de la persona (en minúsculas).
-// Devuelve: una Promise con un ResultadoCuenta (ver arriba).
+// Devuelve: una Promise con un ResultadoCuenta (ver types/Usuario.ts).
 export async function crearCuentaDeAcceso(correo: string): Promise<ResultadoCuenta> {
   // Un nombre distinto ('cuentas-nuevas') crea OTRA instancia de la app, con
   // su propio login. La instancia principal (la del encargado) no se entera.

@@ -11,10 +11,10 @@ import { collection, getDocs, getDoc, doc, setDoc, updateDoc } from 'firebase/fi
 import { baseDatos } from './firebase';
 import { crearCuentaDeAcceso, enviarEnlaceDeAcceso } from './cuentasService';
 import type {
+  CambioUsuario,
   DatosNuevoUsuario,
   ResultadoAltaUsuario,
   ResultadoLecturaUsuario,
-  RolUsuario,
   Usuario,
 } from '../types/Usuario';
 import { obtenerFechaActual } from '../utils/fechas';
@@ -131,13 +131,6 @@ export async function agregarUsuario(datos: DatosNuevoUsuario): Promise<Resultad
     mensaje = mensaje + ' No se pudo enviar el correo: usa "Reenviar acceso".';
   }
   return { ok: true, mensaje: mensaje };
-}
-
-// CambioUsuario: lo que se puede modificar de un usuario (el nombre NO, porque
-// une al docente con sus reservas). Se indica solo el campo que cambia.
-export interface CambioUsuario {
-  rol?: RolUsuario;
-  activo?: boolean;
 }
 
 // modificarUsuario

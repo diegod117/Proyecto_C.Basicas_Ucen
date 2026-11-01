@@ -35,6 +35,19 @@ export interface ResultadoAltaUsuario {
   mensaje: string; // qué pasó, listo para mostrar en pantalla
 }
 
+// Resultado de crear la cuenta de acceso en Authentication (HU-15):
+//   'creada'  -> se creó la cuenta
+//   'existia' -> el correo ya tenía cuenta (no es un error: solo falta registrarlo)
+//   cualquier otro texto -> el mensaje de error
+export type ResultadoCuenta = 'creada' | 'existia' | string;
+
+// Lo que se puede modificar de un usuario ya registrado (HU-15). El nombre NO,
+// porque une al docente con sus reservas. Se indica solo el campo que cambia.
+export interface CambioUsuario {
+  rol?: RolUsuario;
+  activo?: boolean;
+}
+
 // Lo que escribe el encargado en el formulario "Agregar usuario" (HU-15).
 // El estado "activo" no se pide: un usuario nuevo siempre entra activo.
 export interface DatosNuevoUsuario {

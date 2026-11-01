@@ -24,7 +24,10 @@ function PaginaLogin(props: PropsPaginaLogin) {
   // Formulario controlado: cada input guarda su valor en un useState.
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [mensajeError, setMensajeError] = useState(props.mensajeInicial);
+  const [mensajeError, setMensajeError] = useState('');
+  // true cuando la persona ya intentó entrar desde este formulario: desde ahí
+  // manda el mensaje del formulario y se deja de mostrar el que mandó App
+  const [yaIntento, setYaIntento] = useState(false);
 
   // true mientras esperamos la respuesta de Firebase.
   // Sirve para desactivar el botón y que no se haga clic dos veces.
@@ -47,6 +50,7 @@ function PaginaLogin(props: PropsPaginaLogin) {
     }
 
     setMensajeError('');
+    setYaIntento(true);
     setEsperandoRespuesta(true);
     const error = await iniciarSesion(correo.trim(), contrasena);
     setEsperandoRespuesta(false);
@@ -56,6 +60,16 @@ function PaginaLogin(props: PropsPaginaLogin) {
     if (error !== '') {
       setMensajeError(error);
     }
+  }
+
+  // Mensaje que se ve: el del formulario si hay uno; si no, el que mandó App
+  // (por ejemplo "Tu cuenta está desactivada..." al abrir la página con una
+  // sesión guardada). Se calcula en cada dibujo, así NO depende de cuándo
+  // llegue: aunque App primero muestre el login y después reciba el mensaje,
+  // aparece igual (un useState inicial solo se lee una vez, al montar).
+  let mensajeMostrado = mensajeError;
+  if (mensajeMostrado === '' && !yaIntento) {
+    mensajeMostrado = props.mensajeInicial;
   }
 
   // Texto del botón según si estamos esperando o no
@@ -115,7 +129,7 @@ function PaginaLogin(props: PropsPaginaLogin) {
           />
 
           {/* Solo se muestra si hay un mensaje de error */}
-          {mensajeError !== '' && <p className="login-error">{mensajeError}</p>}
+          {mensajeMostrado !== '' && <p className="login-error">{mensajeMostrado}</p>}
 
           <button className="login-boton" type="submit" disabled={esperandoRespuesta}>
             {textoBoton}

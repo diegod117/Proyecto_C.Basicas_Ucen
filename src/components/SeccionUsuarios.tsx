@@ -99,11 +99,17 @@ function SeccionUsuarios() {
         />
       )}
 
-      <h4 className="usuarios-subtitulo">Agregar usuario</h4>
-      <p className="texto-secundario usuarios-ayuda">
-        Se crea su cuenta y se le envía un correo con el enlace para crear su contraseña.
-      </p>
-      <FormularioNuevoUsuario onAgregado={(texto) => mostrar(texto, false)} />
+      {/* El formulario solo aparece cuando la lista cargó: si no, la revisión de
+          correos repetidos vería una lista vacía y dejaría repetir un usuario */}
+      {estadoCarga === 'listo' && (
+        <>
+          <h4 className="usuarios-subtitulo">Agregar usuario</h4>
+          <p className="texto-secundario usuarios-ayuda">
+            Se crea su cuenta y se le envía un correo con el enlace para crear su contraseña.
+          </p>
+          <FormularioNuevoUsuario onAgregado={(texto) => mostrar(texto, false)} />
+        </>
+      )}
 
       {mensaje !== '' && esError && <p className="configuracion-error">{mensaje}</p>}
       {mensaje !== '' && !esError && <p className="configuracion-exito">{mensaje}</p>}
