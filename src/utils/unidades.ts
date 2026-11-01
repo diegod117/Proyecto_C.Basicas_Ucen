@@ -3,14 +3,39 @@
 // instrumentos: saber si una categoría las usa, validar los números que
 // escribe el encargado y contar las unidades por estado.
 // Son funciones puras (no guardan nada): solo calculan.
-// Cubre: HU-12, RF-11 (CA-12.1 y CA-12.2)
+// Cubre: HU-12, RF-11 (CA-12.1 y CA-12.2), HU-15 (máximo de unidades por operación)
 
 import type { Unidad, CantidadesPorEstado } from '../types/Recurso';
 import { obtenerCategoriaPorClave } from '../services/configuracionService';
 
-// Máximo de unidades con número de serie al agregar un recurso (evita
+// Máximo de unidades con número de serie al AGREGAR un recurso (evita
 // formularios gigantes por un error de tipeo, ej: escribir 1000 sin querer).
+// Ahí mandan los 100: el recurso se guarda en un solo documento (2 escrituras).
 export const MAXIMO_UNIDADES_CON_SERIE = 100;
+
+// Máximo de unidades en UNA operación sobre un recurso que ya existe: cambiar el
+// estado de varias unidades, una entrada con números de serie o una salida con
+// unidades marcadas (HU-02, HU-14). En esas operaciones se guarda en un solo
+// lote 1 recurso + 1 registro de historial POR UNIDAD (1 + 18 = 19 escrituras).
+// Las reglas de seguridad de Firestore (HU-15) consultan el documento del
+// usuario con un get() en cada escritura y Firebase permite como máximo 20
+// consultas por lote, así que más de 18 unidades haría fallar el lote entero.
+// Se limita en vez de partir el lote para que el cambio siga siendo atómico
+// (se guarda todo o no se guarda nada). Aquí manda el 18, no el 100.
+export const MAXIMO_UNIDADES_POR_OPERACION = 18;
+
+// validarUnidadesPorOperacion
+// Recibe: cuántas unidades se quieren mover en una sola operación.
+// Devuelve: un mensaje de error, o '' si no pasa del máximo.
+export function validarUnidadesPorOperacion(cantidad: number): string {
+  if (cantidad > MAXIMO_UNIDADES_POR_OPERACION) {
+    return (
+      'Máximo ' + MAXIMO_UNIDADES_POR_OPERACION +
+      ' unidades por operación. Divide el cambio en dos operaciones.'
+    );
+  }
+  return '';
+}
 
 // categoriaUsaNumeroSerie
 // Recibe: la clave de una categoría (ej: 'equipo').

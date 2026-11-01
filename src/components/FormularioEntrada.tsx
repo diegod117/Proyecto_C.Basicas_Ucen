@@ -18,6 +18,7 @@ import { validarEntrada, textoUnidadesMovimiento } from '../utils/movimientos';
 import { textoSubtipo } from '../utils/historial';
 import { obtenerFechaHoy } from '../utils/fechas';
 import CamposNumerosSerie from './CamposNumerosSerie';
+import { MAXIMO_UNIDADES_POR_OPERACION } from '../utils/unidades';
 import './FormularioCambioEstado.css';
 
 interface PropsFormularioEntrada {
@@ -122,6 +123,7 @@ function FormularioEntrada(props: PropsFormularioEntrada) {
       {/* Equipos e instrumentos con unidades: el número de serie de cada unidad nueva */}
       {recurso.unidades !== undefined && (
         <CamposNumerosSerie
+          maximo={MAXIMO_UNIDADES_POR_OPERACION}
           cantidadTexto={cantidadTexto}
           numeros={numerosNuevos}
           onCambiar={(numeros) => {

@@ -1,0 +1,85 @@
+/* SeccionUsuarios.css
+   Estilos de la sección "Usuarios" de Configuración (tabla y textos).
+   Los campos del formulario y los mensajes usan las clases .configuracion-*
+   de PaginaConfiguracion.css. Colores y espacios vienen de global.css. */
+
+.usuarios-subtitulo {
+  margin: var(--espacio-lg) 0 var(--espacio-xs) 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.usuarios-ayuda {
+  margin: 0 0 var(--espacio-md) 0;
+  font-size: 13px;
+}
+
+/* El mensaje de error del formulario ocupa toda la fila */
+.usuarios-mensaje {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* La tabla tiene su propio recuadro con scroll: en el celular se desliza
+   hacia el lado y no ensancha la página (RNF-01) */
+.usuarios-tabla-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+}
+
+.usuarios-tabla {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 640px;
+  font-size: 13px;
+}
+
+.usuarios-tabla th {
+  text-align: left;
+  padding: 6px var(--espacio-sm);
+  background-color: var(--color-fondo-menu);
+  border-bottom: 2px solid var(--color-borde);
+}
+
+.usuarios-tabla td {
+  padding: 6px var(--espacio-sm);
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+
+.usuarios-correo {
+  overflow-wrap: anywhere;
+}
+
+.usuarios-tabla select {
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde-sm);
+  background-color: var(--color-fondo);
+}
+
+/* Estado en TEXTO (no solo en color, RNF-11) */
+.usuarios-estado-activo {
+  font-weight: 600;
+  color: var(--color-disponible);
+}
+
+.usuarios-estado-desactivado {
+  font-weight: 600;
+  color: var(--color-baja);
+}
+
+.usuarios-acciones {
+  white-space: nowrap;
+}
+
+/* Botones más chicos que los de formulario */
+.usuarios-boton {
+  padding: 4px var(--espacio-sm);
+  font-size: 12px;
+  margin-right: var(--espacio-xs);
+}

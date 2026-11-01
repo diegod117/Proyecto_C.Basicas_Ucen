@@ -1,10 +1,11 @@
 // cambioEstado.ts
 // Funciones de ayuda para el formulario de cambio de estado de un recurso:
 // elegir el estado inicial y validar los datos antes de guardar.
-// Cubre: HU-02, RF-01
+// Cubre: HU-02, RF-01, HU-15 (máximo de unidades por operación)
 
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import { obtenerEstadosConUnidades, textoEstado } from './inventario';
+import { validarUnidadesPorOperacion } from './unidades';
 
 // obtenerEstadoOrigenInicial
 // Recibe: un recurso.
@@ -104,6 +105,11 @@ export function validarCambioEstadoUnidades(
 ): string {
   if (numerosMarcados.length === 0) {
     return 'Marca al menos una unidad.';
+  }
+  // Cada unidad deja su registro en el historial dentro del mismo lote (ver unidades.ts)
+  const errorMaximo = validarUnidadesPorOperacion(numerosMarcados.length);
+  if (errorMaximo !== '') {
+    return errorMaximo;
   }
 
   // Ninguna unidad marcada puede estar ya en el estado nuevo

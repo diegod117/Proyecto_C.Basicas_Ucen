@@ -2,13 +2,13 @@
 // Funciones de ayuda para los formularios de entrada y salida de unidades:
 // validar lo que escribe el encargado y armar los mensajes de confirmación.
 // Son funciones puras (no guardan nada): solo calculan.
-// Cubre: HU-14, RF-13 (CA-14.1 y CA-14.2)
+// Cubre: HU-14, RF-13 (CA-14.1 y CA-14.2), HU-15 (máximo de unidades por operación)
 
 import type { Recurso, EstadoRecurso } from '../types/Recurso';
 import type { TipoSalida } from '../types/CambioEstado';
 import { textoEstado } from './inventario';
 import { obtenerFechaHoy } from './fechas';
-import { validarNumerosUnidades } from './unidades';
+import { validarNumerosUnidades, validarUnidadesPorOperacion } from './unidades';
 import { estadoNuevoDeSalida } from './historial';
 
 // validarEntrada
@@ -38,6 +38,11 @@ export function validarEntrada(
   // En equipos e instrumentos con unidades, cada unidad nueva lleva su número,
   // distinto de los que el recurso ya tiene (CA-12.2)
   if (recurso.unidades !== undefined) {
+    // Cada unidad nueva deja su registro en el historial dentro del mismo lote
+    const errorMaximo = validarUnidadesPorOperacion(cantidad);
+    if (errorMaximo !== '') {
+      return errorMaximo;
+    }
     const numerosExistentes: string[] = [];
     for (const unidad of recurso.unidades) {
       numerosExistentes.push(unidad.numero);
@@ -67,6 +72,11 @@ export function validarSalida(
     // Con unidades: se marcan unidades específicas (CA-02.2)
     if (numerosMarcados.length === 0) {
       return 'Marca al menos una unidad.';
+    }
+    // Cada unidad deja su registro en el historial dentro del mismo lote (ver unidades.ts)
+    const errorMaximo = validarUnidadesPorOperacion(numerosMarcados.length);
+    if (errorMaximo !== '') {
+      return errorMaximo;
     }
     for (const unidad of recurso.unidades) {
       if (!numerosMarcados.includes(unidad.numero)) {
