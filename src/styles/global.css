@@ -1,7 +1,8 @@
 /* global.css
    Estilos que se aplican a TODA la aplicación.
    Los estilos de cada componente o página irán en su propio archivo .css.
-   Los colores vienen del mockup (docs/mockup-sgil.html). */
+   Los colores vienen del mockup (docs/mockup-sgil.html).
+   Cubre: RNF-01 (celular) y RNF-11 (contraste mínimo 4,5:1). */
 
 /* =====================================================
    VARIABLES DE DISEÑO (M15 — RNF-01)
@@ -22,7 +23,7 @@
 
   /* --- Texto --- */
   --color-texto: #1f2937;
-  --color-texto-secundario: #6b7280;
+  --color-texto-secundario: #5b6472; /* RNF-11: 5,2:1 o más sobre todos los fondos (antes #6b7280: 4,2:1 sobre azul claro) */
 
   /* --- Bordes --- */
   --color-borde: #e5e7eb;
@@ -107,6 +108,17 @@ h1 {
 
 .texto-secundario {
   color: var(--color-texto-secundario);
+}
+
+/* RNF-11: el texto de ayuda dentro de los campos (placeholder) usa el mismo
+   gris de contraste que el resto de los textos secundarios. El navegador lo
+   deja en #757575, que sobre el fondo de los campos (#f8fafc) da 4,40:1.
+   opacity: 1 porque Firefox le baja la opacidad por defecto. FiltrosInventario.css
+   tiene su propia regla del mismo color para el buscador (más específica). */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-texto-secundario);
+  opacity: 1;
 }
 
 /* M21: reduce el padding lateral en pantallas muy pequeñas (375px).
