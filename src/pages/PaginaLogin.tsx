@@ -6,6 +6,8 @@
 // Cubre: inicio de sesión con roles (sección 3.4 de requerimientos), HU-15, RNF-01
 
 import TableroBienvenida from '../components/TableroBienvenida';
+import SeccionQueHace from '../components/SeccionQueHace';
+import '../styles/bienvenida.css';
 import './PaginaLogin.css';
 
 interface PropsPaginaLogin {
@@ -22,6 +24,7 @@ function PaginaLogin(props: PropsPaginaLogin) {
     <div className="pagina-bienvenida">
       <main>
         <TableroBienvenida mensajeInicial={props.mensajeInicial} />
+        <SeccionQueHace />
       </main>
     </div>
   );

@@ -1,6 +1,23 @@
 // bienvenida.ts
 // Funciones de ayuda de la página de bienvenida (PaginaLogin).
-// Cubre: inicio de sesión (sección 3.4 de requerimientos), RNF-01
+// Cubre: inicio de sesión (sección 3.4 de requerimientos), RNF-01, RNF-03
+
+import type { RolUsuario } from '../types/Usuario';
+import type { FilaQueHace } from '../types/Bienvenida';
+import { filasDocente, filasEncargado, filasDepartamento } from '../data/bienvenida';
+
+// filasSegunRol
+// Recibe: el rol elegido en el selector de "Qué puedes hacer".
+// Devuelve: las filas (título y párrafo) de lo que puede hacer ese rol.
+export function filasSegunRol(rol: RolUsuario): FilaQueHace[] {
+  if (rol === 'encargado') {
+    return filasEncargado;
+  } else if (rol === 'departamento') {
+    return filasDepartamento;
+  } else {
+    return filasDocente;
+  }
+}
 
 // enfocarCampoCorreo
 // No recibe nada. No devuelve nada.
