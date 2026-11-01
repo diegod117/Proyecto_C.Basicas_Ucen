@@ -7,6 +7,27 @@
 
 import type { DatosNuevoUsuario, RolUsuario, Usuario } from '../types/Usuario';
 
+// documentoAUsuario
+// Recibe: los datos de un documento de la colección "usuarios" (sin tipo,
+// tal como los entrega Firestore).
+// Devuelve: un Usuario, o null si el documento está mal escrito (por ejemplo
+// con un rol que no existe). "activo" es true salvo que diga false.
+export function documentoAUsuario(datos: Record<string, unknown>): Usuario | null {
+  const rol = datos.rol;
+  if (typeof datos.correo !== 'string' || typeof datos.nombre !== 'string') {
+    return null;
+  }
+  if (typeof rol !== 'string' || !listaRoles.includes(rol as RolUsuario)) {
+    return null;
+  }
+  return {
+    correo: datos.correo.toLowerCase(),
+    nombre: datos.nombre,
+    rol: rol as RolUsuario,
+    activo: datos.activo !== false,
+  };
+}
+
 // Los tres roles, en el orden en que se muestran en las listas
 export const listaRoles: RolUsuario[] = ['encargado', 'docente', 'departamento'];
 

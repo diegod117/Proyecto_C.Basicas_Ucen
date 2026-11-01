@@ -20,6 +20,21 @@ export interface Usuario {
   activo: boolean;
 }
 
+// Resultado de buscar un usuario en Firestore (login y sesión guardada).
+//   - usuario con datos y error '': lo encontró.
+//   - usuario null y error '': no existe en la colección (no está registrado).
+//   - usuario null y error con texto: no se pudo leer (sin internet o sin permiso).
+export interface ResultadoLecturaUsuario {
+  usuario: Usuario | null;
+  error: string;
+}
+
+// Resultado de agregar un usuario desde Configuración (HU-15, CA-15.2)
+export interface ResultadoAltaUsuario {
+  ok: boolean;
+  mensaje: string; // qué pasó, listo para mostrar en pantalla
+}
+
 // Lo que escribe el encargado en el formulario "Agregar usuario" (HU-15).
 // El estado "activo" no se pide: un usuario nuevo siempre entra activo.
 export interface DatosNuevoUsuario {

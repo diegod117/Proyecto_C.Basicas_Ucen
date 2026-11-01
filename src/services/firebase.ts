@@ -14,7 +14,9 @@ import { initializeFirestore } from 'firebase/firestore';
 // (Configuración del proyecto > Tus apps > App web).
 // Estos datos NO son secretos: identifican el proyecto, pero no dan
 // permisos por sí solos. Por eso pueden estar en el repositorio.
-const configuracionFirebase = {
+// Se exporta porque cuentasService crea una SEGUNDA instancia de la app con los
+// mismos datos (para crear cuentas nuevas sin cerrar la sesión del encargado).
+export const configuracionFirebase = {
   apiKey: 'AIzaSyB5oln7cskiEaXV-u3C_NTK_JGiH8fRlJs',
   authDomain: 'ucen-gestiondelaboratorio.firebaseapp.com',
   projectId: 'ucen-gestiondelaboratorio',
