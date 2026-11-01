@@ -43,8 +43,13 @@ function TableroBienvenida(props: PropsTableroBienvenida) {
           clase="tablero-foto-probetas"
         />
 
+        {/* Acento: la frase arriba y, abajo, dónde está el laboratorio y el lema UCEN */}
         <div className="tablero-tile tablero-acento">
-          <p>Reserva por fecha y horario, sin chocar con otro curso.</p>
+          <p className="tablero-acento-frase">Reserva por fecha y horario, sin chocar con otro curso.</p>
+          <div className="tablero-acento-pie">
+            <p className="bienv-nota">Torre B · Salas B206 y B302</p>
+            <p className="bienv-nota">Desde la Central hacia tu futuro</p>
+          </div>
         </div>
 
         <FotoTablero

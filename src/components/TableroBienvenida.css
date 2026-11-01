@@ -55,20 +55,36 @@
   background-color: var(--ucen-superficie);
 }
 
-/* Tile de acento azul con la frase en blanco (9,6:1), arriba a la izquierda */
+/* Tile de acento azul: la frase en blanco (9,6:1) arriba y el pie abajo.
+   flex + space-between empuja el pie al fondo, así el tile no queda
+   con la mitad de abajo vacía. */
 .tablero-acento {
   grid-area: acento;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
   padding: 32px 24px;
   background-color: var(--ucen-azul);
 }
 
-.tablero-acento p {
+/* 24px: en el tile angosto (~230px) la frase queda en 3 o 4 líneas */
+.tablero-acento-frase {
   margin: 0;
-  font-size: var(--bienv-titulo);
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--ucen-papel);
+}
+
+/* Pie del acento en texto claro (6,5:1 sobre el azul) */
+.pagina-bienvenida .tablero-acento-pie .bienv-nota {
+  color: var(--ucen-texto-claro);
+}
+
+.pagina-bienvenida .tablero-acento-pie .bienv-nota + .bienv-nota {
+  margin-top: 4px;
 }
 
 /* Escritorio de 801 a 900px de alto: tiles con menos relleno */
@@ -96,10 +112,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-
-  .tablero-acento p {
-    font-size: 24px;
   }
 }
 
