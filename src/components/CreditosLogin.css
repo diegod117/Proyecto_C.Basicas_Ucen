@@ -1,0 +1,70 @@
+/* CreditosLogin.css
+   Créditos del equipo en la esquina de la página de ingreso.
+   En escritorio quedan abajo del panel azul (esquina inferior izquierda);
+   en el celular, al final de la página. Ver PaginaLogin.css (grid-area).
+   Mismo azul que el panel, para que se vean como una sola pieza.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste) */
+
+/* El <footer> pone el fondo azul y el margen; adentro, la caja con el
+   logo y los textos lado a lado */
+.creditos-login {
+  padding: 24px;
+  background-color: var(--ucen-azul);
+  color: var(--ucen-papel);
+}
+
+.creditos-login-contenido {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* Logo de la carrera, chico, a la izquierda de los nombres */
+.creditos-login-logo {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  height: 40px;
+}
+
+.creditos-login-titulo {
+  margin: 0 0 4px;
+  font-size: var(--login-pequeno);
+  color: var(--ucen-texto-claro);
+}
+
+.creditos-login-nombre {
+  margin: 0;
+  font-size: var(--login-pequeno);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* Carrera, asignatura y profesor (--ucen-texto-claro: 6,51:1 sobre el azul) */
+.creditos-login-nota {
+  margin: 8px 0 0;
+  max-width: 48ch;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ucen-texto-claro);
+}
+
+/* Celular muy angosto: el logo arriba y los nombres debajo */
+@media (max-width: 400px) {
+  .creditos-login-contenido {
+    flex-direction: column;
+  }
+}
+
+/* Escritorio: mismo margen lateral que el panel (56px) y una línea fina
+   que separa los créditos de la frase */
+@media (min-width: 800px) {
+  .creditos-login {
+    padding: 0 56px 32px;
+  }
+
+  .creditos-login-contenido {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+  }
+}
