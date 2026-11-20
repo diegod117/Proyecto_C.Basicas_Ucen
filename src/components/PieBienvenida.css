@@ -1,0 +1,164 @@
+/* PieBienvenida.css
+   Pie de la bienvenida: fondo azul noche, el nombre a todo el ancho,
+   lugares, enlaces, logos, créditos y la última fila.
+   Cubre: RNF-01 (celular) y RNF-11 (blanco 16:1, #c9d6e6 10,9:1 y
+   --ucen-gris 4,93:1 sobre azul noche) */
+
+.pie {
+  margin-top: 160px;
+  padding: 96px 0 40px;
+  background-color: var(--ucen-noche);
+  color: var(--ucen-papel);
+}
+
+/* "LabCentral" llenando el ancho del contenido. Montserrat 600 con -0.05em
+   mide 5,1 veces su letra; se divide el ancho del contenido por 5,5 para
+   dejar margen (también si la ventana tiene barra de scroll).
+   Ancho del contenido = 100vw menos el margen de los dos lados (32px cada
+   uno). line-height 0.8 junta las líneas, pero el texto no se recorta (no
+   hay overflow: hidden). text-align: center reparte el espacio que sobra
+   por igual a los dos lados. */
+.pie-nombre {
+  margin: 0;
+  text-align: center;
+  font-size: calc((100vw - 64px) / 5.5);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  white-space: nowrap;
+  color: var(--ucen-papel);
+}
+
+.pie-fila {
+  margin-top: 72px;
+  row-gap: 48px;
+}
+
+/* Lugares: columnas 1 a 5, uno por línea */
+.pie-lugares {
+  grid-column: 1 / 6;
+}
+
+.pagina-bienvenida .pie-lugares .bienv-titulo {
+  color: var(--ucen-texto-claro);
+}
+
+.pagina-bienvenida .pie-lugares .bienv-titulo + .bienv-titulo {
+  margin-top: 8px;
+}
+
+/* Enlaces: columnas 7 a 12, en tres columnas */
+.pie-enlaces {
+  grid-column: 7 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  font-size: var(--bienv-cuerpo);
+  line-height: 1.5;
+}
+
+.pagina-bienvenida .pie-enlaces-titulo {
+  margin-bottom: 12px;
+  color: var(--ucen-gris);
+}
+
+.pie-enlaces ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pie-enlaces li + li {
+  margin-top: 8px;
+}
+
+.pie-enlaces a,
+.pie-boton-enlace,
+.pie-final a {
+  color: var(--ucen-papel);
+  text-decoration: none;
+}
+
+.pie-enlaces a:hover,
+.pie-boton-enlace:hover,
+.pie-final a:hover {
+  text-decoration: underline;
+}
+
+/* "Ingresar" es un <button> que se ve igual que los enlaces */
+.pie-boton-enlace {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+/* Logos de la facultad y de la carrera, con el lema, centrados */
+.pie-logos {
+  margin-top: 72px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px 40px;
+}
+
+.pie-logos img {
+  display: block;
+  width: auto;
+  height: 56px;
+}
+
+.pagina-bienvenida .pie-lema {
+  color: var(--ucen-texto-claro);
+}
+
+/* Última fila: © a la izquierda y "Volver arriba" a la derecha */
+.pie-final {
+  margin-top: 96px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 24px;
+  font-size: var(--bienv-pequeno);
+  color: var(--ucen-texto-claro);
+}
+
+.pie-final p {
+  margin: 0;
+}
+
+/* Tablet: lugares arriba y enlaces debajo, cada uno a todo el ancho */
+@media (max-width: 1024px) {
+  .pie-lugares,
+  .pie-enlaces {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .pie {
+    margin-top: 96px;
+    padding-top: 72px;
+  }
+
+  /* Misma fórmula que el nombre del tablero en celular (NombreTablero.css),
+     para que los dos sean un solo tamaño de letra */
+  .pie-nombre {
+    font-size: calc((100vw - 48px) / 5.4);
+  }
+
+  .pie-enlaces {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* En celular la última fila se apila: centrada, como los créditos de arriba */
+  .pie-final {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

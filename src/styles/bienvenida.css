@@ -1,0 +1,149 @@
+/* bienvenida.css
+   Estilos COMPARTIDOS por las secciones de la página de bienvenida
+   (PaginaLogin.tsx lo importa una sola vez):
+     - las variables de la escala tipográfica y del margen,
+     - las clases de cada paso de la escala,
+     - el ancho y la grilla de 12 columnas con su "eje",
+     - el contorno de foco con teclado.
+   IMPORTANTE: Vite junta todos los .css en uno solo para toda la app, así que
+   cada regla empieza con .pagina-bienvenida: así no cambia nada de las otras
+   páginas (inventario, reservas...).
+   Cubre: RNF-01 (celular) y RNF-11 (contraste) */
+
+/* ---------- Variables ----------
+   Una página se lee mejor con pocos tamaños de letra. Estos son los únicos
+   que usan las secciones (más el nombre "LabCentral", que va aparte).
+   Se definen en .pagina-bienvenida y los heredan todos sus elementos. */
+.pagina-bienvenida {
+  /* Display: títulos h2 de las secciones y cifras grandes (B206, B302).
+     El mínimo de 32px deja "Todo el laboratorio, ordenado" en 2 líneas a 360px. */
+  --bienv-display: clamp(32px, 4.6vw, 72px);
+  /* Título: títulos de fila y frases destacadas */
+  --bienv-titulo: clamp(24px, 2.4vw, 32px);
+  /* Entrada (lead): frases cortas en tiles angostos */
+  --bienv-lead: 20px;
+  /* Cuerpo: párrafos, enlaces y botones (16px en celular) */
+  --bienv-cuerpo: 17px;
+  /* Pequeño: etiquetas, datos laterales y créditos (nunca menos de 13px) */
+  --bienv-pequeno: 14px;
+  /* Margen de la página: el MISMO a los dos lados en barra, tablero,
+     secciones y pie (32px; 24px en celular) */
+  --bienv-margen: 32px;
+}
+
+/* ---------- Escala tipográfica ---------- */
+
+.pagina-bienvenida .bienv-display {
+  margin: 0;
+  font-size: var(--bienv-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pagina-bienvenida .bienv-titulo {
+  margin: 0;
+  font-size: var(--bienv-titulo);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.pagina-bienvenida .bienv-lead {
+  margin: 0;
+  font-size: var(--bienv-lead);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pagina-bienvenida .bienv-texto {
+  margin: 0;
+  font-size: var(--bienv-cuerpo);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.pagina-bienvenida .bienv-nota {
+  margin: 0;
+  font-size: var(--bienv-pequeno);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* ---------- Ancho, grilla y eje ---------- */
+
+/* Mismo margen a los dos lados (ver --bienv-margen) */
+.pagina-bienvenida .bienv-ancho {
+  padding-left: var(--bienv-margen);
+  padding-right: var(--bienv-margen);
+}
+
+/* Grilla de 12 columnas, como la de un informe impreso */
+.pagina-bienvenida .bienv-grilla {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+/* El "eje": todo lo que empieza en la columna 5 (~35 % del ancho) */
+.pagina-bienvenida .bienv-eje {
+  grid-column: 5 / -1;
+}
+
+/* Separación entre secciones */
+.pagina-bienvenida .bienv-seccion {
+  margin-top: 160px;
+}
+
+/* Cabecera de sección: título (y su párrafo) centrados en la página.
+   Todas las secciones abren igual, así la página se ve ordenada y pareja.
+   grid-column: 1 / -1 la estira a todo el ancho cuando está en una grilla;
+   margin auto la centra cuando no lo está. */
+.pagina-bienvenida .bienv-cabecera {
+  grid-column: 1 / -1;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Párrafo de la cabecera: más angosto que el título para que se lea bien */
+.pagina-bienvenida .bienv-cabecera .bienv-texto {
+  max-width: 60ch;
+  margin: 24px auto 0;
+}
+
+/* ---------- Foco con teclado ----------
+   :focus-visible solo aparece al navegar con Tab (no al hacer clic).
+   Sobre fondos claros: contorno azul por fuera. */
+.pagina-bienvenida a:focus-visible,
+.pagina-bienvenida button:focus-visible {
+  outline: 2px solid var(--ucen-azul);
+  outline-offset: 2px;
+}
+
+/* Sobre fondos oscuros (azul noche): contorno blanco */
+.pagina-bienvenida .bienv-oscuro a:focus-visible,
+.pagina-bienvenida .bienv-oscuro button:focus-visible {
+  outline-color: var(--ucen-papel);
+}
+
+/* Celular: el eje se junta con el margen izquierdo (todo a lo ancho) */
+@media (max-width: 700px) {
+  .pagina-bienvenida {
+    --bienv-cuerpo: 16px;
+    --bienv-margen: 24px;
+  }
+
+  .pagina-bienvenida .bienv-grilla {
+    column-gap: 16px;
+  }
+
+  .pagina-bienvenida .bienv-eje {
+    grid-column: 1 / -1;
+  }
+
+  .pagina-bienvenida .bienv-seccion {
+    margin-top: 96px;
+  }
+}

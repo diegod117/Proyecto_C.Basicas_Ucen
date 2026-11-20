@@ -1,0 +1,101 @@
+/* NombreTablero.css
+   Tile del nombre "LabCentral" en el tablero de bienvenida.
+   Las cuatro disposiciones del tablero están explicadas en
+   TableroBienvenida.css; aquí solo va el tamaño del nombre en cada una.
+   "LabCentral" en Montserrat 600 con -0.04em mide 5,2 veces su tamaño de
+   letra: cada tamaño está calculado para que quepa en su tile (medidas en
+   la bitácora J42).
+   El relleno de los lados es --bienv-margen menos los 8px del borde del
+   tablero: así el texto queda alineado con el de las secciones y el pie.
+   Cubre: RNF-01 (celular, sin scroll horizontal) y RNF-11 (contraste) */
+
+.tablero-nombre {
+  grid-area: nombre;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px 24px;
+  background-color: var(--ucen-papel);
+}
+
+/* align-self: flex-start evita que el flex estire el logo a todo el ancho
+   (si se estira, el dibujo del SVG queda centrado y no a la izquierda) */
+.tablero-logo {
+  display: block;
+  align-self: flex-start;
+  width: auto;
+  height: 48px;
+}
+
+/* 1) Escritorio: paso "Nombre" */
+.tablero-titulo {
+  margin: 0;
+  font-size: clamp(64px, 7.6vw, 124px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--ucen-tinta); /* global.css pinta los h1 de azul: aquí no */
+  white-space: nowrap;
+}
+
+/* Frase bajo el nombre: paso "Título" */
+.tablero-frase {
+  margin: 24px 0 0;
+  font-size: var(--bienv-titulo);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--ucen-tinta);
+}
+
+/* Escritorio de 801 a 900px de alto: menos relleno y el nombre limitado
+   también por el alto (11vh), para que el formulario quepa */
+@media (min-width: 1025px) and (max-height: 900px) {
+  .tablero-nombre {
+    padding: 24px;
+  }
+
+  .tablero-titulo {
+    font-size: min(7.6vw, 11vh);
+  }
+}
+
+/* 2) Escritorio bajo: la columna "nombre" mide la mitad del tablero,
+   (100vw - 32px) / 2. Menos 48px de relleno quedan 50vw - 64px de espacio;
+   dividir por 5,4 (el nombre mide 5,2 veces su letra) deja un poco de
+   margen. 11vh lo limita también por el alto. */
+@media (min-width: 1025px) and (max-height: 800px) {
+  .tablero-titulo {
+    font-size: min(calc((50vw - 64px) / 5.4), 11vh);
+  }
+
+  .tablero-frase {
+    margin-top: 16px;
+    font-size: 24px;
+  }
+}
+
+/* 3) Tablet: el tile mide la mitad del ancho; 7vw cabe desde 701px */
+@media (max-width: 1024px) {
+  .tablero-nombre {
+    padding: 24px;
+  }
+
+  .tablero-titulo {
+    font-size: 7vw;
+  }
+}
+
+/* 4) Celular: el nombre llena el ancho. 48px = 2 × 8 de borde + 2 × 16 de
+   relleno; dividir por 5,4 deja margen. En 360px queda en 58px y en 390px
+   en 63px (el nombre del pie usa la MISMA fórmula, así es un solo tamaño). */
+@media (max-width: 700px) {
+  .tablero-nombre {
+    padding: 24px 16px;
+  }
+
+  .tablero-titulo {
+    font-size: calc((100vw - 48px) / 5.4);
+  }
+}

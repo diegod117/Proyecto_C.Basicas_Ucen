@@ -1,0 +1,159 @@
+/* TableroBienvenida.css
+   Primera pantalla: tablero de tiles que llena la pantalla.
+   8px de margen exterior y 8px entre tiles; un solo radio (--ucen-radio).
+   Cuatro disposiciones (medidas en la bitácora J42):
+     1) Escritorio (más de 1024px de ancho): grilla 2×2; abajo a la derecha
+        van el ingreso (60 %) y el acento (40 %).
+     2) Escritorio bajo (más de 1024px de ancho y 800px de alto o menos):
+        el ingreso ocupa las dos filas de la columna del medio, para que el
+        formulario completo quepa sin scroll en 1280×720.
+     3) Tablet (701 a 1024px): nombre y foto arriba, ingreso + acento al
+        medio y la foto de hornos abajo, a todo el ancho.
+     4) Celular (hasta 700px): una sola columna.
+   El tile del nombre está en NombreTablero.css y las fotos en FotoTablero.css.
+   Relleno de los lados de los tiles = --bienv-margen menos los 8px del borde
+   (24px; 16px en celular): el texto queda alineado con las secciones.
+   Cubre: RNF-01 (celular, sin scroll horizontal) y RNF-11 (contraste) */
+
+.tablero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100svh;
+  padding: 8px;
+  background-color: var(--ucen-papel);
+}
+
+/* ---------- 1) Escritorio ----------
+   grid-template-areas "dibuja" la grilla con nombres: cada palabra es una
+   celda y cada tile dice en qué área va (grid-area). Las columnas 5fr 3fr 2fr
+   dejan la izquierda en la mitad y parten la derecha en 60/40.
+   La fila de abajo mide lo que pide el formulario (auto) y la de arriba se
+   queda con el resto (minmax(0, 1fr)). */
+.tablero-grilla {
+  flex: 1 1 auto;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 5fr 3fr 2fr;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'nombre probetas probetas'
+    'hornos ingreso acento';
+}
+
+/* Todos los tiles: rectángulo relleno, sin borde, texto nunca centrado.
+   min-width: 0 deja que el tile se achique aunque su contenido sea ancho. */
+.tablero-tile {
+  min-width: 0;
+  border-radius: var(--ucen-radio);
+}
+
+/* Tile de ingreso: un paso de tono para que se distinga del fondo blanco */
+.tablero-ingreso {
+  grid-area: ingreso;
+  padding: 32px 24px;
+  background-color: var(--ucen-superficie);
+}
+
+/* Tile de acento azul: la frase en blanco (9,6:1) arriba y el pie abajo.
+   flex + space-between empuja el pie al fondo, así el tile no queda
+   con la mitad de abajo vacía. */
+.tablero-acento {
+  grid-area: acento;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px 24px;
+  background-color: var(--ucen-azul);
+}
+
+/* 24px: en el tile angosto (~230px) la frase queda en 3 o 4 líneas */
+.tablero-acento-frase {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--ucen-papel);
+}
+
+/* Pie del acento en texto claro (6,5:1 sobre el azul) */
+.pagina-bienvenida .tablero-acento-pie .bienv-nota {
+  color: var(--ucen-texto-claro);
+}
+
+.pagina-bienvenida .tablero-acento-pie .bienv-nota + .bienv-nota {
+  margin-top: 4px;
+}
+
+/* Escritorio de 801 a 900px de alto: tiles con menos relleno */
+@media (min-width: 1025px) and (max-height: 900px) {
+  .tablero-ingreso,
+  .tablero-acento {
+    padding: 24px;
+  }
+}
+
+/* ---------- 2) Escritorio bajo ----------
+   SOLO con más de 1024px de ancho y 800px de alto o menos (ej: 1280×720,
+   1366×768). Con 1024px o menos mandan las reglas de tablet y celular
+   aunque la pantalla sea baja (iPad o celular horizontal).
+   El ingreso ocupa las dos filas de la columna del medio. */
+@media (min-width: 1025px) and (max-height: 800px) {
+  .tablero-grilla {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'nombre ingreso probetas'
+      'hornos ingreso acento';
+  }
+
+  .tablero-ingreso {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* ---------- 3) Tablet ----------
+   10 columnas para poder partir cada fila distinto: arriba 5 + 5 (mitad y
+   mitad), al medio 6 + 4 (ingreso 60 %, acento 40 %), abajo la foto entera. */
+@media (max-width: 1024px) {
+  .tablero-grilla {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-rows: minmax(300px, auto) auto minmax(240px, 40svh);
+    grid-template-areas:
+      'nombre nombre nombre nombre nombre probetas probetas probetas probetas probetas'
+      'ingreso ingreso ingreso ingreso ingreso ingreso acento acento acento acento'
+      'hornos hornos hornos hornos hornos hornos hornos hornos hornos hornos';
+  }
+
+  .tablero-ingreso,
+  .tablero-acento {
+    padding: 24px;
+  }
+}
+
+/* ---------- 4) Celular ---------- */
+@media (max-width: 700px) {
+  .tablero {
+    gap: 6px;
+  }
+
+  .tablero-grilla {
+    gap: 6px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      'nombre'
+      'ingreso'
+      'probetas'
+      'acento'
+      'hornos';
+  }
+
+  .tablero-ingreso,
+  .tablero-acento {
+    padding: 24px 16px;
+  }
+}

@@ -1,0 +1,129 @@
+/* BarraBienvenida.css
+   Fila de tiles de 60px de alto arriba de la bienvenida.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste) */
+
+.barra-bienvenida {
+  display: flex;
+  gap: 8px;
+  height: 60px;
+}
+
+/* Los tres tiles: rectángulos rellenos con el radio único de la página */
+.barra-marca,
+.barra-enlaces,
+.barra-ingresar {
+  border-radius: var(--ucen-radio);
+}
+
+/* Tile cuadrado azul con el círculo UCEN blanco al centro */
+.barra-marca {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ucen-azul);
+}
+
+.barra-marca img {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
+/* Tile ancho claro con los 4 enlaces */
+.barra-enlaces {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 24px;
+  background-color: var(--ucen-superficie);
+}
+
+.barra-enlaces a {
+  color: var(--ucen-tinta);
+  font-size: var(--bienv-cuerpo);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.barra-enlaces a:hover {
+  text-decoration: underline;
+}
+
+/* Tile oscuro "Ingresar": es un botón, con el texto a la izquierda */
+.barra-ingresar {
+  flex: 0 0 auto;
+  padding: 0 32px 0 24px;
+  border: none;
+  background-color: var(--ucen-noche);
+  color: var(--ucen-papel);
+  font-family: inherit;
+  font-size: var(--bienv-cuerpo);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.barra-ingresar:hover {
+  background-color: var(--ucen-azul);
+}
+
+/* Foco con teclado en los tiles oscuros: contorno BLANCO hacia adentro,
+   porque un contorno azul no se vería sobre el azul del tile.
+   Empieza con .pagina-bienvenida para ganarle a la regla general de foco
+   de bienvenida.css (que pone el contorno azul por fuera). */
+.pagina-bienvenida .barra-marca:focus-visible,
+.pagina-bienvenida .barra-ingresar:focus-visible {
+  outline: 2px solid var(--ucen-papel);
+  outline-offset: -6px;
+}
+
+.barra-enlaces a:focus-visible {
+  outline: 2px solid var(--ucen-azul);
+  outline-offset: 2px;
+}
+
+/* Pantallas anchas: los enlaces empiezan en el eje de la página, que en la
+   primera pantalla es el centro (50vw). 76px = 8 de margen + 60 de la marca
+   + 8 de separación, que es donde empieza este tile. Desde 1440px sobra
+   espacio para los 4 enlaces (medido en la bitácora J42); más angosto,
+   empiezan pegados al borde del tile. */
+@media (min-width: 1440px) {
+  .barra-enlaces {
+    padding-left: calc(50vw - 76px);
+  }
+}
+
+/* Celular y tablet angosta: no caben los 4 enlaces; quedan en el pie.
+   El tile "Ingresar" ocupa el espacio que sobra. */
+@media (max-width: 860px) {
+  .barra-enlaces {
+    display: none;
+  }
+
+  .barra-ingresar {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .barra-bienvenida {
+    gap: 6px;
+  }
+}
+
+/* Respuesta al presionar (solo si la persona acepta movimiento) */
+@media (prefers-reduced-motion: no-preference) {
+  .barra-ingresar,
+  .barra-marca {
+    transition: transform 150ms ease, background-color 150ms ease;
+  }
+
+  .barra-ingresar:active,
+  .barra-marca:active {
+    transform: scale(0.98);
+  }
+}

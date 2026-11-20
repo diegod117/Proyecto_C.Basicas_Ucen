@@ -1,0 +1,107 @@
+/* SeccionLaboratorios.css
+   Página de color a todo el ancho (azul noche) con un mosaico de fotos y
+   bloques planos, como un informe impreso a dos tintas.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste: blanco 16:1 y #c9d6e6 10,9:1) */
+
+.laboratorios {
+  padding: 160px 0;
+  background-color: var(--ucen-noche);
+  color: var(--ucen-papel);
+}
+
+.pagina-bienvenida .laboratorios-parrafo {
+  color: var(--ucen-texto-claro);
+}
+
+/* Mosaico sin separación (gap 0). El radio va solo en el contenedor y
+   overflow: hidden recorta las esquinas de las celdas de los bordes. */
+.laboratorios-mosaico {
+  grid-column: 1 / -1;
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  height: 70svh;
+  min-height: 480px;
+  border-radius: var(--ucen-radio);
+  overflow: hidden;
+}
+
+/* Cada celda pone su texto abajo a la izquierda */
+.mosaico-celda {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+}
+
+.mosaico-azul {
+  background-color: var(--ucen-azul);
+  color: var(--ucen-papel);
+}
+
+.mosaico-claro {
+  background-color: var(--ucen-papel);
+  color: var(--ucen-tinta);
+}
+
+.pagina-bienvenida .mosaico-lista {
+  margin-top: 12px;
+  color: var(--ucen-texto-claro);
+}
+
+/* Fotos: llenan la celda sin estirarla (position: absolute) */
+.mosaico-foto {
+  padding: 0;
+  background-color: var(--ucen-superficie);
+}
+
+.mosaico-foto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+}
+
+/* La foto de hornos ya está en el tablero: aquí se muestra su lado derecho */
+.mosaico-foto .mosaico-hornos {
+  object-position: right;
+}
+
+/* Tablet: 2 columnas (con 3, "categorías" no cabe a 768px) */
+@media (max-width: 1024px) {
+  .laboratorios-mosaico {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    height: auto;
+    min-height: 0;
+  }
+
+  .mosaico-celda {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Celular: B302 y "13 categorías" ocupan las dos columnas, porque en media
+   columna (156px a 360px) la palabra "categorías" no cabe */
+@media (max-width: 700px) {
+  .laboratorios {
+    padding: 96px 0;
+  }
+
+  .mosaico-celda {
+    aspect-ratio: 1 / 1;
+    padding: 16px;
+  }
+
+  .mosaico-ancho-celular {
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    min-height: 160px;
+    padding: 24px;
+  }
+}
