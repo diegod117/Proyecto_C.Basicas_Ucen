@@ -5,13 +5,26 @@
    --ucen-azul (6,51:1), los dos cumplen RNF-11.
    Cubre: RNF-01 (celular) y RNF-11 (contraste) */
 
-/* CELULAR: panel corto, con el logo arriba y la frase debajo */
+/* CELULAR: panel corto, con el logo arriba y la frase debajo.
+   Fondo (como en MiUcen): la foto del edificio de la UCEN con un "fade"
+   azul encima. background acepta varias capas separadas por coma; la
+   PRIMERA queda arriba:
+     1) un degradado del azul UCEN, medio transparente arriba (se ve la
+        foto) y casi sólido abajo (ahí van los textos y se une con el azul
+        de los créditos),
+     2) la foto, que cubre todo el panel (cover) sin deformarse.
+   background-color queda de respaldo si la foto no carga. */
 .panel-marca {
   display: flex;
   flex-direction: column;
   gap: 32px;
   padding: 32px 24px;
   background-color: var(--ucen-azul);
+  background-image:
+    linear-gradient(to bottom, rgba(0, 70, 128, 0.55) 0%, rgba(0, 70, 128, 0.85) 45%, rgba(0, 70, 128, 1) 100%),
+    url('/bienvenida/edificio-ucen.jpg');
+  background-size: cover;
+  background-position: center;
   color: var(--ucen-papel);
 }
 
