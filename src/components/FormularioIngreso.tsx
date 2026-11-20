@@ -1,10 +1,10 @@
 // FormularioIngreso.tsx
-// Formulario para iniciar sesión con correo y contraseña. Va dentro del
-// tile de ingreso de la página de bienvenida (TableroBienvenida).
+// Formulario para iniciar sesión con correo y contraseña. Va en la columna
+// blanca de la página de ingreso (PaginaLogin).
 // Desde aquí también se puede pedir un correo para recuperar la contraseña:
-// en ese caso el mismo tile muestra FormularioRecuperarContrasena.
+// en ese caso, en el mismo lugar se muestra FormularioRecuperarContrasena.
 // La lógica es la MISMA que tenía PaginaLogin.tsx antes de J42; solo se
-// movió a este componente para que la página pudiera crecer con secciones.
+// movió a este componente (J42) y en J43 se mantuvo sin cambios.
 // Cubre: inicio de sesión con roles (sección 3.4 de requerimientos),
 //        HU-15 (mensaje de cuenta desactivada o no registrada)
 
@@ -38,7 +38,7 @@ function FormularioIngreso(props: PropsFormularioIngreso) {
   const [esperandoRespuesta, setEsperandoRespuesta] = useState(false);
 
   // true cuando la persona hizo clic en "¿Olvidaste tu contraseña?".
-  // En ese caso el tile muestra el formulario de recuperación.
+  // En ese caso se muestra el formulario de recuperación en su lugar.
   const [mostrarRecuperacion, setMostrarRecuperacion] = useState(false);
 
   // manejarEnvio
@@ -83,7 +83,7 @@ function FormularioIngreso(props: PropsFormularioIngreso) {
   }
 
   // Si eligió recuperar la contraseña, mostramos ese formulario en el
-  // mismo tile. Le pasamos el correo que ya escribió y una función
+  // mismo lugar. Le pasamos el correo que ya escribió y una función
   // para volver al login.
   if (mostrarRecuperacion) {
     return (

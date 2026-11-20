@@ -1,0 +1,70 @@
+/* PanelMarcaLogin.css
+   Panel azul UCEN de la página de ingreso, con el logo blanco y la frase.
+   Dónde va en la pantalla lo decide PaginaLogin.css (grid-area: marca).
+   Colores: blanco sobre --ucen-azul (10:1) y --ucen-texto-claro sobre
+   --ucen-azul (6,51:1), los dos cumplen RNF-11.
+   Cubre: RNF-01 (celular) y RNF-11 (contraste) */
+
+/* CELULAR: panel corto, con el logo arriba y la frase debajo */
+.panel-marca {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px 24px;
+  background-color: var(--ucen-azul);
+  color: var(--ucen-papel);
+}
+
+/* align-self: flex-start deja el logo a la izquierda; sin esto, el flex
+   en columna lo estira a todo el ancho y el dibujo queda centrado */
+.panel-marca-logo {
+  display: block;
+  align-self: flex-start;
+  width: auto;
+  height: 48px;
+}
+
+.panel-marca-frase {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.panel-marca-subtitulo {
+  margin: 12px 0 0;
+  max-width: 34ch;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ucen-texto-claro);
+}
+
+/* ESCRITORIO Y TABLET: el panel ocupa casi toda la altura. El logo queda
+   arriba y la frase al centro (justify-content: space-between empuja el
+   logo hacia arriba y los textos hacia el medio-abajo). */
+@media (min-width: 800px) {
+  .panel-marca {
+    justify-content: space-between;
+    padding: 48px 56px 40px;
+  }
+
+  .panel-marca-logo {
+    height: 60px;
+  }
+
+  .panel-marca-textos {
+    margin-bottom: 8vh;
+  }
+
+  /* clamp(mínimo, ideal, máximo): crece con el ancho de la pantalla */
+  .panel-marca-frase {
+    max-width: 14ch;
+    font-size: clamp(36px, 4vw, 56px);
+  }
+
+  .panel-marca-subtitulo {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+}

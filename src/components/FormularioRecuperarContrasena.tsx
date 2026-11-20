@@ -1,7 +1,7 @@
 // FormularioRecuperarContrasena.tsx
 // Formulario de "¿Olvidaste tu contraseña?": pide el correo y Firebase
 // envía un enlace para crear una contraseña nueva.
-// Se muestra dentro del tile de ingreso de la bienvenida, en lugar del
+// Se muestra en la página de ingreso, en el mismo lugar del
 // formulario normal. Usa las mismas clases login-* de FormularioIngreso.css
 // para que se vea igual (J42: su título pasó de h1 a h2, porque el único
 // h1 de la página es "LabCentral").

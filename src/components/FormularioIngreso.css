@@ -1,9 +1,9 @@
 /* FormularioIngreso.css
    Estilos del formulario de ingreso y del de recuperar contraseña
    (FormularioRecuperarContrasena usa estas mismas clases login-*).
-   Van dentro del tile de ingreso de la bienvenida, que pone el fondo
-   (--ucen-superficie) y el padding. Aquí no hay sombras ni degradados.
-   Los tamaños de letra salen de las variables de styles/bienvenida.css.
+   Van en la columna blanca de la página de ingreso (PaginaLogin).
+   Aquí no hay sombras ni degradados.
+   Los tamaños de letra salen de las variables de PaginaLogin.css.
    Cubre: inicio de sesión (sección 3.4), RNF-01 (celular) y RNF-11 (contraste) */
 
 /* El formulario apila sus partes en una columna */
@@ -12,10 +12,10 @@
   flex-direction: column;
 }
 
-/* Título del formulario: paso "Título" de la escala de la bienvenida */
+/* Título del formulario ("Ingresa a tu cuenta") */
 .login-titulo {
   margin: 0 0 20px;
-  font-size: var(--bienv-titulo);
+  font-size: var(--login-titulo);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.15;
@@ -25,7 +25,7 @@
 /* Texto bajo el título del formulario de recuperación */
 .login-subtitulo {
   margin: -8px 0 20px;
-  font-size: var(--bienv-cuerpo);
+  font-size: var(--login-cuerpo);
   line-height: 1.5;
   color: var(--ucen-tinta);
 }
@@ -34,7 +34,7 @@
 .login-etiqueta {
   display: block;
   margin-bottom: 6px;
-  font-size: var(--bienv-pequeno);
+  font-size: var(--login-pequeno);
   font-weight: 600;
   line-height: 1.4;
   color: var(--ucen-tinta);
@@ -57,7 +57,7 @@
   font-size: 16px;
 }
 
-/* Foco: contorno de 2px azul UCEN (se ve sobre el fondo claro del tile) */
+/* Foco: contorno de 2px azul UCEN (se ve sobre el fondo blanco) */
 .login-input:focus {
   outline: 2px solid var(--ucen-azul);
   outline-offset: 1px;
@@ -70,7 +70,7 @@
   border-radius: var(--ucen-radio);
   background-color: #fef2f2;
   color: var(--color-danado);
-  font-size: var(--bienv-cuerpo);
+  font-size: var(--login-cuerpo);
   line-height: 1.4;
 }
 
@@ -83,7 +83,7 @@
   background-color: var(--ucen-azul);
   color: var(--ucen-papel);
   font-family: inherit;
-  font-size: var(--bienv-cuerpo);
+  font-size: var(--login-cuerpo);
   font-weight: 600;
   cursor: pointer;
 }
@@ -108,7 +108,7 @@
   background: none;
   color: var(--ucen-azul);
   font-family: inherit;
-  font-size: var(--bienv-cuerpo);
+  font-size: var(--login-cuerpo);
   font-weight: 500;
   line-height: 1.4;
   text-align: left;
@@ -122,7 +122,7 @@
 /* "¿No tienes cuenta?...": tamaño pequeño en tinta completa */
 .login-nota {
   margin: 4px 0 0;
-  font-size: var(--bienv-pequeno);
+  font-size: var(--login-pequeno);
   line-height: 1.4;
   color: var(--ucen-tinta);
 }
@@ -144,13 +144,5 @@
   .login-boton:active:not(:disabled),
   .login-enlace:active {
     transform: scale(0.98);
-  }
-}
-
-/* Escritorio bajo (ver TableroBienvenida.css): el título baja a 24px para
-   que el formulario completo quepa sin scroll en 1280×720. */
-@media (min-width: 1025px) and (max-height: 800px) {
-  .login-titulo {
-    font-size: 24px;
   }
 }
